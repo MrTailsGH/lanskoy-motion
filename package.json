@@ -1,0 +1,25 @@
+{
+  "name": "lanskoy-motion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ролики-инфографика для канала Ланского. Рендерится в облаке GitHub Actions.",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render Skidka20 out/skidka20.mp4",
+    "render4k": "remotion render Skidka20 out/skidka20_4k.mp4 --scale=2",
+    "still": "remotion still Skidka20 out/frame.png --frame=500",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/bundler": "^4.0.0",
+    "@remotion/renderer": "^4.0.0",
+    "remotion": "^4.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}

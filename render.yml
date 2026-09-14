@@ -1,0 +1,115 @@
+name: Рендер ролика
+
+# Запускается вручную кнопкой Run workflow, либо автоматически при изменении сцен.
+on:
+  workflow_dispatch:
+    inputs:
+      composition:
+        description: 'ID композиции (см. src/Root.tsx)'
+        required: true
+        default: 'Skidka20'
+      quality:
+        description: 'Качество'
+        required: true
+        default: '1080x1920'
+        type: choice
+        options:
+          - 1080x1920
+          - 2160x3840
+      publish:
+        description: 'Положить результат в ветку renders (нужно для автоматического забора)'
+        required: true
+        default: true
+        type: boolean
+  push:
+    paths:
+      - '**.tsx'
+      - '**.ts'
+      - 'package.json'
+
+concurrency:
+  group: render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write          # чтобы запушить готовый MP4 в ветку renders
+
+    steps:
+      - name: Забрать репозиторий
+        uses: actions/checkout@v4
+
+      - name: Поставить Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Системные библиотеки для headless-браузера
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+            libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+            libgbm1 libasound2t64 libpango-1.0-0 libcairo2 fonts-liberation \
+            || sudo apt-get install -y -qq libasound2
+
+      - name: Установить зависимости
+        run: npm ci || npm install
+
+      - name: Проверить типы
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      - name: Определить параметры рендера
+        id: cfg
+        run: |
+          COMP="${{ github.event.inputs.composition || 'Skidka20' }}"
+          Q="${{ github.event.inputs.quality || '1080x1920' }}"
+          if [ "$Q" = "2160x3840" ]; then SCALE=2; SUFFIX="_4k"; else SCALE=1; SUFFIX=""; fi
+          echo "comp=$COMP"     >> $GITHUB_OUTPUT
+          echo "scale=$SCALE"   >> $GITHUB_OUTPUT
+          echo "name=${COMP}${SUFFIX}_$(date +%Y%m%d-%H%M).mp4" >> $GITHUB_OUTPUT
+
+      - name: Рендер
+        run: |
+          mkdir -p out
+          npx remotion render "${{ steps.cfg.outputs.comp }}" \
+            "out/${{ steps.cfg.outputs.name }}" \
+            --scale=${{ steps.cfg.outputs.scale }} \
+            --concurrency=4 \
+            --log=info
+
+      - name: Показать результат в логе
+        run: ls -lh out/ && du -h out/*
+
+      - name: Выгрузить артефактом
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.cfg.outputs.comp }}-video
+          path: out/*.mp4
+          retention-days: 30
+          compression-level: 0
+
+      # Публикация в отдельную ветку: так готовый файл можно забрать
+      # обычным git clone, без токенов и без ручного скачивания.
+      - name: Положить в ветку renders
+        if: ${{ github.event.inputs.publish != 'false' }}
+        run: |
+          git config user.name  "render-bot"
+          git config user.email "render-bot@users.noreply.github.com"
+          git fetch origin renders --depth=1 || true
+          if git show-ref --quiet refs/remotes/origin/renders; then
+            git checkout -B renders origin/renders
+          else
+            git checkout --orphan renders
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+          mkdir -p videos
+          cp out/*.mp4 videos/
+          git add videos
+          git commit -m "render: ${{ steps.cfg.outputs.name }}" || echo "нечего коммитить"
+          git push origin renders
