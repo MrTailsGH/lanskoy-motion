@@ -1,7 +1,7 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame, continueRender, delayRender } from 'remotion';
 import { COLOR, FONT, LAYOUT, TYPE, BEAT } from './theme';
-import { seg, s } from './anim';
+import { seg, s, FPS } from './anim';
 
 /* ───────────────────────────────────────────────────────────
    ШРИФТ. Golos Text тянется с Google Fonts прямо на раннере —
@@ -129,8 +129,8 @@ export const Caption: React.FC<{ cues: Cue[]; color?: string }> = ({
       {words.map((w, i) => {
         const p = seg(
           frame,
-          active!.at + (i * BEAT.wordStagger) / 24,
-          BEAT.wordIn / 24
+          active!.at + (i * BEAT.wordStagger) / FPS,
+          BEAT.wordIn / FPS
         );
         return (
           <span

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { COLOR } from './theme';
-import { seg, between, ru, pct, BACK, SMOOTH } from './anim';
+import { seg, between, s, ru, pct, BACK, SMOOTH } from './anim';
 import {
   useFonts, Backdrop, Flash, Footer, Caption, Cue,
   Card, Pills, Hero, Bars, WhiteCard, CTA,
@@ -58,7 +58,7 @@ export const Skidka20: React.FC = () => {
   const discount = seg(frame, 13.0, 1.2, SMOOTH);
   const price = BASE_PRICE - 200 * discount;
   const profit = price - COST;
-  const afterDiscount = frame >= 13 * 24;
+  const afterDiscount = frame >= s(13);
 
   /* ── карточка ── */
   const cardOn = between(frame, 4.2, 24.2);
@@ -70,7 +70,7 @@ export const Skidka20: React.FC = () => {
   const c3 = seg(frame, 8.4, 0.8);
 
   const margin = (profit / price) * 100;
-  const barOn = frame >= 9.8 * 24;
+  const barOn = frame >= s(9.8);
   const shownMargin = afterDiscount ? margin : 30 * seg(frame, 9.8, 0.8);
 
   /* ── крупное число ── */
@@ -82,7 +82,7 @@ export const Skidka20: React.FC = () => {
   const g1 = seg(frame, 28.2, 0.7);
   const g2 = seg(frame, 30.2, 0.9);
 
-  const ctaOn = frame >= 34.8 * 24;
+  const ctaOn = frame >= s(34.8);
   const ctaP = seg(frame, 34.8, 0.5, BACK);
 
   return (
@@ -111,10 +111,10 @@ export const Skidka20: React.FC = () => {
               opacity: seg(frame, 6.2, 0.35),
             },
             {
-              label: frame >= 17 * 24 ? 'прибыль стала' : 'прибыль с продажи',
+              label: frame >= s(17) ? 'прибыль стала' : 'прибыль с продажи',
               value: ru(afterDiscount ? profit : 300 * c3),
               unit: '₽',
-              tone: frame >= 17 * 24 && profit < 150 ? 'red' : 'green',
+              tone: frame >= s(17) && profit < 150 ? 'red' : 'green',
               dot: 'green',
               opacity: seg(frame, 8.4, 0.35),
             },
@@ -137,7 +137,7 @@ export const Skidka20: React.FC = () => {
         <Pills
           top={470}
           items={['дать скидку 20%', 'держать цену']}
-          activeIndex={frame >= 12.6 * 24 ? 0 : null}
+          activeIndex={frame >= s(12.6) ? 0 : null}
           opacity={seg(frame, 11.0, 0.3) * (1 - seg(frame, 18.9, 0.3))}
         />
       ) : null}

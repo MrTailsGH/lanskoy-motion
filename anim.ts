@@ -5,7 +5,7 @@ import { interpolate, Easing } from 'remotion';
  * вся математика движения живёт здесь, а не размазана по компонентам.
  */
 
-export const FPS = 24;
+export const FPS = 30;
 
 /** Секунды → кадры. Сценарий пишем в секундах, Remotion считает в кадрах. */
 export const s = (seconds: number) => Math.round(seconds * FPS);
