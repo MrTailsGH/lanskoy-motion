@@ -144,8 +144,10 @@ const i1items=[];
   w.appendChild(d);w.appendChild(l);in1.appendChild(w);i1items.push({w,d,l});
 });
 in1.insertBefore(i1r,in1.firstChild);in1.insertBefore(i1a,in1.firstChild);
+/* Подпись «до последнего рубля · нормы 2026 года» снята: блок обещания
+   длится около двух секунд, на неё физически не остаётся времени. */
 const i1s=E_('med',{position:'relative',font:'30px "Golos Text Medium"',color:C.dim2,
-  marginTop:'28px',letterSpacing:'.04em'},'до последнего рубля · нормы 2026 года');
+  marginTop:'28px',letterSpacing:'.04em',display:'none'},'до последнего рубля · нормы 2026 года');
 in1.appendChild(i1s);
 
 /* ═══ КАРТОЧКА РАСЧЁТА ═══════════════════════════════════════════ */
@@ -174,7 +176,11 @@ const subVal=E_('blk tnum',{right:0,top:'16px',font:'56px "Golos Text Black"',co
 subW.appendChild(subLab);subW.appendChild(subVal);card.appendChild(subW);
 /* четвёртая строка — рабочее место — после подытога */
 const R4=row(122);
-const wp=E_('',{position:'relative',height:'58px',marginTop:'2px'});
+/* Разбивка рабочего места (аренда · техника · софт) снята: блок про него
+   длится 2,4 с, из них сама разбивка успевала побыть меньше секунды.
+   Три колонки мелкого текста за это время не читаются. Цифры перенести
+   в пост Телеграма, там их можно рассмотреть. */
+const wp=E_('',{position:'relative',height:'58px',marginTop:'2px',display:'none'});
 [['АРЕНДА','7 400'],['ТЕХНИКА','5 000'],['СОФТ И СВЯЗЬ','2 000']].forEach((pair,i)=>{
   const c=E_('',{left:px(i*231),top:0,width:'220px'});
   const k=E_('med',{left:0,top:0,font:'21px "Golos Text Medium"',color:C.dim2,
@@ -240,8 +246,12 @@ const mspH=E_('med',{position:'relative',font:'29px "Golos Text Medium"',letterS
 const mspT=E_('blk',{position:'relative',font:'64px "Golos Text Black"',color:C.ink,
   marginTop:'18px',lineHeight:'1.12'},'три условия<br>сразу');
 const mspItems=[];
+/* Три условия списком сняты: блок длится 2,3 с, а на карточке с ними
+   пятнадцать слов. Остаются заголовок и «три условия сразу» — ровно то,
+   что успевает прочитаться, и ровно то, что говорит диктор: проверьте.
+   Сами условия — в посте Телеграма. */
 ['в реестре МСП','ОКВЭД из перечня','≥ 70% дохода по нему'].forEach(s=>{
-  const w=E_('',{position:'relative',height:'76px',marginTop:'18px'});
+  const w=E_('',{position:'relative',height:'76px',marginTop:'18px',display:'none'});
   const d=E_('',{left:0,top:'22px',width:'12px',height:'12px',borderRadius:'6px',background:C.green});
   const x=E_('med',{left:'32px',top:'4px',font:'40px "Golos Text Medium"',color:C.ink},s);
   w.appendChild(d);w.appendChild(x);msp.appendChild(w);mspItems.push(w);
@@ -270,7 +280,9 @@ const flash=E_('',{left:0,top:0,width:'1080px',height:'1920px',background:'#FFFF
 const fTxt=E_('',{left:px(X0),top:'760px',width:px(CW)});
 const fT1=E_('blk',{position:'relative',font:'84px "Golos Text Black"',color:'#0A0D0C',lineHeight:'1.06'},
   'но это<br>не вся цена');
-const fT2=E_('med',{position:'relative',font:'34px "Golos Text Medium"',color:'#5B6663',marginTop:'26px',lineHeight:'1.35'},
+/* Вторая строка вспышки снята: блок длится 1,1 с, за это время читается
+   только крупная строка — она же то, что говорит диктор. */
+const fT2=E_('med',{position:'relative',font:'34px "Golos Text Medium"',color:'#5B6663',marginTop:'26px',lineHeight:'1.35',display:'none'},
   'вы платите за месяц,<br>а работает он меньше');
 fTxt.appendChild(fT1);fTxt.appendChild(fT2);
 
@@ -372,10 +384,9 @@ window.seek=function(tt){
     const p=seg(tt,A1,0.45,E.back);
     show(in1, seg(tt,A1,0.3,E.io)*(1-seg(tt,A1_OUT,0.32,E.io)), lerp(22,0,p));
     i1items.forEach((it,i)=>{
-      const o=seg(tt,at(2,0.22)+i*0.20,0.3,E.io);
+      const o=seg(tt,at(2,0.10)+i*0.05,0.3,E.io);   // почти разом: список сканируют, а не читают
       it.w.style.opacity=o; it.d.style.background = i===3 ? C.green : C.dim;
     });
-    i1s.style.opacity=seg(tt,at(2,0.72),0.4,E.io);
   } else show(in1,0);
 
   if(tt < HK-0.05){ hideMain(); drawCaption(tt); drawFooter(tt); return; }
@@ -439,7 +450,6 @@ window.seek=function(tt){
     subW.style.opacity=1; subLab.style.opacity=Math.max(seg(tt,CARD+0.5,0.3,E.io),sO);
     subLab.style.color=sO>0.5?C.dim:C.dim2; subVal.style.opacity=sO;
     subVal.textContent=ru(119600*seg(tt,SUBON,0.5,E.out))+' ₽';
-    wp.style.opacity=seg(tt,at(6,0.70),0.35,E.io);
   } else show(card,0);
 
   /* ── БЛОК 7 · итог ── */
@@ -521,7 +531,7 @@ window.seek=function(tt){
   if(mOn){
     const p=seg(tt,MS,0.42,E.back);
     show(msp,seg(tt,MS,0.28,E.io)*(1-seg(tt,MS_OUT,0.30,E.io)),lerp(24,0,p));
-    mspItems.forEach((w,i)=>{w.style.opacity=seg(tt,at(11,0.20)+i*0.26,0.3,E.io);});
+    mspItems.forEach(w=>{w.style.opacity=1;});
   } else show(msp,0);
 
   /* ── БЛОК 12 · CTA, картинка возвращается к началу ── */
