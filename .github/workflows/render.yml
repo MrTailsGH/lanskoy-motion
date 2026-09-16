@@ -120,10 +120,17 @@ jobs:
           fi
 
       - name: Что получилось
+        # ffprobe отдельно не ставим: imageio-ffmpeg кладёт только ffmpeg.
+        # Длина и потоки одинаково хорошо видны в его собственном разборе.
         working-directory: remotion
-        run: ffprobe -v error -show_entries format=duration,size -of default=nw=1 out/rolik.mp4
+        run: |
+          ls -la out/rolik.mp4
+          ffmpeg -hide_banner -i out/rolik.mp4 2>&1 | grep -E 'Duration|Stream' || true
 
       - uses: actions/upload-artifact@v4
+        # Артефакт нужен даже если диагностика споткнулась: рендер уже сделан,
+        # терять его из-за строчки в логе глупо.
+        if: always()
         with:
           name: rolik-${{ github.run_number }}
           path: remotion/out/rolik.mp4
