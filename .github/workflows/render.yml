@@ -115,8 +115,11 @@ jobs:
             -x264-params "deblock=-1,-1:aq-mode=3:aq-strength=1.1" \
             -movflags +faststart -r 30 out/video.mp4
           if [ -f public/voice.mp3 ]; then
+            # Без -shortest: картинка длиннее звука на хвост под CTA, и
+            # обрезать её по звуку нельзя. Лишнего тоже не будет — ffmpeg
+            # закончит, когда кончатся оба входа.
             ffmpeg -y -i out/video.mp4 -i public/voice.mp3 \
-              -c:v copy -c:a aac -b:a 192k -shortest out/rolik.mp4
+              -c:v copy -c:a aac -b:a 192k out/rolik.mp4
           else
             mv out/video.mp4 out/rolik.mp4
           fi

@@ -16,6 +16,15 @@ settime.py — подставить тайминг дорожки в сцену.
         подставить ОЦЕНКУ по темпу Станислава, пока дорожки нет.
         Сцену можно строить и смотреть до записи; когда дорожка
         придёт, оценка заменяется первой командой.
+
+    python3 settime.py i01.html timing.json --tail 1.4
+        придержать картинку на 1,4 с после последнего слова.
+
+Про хвост. Длина ролика по-прежнему не назначается — её задаёт дорожка. Но
+CTA надо успеть прочитать, а ElevenLabs иногда срезает тишину в конце
+вплотную к последнему слову. Тогда финальный кадр держится своим ходом:
+голос кончился, картинка ещё секунду стоит. Это не растягивание ролика под
+картинку, это пауза после точки.
 """
 
 import json, re, sys, os
@@ -39,10 +48,13 @@ def block_js(src, dur, B):
             "};\n" + END)
 
 
-def from_timing(path):
+def from_timing(path, tail=0.0):
     d = json.load(open(path, encoding='utf-8'))
     B = [(float(a), float(b)) for a, b in d['B']]
-    return d.get('audio', os.path.basename(path)), float(d['DUR']), B
+    src = d.get('audio', os.path.basename(path))
+    if tail:
+        src += f" + хвост {tail:.2f} с"
+    return src, float(d['DUR']) + tail, B
 
 
 def estimate(text_path):
@@ -80,12 +92,18 @@ def main():
         print(__doc__)
         sys.exit(1)
     scene = sys.argv[1]
+    tail = 0.0
+    if '--tail' in sys.argv:
+        i = sys.argv.index('--tail')
+        if len(sys.argv) <= i + 1:
+            print("не указано, сколько держать хвост"); sys.exit(1)
+        tail = float(sys.argv[i + 1].replace(',', '.'))
     if sys.argv[2] == '--estimate':
         if len(sys.argv) < 4:
             print("не указан файл текста"); sys.exit(1)
         src, dur, B = estimate(sys.argv[3])
     else:
-        src, dur, B = from_timing(sys.argv[2])
+        src, dur, B = from_timing(sys.argv[2], tail)
 
     html = open(scene, encoding='utf-8').read()
     if BEG not in html or END not in html:
@@ -104,4 +122,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except BrokenPipeError:
+        pass          # вывод обрезали через head — это не ошибка
