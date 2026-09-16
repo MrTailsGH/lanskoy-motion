@@ -1,0 +1,130 @@
+name: Рендер ролика
+
+# Облачный рендер. Сцена — тот же самый .html, что и в локальном конвейере:
+# Remotion открывает её в iframe и дёргает window.seek(t) на каждом кадре.
+# Переписывать сцены под React не нужно.
+
+on:
+  workflow_dispatch:
+    inputs:
+      scene:
+        description: 'Сцена'
+        type: choice
+        options: [i01.html, i02.html]
+        default: i01.html
+      voice:
+        description: 'Дорожка из папки voice/ (например I-01.mp3). Пусто — без звука'
+        required: false
+        default: ''
+      draft:
+        description: 'Черновик: кодирует Remotion, быстрее, качество ниже'
+        type: boolean
+        default: false
+  push:
+    paths:
+      - 'remotion/**'
+      - 'i0*.html'
+      - '.github/workflows/render.yml'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      SCENE: ${{ github.event.inputs.scene || 'i01.html' }}
+      VOICE: ${{ github.event.inputs.voice || '' }}
+      DRAFT: ${{ github.event.inputs.draft || 'false' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: remotion/package-lock.json
+
+      - name: Шрифты Golos Text
+        # Полные TTF, имена гарнитур ровно те, что ждёт сцена.
+        # @fontsource не годится: там подмножества woff2 с одним именем.
+        run: |
+          npm install --silent --prefix /tmp/fonts @expo-google-fonts/golos-text
+          mkdir -p ~/.fonts
+          cp /tmp/fonts/node_modules/@expo-google-fonts/golos-text/*/*.ttf ~/.fonts/
+          fc-cache -f
+          echo "начертаний: $(fc-list | grep -ci golos)"
+
+      - name: Python для выравнивателя
+        run: pip install --quiet numpy imageio-ffmpeg
+
+      - name: ffmpeg
+        run: |
+          mkdir -p ~/.local/bin
+          ln -sf "$(python3 -c 'import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())')" ~/.local/bin/ffmpeg
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Выравнивание текста по дорожке
+        # Есть дорожка — раскладка считается здесь же и уходит в сцену.
+        # Нет дорожки — рендерим с тем таймингом, что лежит в сцене.
+        if: env.VOICE != ''
+        run: |
+          case "$SCENE" in
+            i01.html) TEXT=text-I-01.txt ;;
+            i02.html) TEXT=text-I-02.txt ;;
+            *) echo "не знаю, какой текст у сцены $SCENE"; exit 1 ;;
+          esac
+          python3 align.py "voice/$VOICE" "$TEXT" timing.json
+          python3 settime.py "$SCENE" timing.json
+
+      - run: npm ci
+        working-directory: remotion
+
+      - name: Собрать public
+        working-directory: remotion
+        run: |
+          if [ -n "$VOICE" ]; then node prepare.mjs "$SCENE" "voice/$VOICE"; \
+          else node prepare.mjs "$SCENE"; fi
+
+      - name: Скачать chrome-headless-shell
+        working-directory: remotion
+        run: npx remotion browser ensure
+
+      - name: Рендер — черновик
+        if: env.DRAFT == 'true'
+        working-directory: remotion
+        run: |
+          npx remotion render src/index.ts Rolik out/rolik.mp4 \
+            --crf=16 --x264-preset=slow --pixel-format=yuv420p
+
+      - name: Рендер — кадры
+        if: env.DRAFT != 'true'
+        working-directory: remotion
+        run: npx remotion render src/index.ts Rolik out/frames --sequence --image-format=png
+
+      - name: Сборка и сведение
+        # Строка кодирования из регламента, раздел 1. Свой кодировщик Remotion
+        # не даёт задать deblock и aq-mode, а без них зерно съедается и на
+        # градиенте возвращаются полосы. Замерено: 43,2 дБ против 44,5 дБ.
+        if: env.DRAFT != 'true'
+        working-directory: remotion
+        run: |
+          ffmpeg -y -framerate 30 -pattern_type glob -i 'out/frames/element-*.png' \
+            -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level 4.2 \
+            -x264-params "deblock=-1,-1:aq-mode=3:aq-strength=1.1" \
+            -movflags +faststart -r 30 out/video.mp4
+          if [ -f public/voice.mp3 ]; then
+            ffmpeg -y -i out/video.mp4 -i public/voice.mp3 \
+              -c:v copy -c:a aac -b:a 192k -shortest out/rolik.mp4
+          else
+            mv out/video.mp4 out/rolik.mp4
+          fi
+
+      - name: Что получилось
+        working-directory: remotion
+        run: ffprobe -v error -show_entries format=duration,size -of default=nw=1 out/rolik.mp4
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rolik-${{ github.run_number }}
+          path: remotion/out/rolik.mp4
+          retention-days: 30
