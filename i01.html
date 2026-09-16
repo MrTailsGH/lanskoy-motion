@@ -17,12 +17,58 @@
 <body><div id="stage"></div>
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   И-01 «Сотрудник за 80 стоит 134» · 1080×1920 · 30 fps · 38,000 с
+   И-01 «Сотрудник за 80 стоит 134» · 1080×1920 · 30 fps
    Всё состояние — чистая функция window.seek(t). CSS-анимаций нет.
+   Длина ролика не назначается: её задаёт дорожка через объект T.
    ═══════════════════════════════════════════════════════════════════ */
-const FPS=30, DUR=46.0, FRAMES=Math.round(DUR*FPS);
-const OFF=7.60;   // постановка + обещание идут ДО расчёта
+
+/* ═══ ТАЙМИНГ · начало ══════════════════════════════════════════ */
+const T = {
+  src: "ОЦЕНКА по темпу 125 слов/мин — дорожки ещё нет. Заменить на timing.json от align.py",
+  DUR: 45.80,
+  B: [
+  [  0.30,   3.67]   /*  1 */,
+  [  4.22,   6.37]   /*  2 */,
+  [  6.92,  10.94]   /*  3 */,
+  [ 11.49,  17.01]   /*  4 */,
+  [ 17.56,  22.05]   /*  5 */,
+  [ 22.60,  25.03]   /*  6 */,
+  [ 25.58,  27.83]   /*  7 */,
+  [ 28.38,  29.69]   /*  8 */,
+  [ 30.24,  35.94]   /*  9 */,
+  [ 36.49,  40.32]   /* 10 */,
+  [ 40.87,  43.49]   /* 11 */,
+  [ 44.04,  45.35]   /* 12 */
+  ]
+};
+/* ═══ ТАЙМИНГ · конец ═══════════════════════════════════════════ */
+
+/* ── раскладка блоков дорожки по актам сцены ──────────────────────
+    1  постановка: вы наняли за 80          7  итог 134 000
+    2  обещание: считаем                    8  вспышка «не вся цена»
+    3  разрыв: 80 против 134                9  шкала рабочих дней
+    4  карточка: на руки, начислено        10  столбики: день против дня
+    5  взносы и подытог                    11  льготный тариф МСП
+    6  рабочее место                       12  CTA
+   Внутри акта события привязаны к долям блока, а не к секундам:
+   дорожка другой длины — сцена подстраивается сама.
+   ───────────────────────────────────────────────────────────────── */
+const FPS=30, DUR=T.DUR, FRAMES=Math.round(DUR*FPS);
 window.META={FPS,DUR,FRAMES};
+
+const B=T.B;
+const bs=i=>B[i-1][0];              // начало блока i (нумерация с единицы)
+const be=i=>B[i-1][1];              // конец блока i
+const bdur=i=>be(i)-bs(i);
+const at=(i,p)=>bs(i)+bdur(i)*p;    // доля внутри блока
+const before=(i,d)=>Math.max(0,bs(i)-d);
+/* Вход акта: за d секунд до его блока, но никогда раньше, чем договорён
+   предыдущий блок. На короткой паузе акт просто въезжает позже. */
+const enter=(i,d)=>i<=1 ? Math.max(0,bs(i)-d) : Math.max(bs(i)-d, be(i-1)+0.05);
+/* Уход акта: держим картинку всю паузу и убираем ровно к приходу
+   следующего акта. На длинной паузе экран не пустует, на короткой
+   два акта не встречаются. */
+const gone=(i,next)=>Math.max(be(i)+0.05, next-0.30);
 
 const C={bg:'#0A0D0C',ink:'#FFFFFF',dim:'#6E7A76',dim2:'#49544F',
          green:'#2FD38E',red:'#F0524D',teal:'#3FB7C9',card:'#121716',line:'#232C29'};
@@ -88,7 +134,7 @@ const i0c=E_('med',{position:'relative',font:'38px "Golos Text Medium"',color:C.
 /* ═══ СЦЕНА 1 · ОБЕЩАНИЕ ═════════════════════════════════════════ */
 const in1=E_('',{left:px(X0),top:'420px',width:px(CW)});
 const i1a=E_('blk',{position:'relative',font:'84px "Golos Text Black"',color:C.ink,
-  lineHeight:'1.05',letterSpacing:'-.01em'},'СЧИТАЕМ,<br>СКОЛЬКО ОН СТОИТ<br><span style="color:#2FD38E">НА САМОМ ДЕЛЕ</span>');
+  lineHeight:'1.05',letterSpacing:'-.01em'},'СЧИТАЕМ,<br>ВО СКОЛЬКО ОН<br><span style="color:#2FD38E">ОБХОДИТСЯ</span>');
 const i1r=E_('',{position:'relative',height:'3px',width:'140px',background:C.green,margin:'44px 0 34px 0'});
 const i1items=[];
 ['оклад и налоги','взносы','рабочее место','реальные рабочие дни'].forEach(x=>{
@@ -223,7 +269,7 @@ const cap=E_('blk',{left:px(X0),top:'258px',width:px(CW),height:'200px',font:'76
 const flash=E_('',{left:0,top:0,width:'1080px',height:'1920px',background:'#FFFFFF'});
 const fTxt=E_('',{left:px(X0),top:'760px',width:px(CW)});
 const fT1=E_('blk',{position:'relative',font:'84px "Golos Text Black"',color:'#0A0D0C',lineHeight:'1.06'},
-  'и это ещё<br>не вся цена');
+  'но это<br>не вся цена');
 const fT2=E_('med',{position:'relative',font:'34px "Golos Text Medium"',color:'#5B6663',marginTop:'26px',lineHeight:'1.35'},
   'вы платите за месяц,<br>а работает он меньше');
 fTxt.appendChild(fT1);fTxt.appendChild(fT2);
@@ -238,26 +284,58 @@ const fTail=E_('med',{left:'168px',top:'2px',font:'25px "Golos Text Medium"',
   color:C.dim,letterSpacing:'.05em'},'· про деньги без воды');
 fSign.appendChild(fName);fSign.appendChild(fTail);
 
-/* ═══ ТИТРЫ ══════════════════════════════════════════════════════ */
+/* ═══ ЯКОРЯ АКТОВ ════════════════════════════════════════════════
+   Момент, когда акт выезжает на экран: чуть раньше своего блока,
+   чтобы картинка была на месте к первому слову.
+   ═══════════════════════════════════════════════════════════════ */
+const A0   = enter(1,0.20);    // постановка
+const A1   = enter(2,0.30);    // обещание
+const HK   = enter(3,0.40);    // разрыв
+const CARD = enter(4,0.45);    // карточка расчёта
+const TOT  = enter(7,0.15);    // итог
+const FL   = enter(8,0.30);    // вспышка
+const SC   = enter(9,0.25);    // шкала
+const BR   = enter(10,0.15);   // столбики
+const MS   = enter(11,0.20);   // МСП
+const CT   = enter(12,0.20);   // CTA
+
+/* когда акт уходит — ровно к приходу следующего */
+const A0_OUT   = gone(1,A1);
+const A1_OUT   = gone(2,HK);
+const HK_OUT   = gone(3,CARD);
+const CARD_OUT = gone(7,FL);
+const FL_OUT   = gone(8,SC);
+const SC_OUT   = gone(9,BR);
+const BR_OUT   = gone(10,MS);
+const MS_OUT   = gone(11,CT);
+
+/* строки карточки: на какой доле какого блока набегает значение */
+const ROWON=[bs(4)+0.05, at(4,0.42), at(5,0.30), at(6,0.45)];
+const SUBON=at(5,0.72);         // подытог «прямые расходы»
+
+/* ═══ ТИТРЫ ══════════════════════════════════════════════════════
+   Каждый титр привязан к блоку дорожки: либо к его началу, либо к
+   доле внутри него. Абсолютных секунд здесь нет.
+   ═══════════════════════════════════════════════════════════════ */
+const FLASH_OUT = FL_OUT+0.32;                // когда белое поле ушло
 const CUES=[
- [0.00,''],
- [7.75,'ВЫ ПЛАТИТЕ ЕМУ'],
- [10.00,'А ТРАТИТЕ|СТО ТРИДЦАТЬ ЧЕТЫРЕ.|r'],
- [12.20,'СМОТРИТЕ, ОТКУДА.'],
- [13.60,'НА РУКИ —|ВОСЕМЬДЕСЯТ.|w'],
- [15.80,'НАЧИСЛИТЬ НАДО|ДЕВЯНОСТО ДВЕ.|w'],
- [18.60,'СВЕРХУ ВЗНОСЫ:|ТРИДЦАТЬ ПРОЦЕНТОВ|r'],
- [21.40,'ЭТО УЖЕ|СТО ДЕВЯТНАДЦАТЬ.|w'],
- [23.20,'И ОН ГДЕ-ТО СИДИТ.'],
- [25.60,'СТО ТРИДЦАТЬ ЧЕТЫРЕ|ТЫСЯЧИ В МЕСЯЦ|r'],
- [28.90,''],
- [31.00,'В ГОДУ|247 РАБОЧИХ ДНЕЙ|w'],
- [33.40,'МИНУС ОТПУСК.|МИНУС БОЛЬНИЧНЫЕ.|r'],
- [35.60,'ОСТАЁТСЯ|ДВЕСТИ ОДИННАДЦАТЬ.|g'],
- [37.40,'ДЕНЬ ЕГО РАБОТЫ —|СЕМЬ ШЕСТЬСОТ.|r'],
- [39.60,'ПОЧТИ ВДВОЕ.'],
- [40.60,'ПРОВЕРЬТЕ|ЛЬГОТНЫЙ ТАРИФ.|g'],
- [43.00,'']
+ [0.00,                        ''],
+ [bs(3),                       'ВЫ ПЛАТИТЕ ЕМУ'],
+ [at(3,0.50),                  'А ТРАТИТЕ|СТО ТРИДЦАТЬ ЧЕТЫРЕ.|r'],
+ [bs(4),                       'НА РУКИ —|ВОСЕМЬДЕСЯТ.|w'],
+ [at(4,0.42),                  'НАЧИСЛИТЬ НАДО|ДЕВЯНОСТО ДВЕ.|w'],
+ [bs(5),                       'СВЕРХУ ВЗНОСЫ:|ТРИДЦАТЬ ПРОЦЕНТОВ|r'],
+ [at(5,0.72),                  'ЭТО УЖЕ|СТО ДВАДЦАТЬ.|w'],
+ [bs(6),                       'ПЛЮС РАБОЧЕЕ МЕСТО:|ЕЩЁ ЧЕТЫРНАДЦАТЬ.|r'],
+ [bs(7),                       'СТО ТРИДЦАТЬ ЧЕТЫРЕ|ТЫСЯЧИ В МЕСЯЦ|r'],
+ [FL,                          ''],
+ [Math.max(bs(9),FLASH_OUT),   'В ГОДУ|247 РАБОЧИХ ДНЕЙ|w'],
+ [at(9,0.55),                  'МИНУС ОТПУСК.|МИНУС БОЛЬНИЧНЫЕ.|r'],
+ [at(9,0.80),                  'ОСТАЁТСЯ|ДВЕСТИ ОДИННАДЦАТЬ.|g'],
+ [bs(10),                      'ЕГО РАБОЧИЙ ДЕНЬ —|СЕМЬ ШЕСТЬСОТ.|r'],
+ [at(10,0.68),                 'В ДВА РАЗА БОЛЬШЕ.'],
+ [bs(11),                      'ПРОВЕРЬТЕ|ЛЬГОТНЫЙ ТАРИФ.|g'],
+ [CT,                          '']
 ];
 function capHTML(s){
   if(!s)return '';
@@ -277,137 +355,146 @@ function show(el,o,y,s){
 function hideMain(){[hook,card,tot,totScrim,flash,fTxt,scale,bars,bx2,msp,cta]
   .forEach(e=>{e.style.opacity=0;e.style.display='none';});}
 
-window.seek=function(T){
-  const t = T - OFF;                     // время основного расчёта
-  glow.style.opacity = 0.55 + 0.45*Math.sin(T*0.42);
+window.seek=function(tt){
+  glow.style.opacity = 0.55 + 0.45*Math.sin(tt*0.42);
   vign.style.opacity = 1;
 
-  /* ── СЦЕНА 0 · постановка ── */
-  if(T<4.30){
-    const p=seg(T,0.15,0.5,E.out);
-    show(in0, seg(T,0.10,0.35,E.io)*(1-seg(T,3.95,0.32,E.io)), lerp(20,0,p));
-    i0b.style.color = T>=2.30 ? C.ink : C.dim;
-    i0c.style.opacity = seg(T,1.30,0.4,E.io);
+  /* ── БЛОК 1 · постановка ── */
+  if(tt < A0_OUT+0.40){
+    const p=seg(tt,A0+0.05,0.5,E.out);
+    show(in0, seg(tt,A0,0.35,E.io)*(1-seg(tt,A0_OUT,0.32,E.io)), lerp(20,0,p));
+    i0b.style.color = tt>=at(1,0.45) ? C.ink : C.dim;
+    i0c.style.opacity = seg(tt,at(1,0.58),0.4,E.io);
   } else show(in0,0);
 
-  /* ── СЦЕНА 1 · обещание ── */
-  if(btw(T,4.25,7.70)){
-    const p=seg(T,4.30,0.45,E.back);
-    show(in1, seg(T,4.30,0.3,E.io)*(1-seg(T,7.35,0.32,E.io)), lerp(22,0,p));
+  /* ── БЛОК 2 · обещание ── */
+  if(btw(tt,A1-0.05,A1_OUT+0.40)){
+    const p=seg(tt,A1,0.45,E.back);
+    show(in1, seg(tt,A1,0.3,E.io)*(1-seg(tt,A1_OUT,0.32,E.io)), lerp(22,0,p));
     i1items.forEach((it,i)=>{
-      const o=seg(T,4.95+i*0.22,0.3,E.io);
+      const o=seg(tt,at(2,0.22)+i*0.20,0.3,E.io);
       it.w.style.opacity=o; it.d.style.background = i===3 ? C.green : C.dim;
     });
-    i1s.style.opacity=seg(T,6.20,0.4,E.io);
+    i1s.style.opacity=seg(tt,at(2,0.72),0.4,E.io);
   } else show(in1,0);
 
-  if(t < -0.03){ hideMain(); drawCaption(T); drawFooter(t); return; }
+  if(tt < HK-0.05){ hideMain(); drawCaption(tt); drawFooter(tt); return; }
 
-  /* ── ХУК ── */
-  if(t<5.0){
-    show(hook,1-seg(t,4.50,0.40,E.io),0,1);
+  /* ── БЛОК 3 · разрыв: 80 против 134 ── */
+  if(tt < HK_OUT+0.50){
+    show(hook,1-seg(tt,HK_OUT,0.40,E.io),0,1);
     hkV1.style.transformOrigin='left center';
-    hkV1.style.transform='scale('+(1+0.014*Math.max(0,1-seg(t,0.10,0.55,E.out)))+')';
-    const rv=seg(t,2.40,0.42,E.back);
-    hkV2.style.color = t<2.40 ? C.dim2 : C.red;
-    hkV2.style.opacity = t<2.40 ? 0.42 : lerp(0.42,1,rv);
+    hkV1.style.transform='scale('+(1+0.014*Math.max(0,1-seg(tt,HK+0.10,0.55,E.out)))+')';
+    const RV=at(3,0.50);                       // «а тратите — сто тридцать четыре»
+    const rv=seg(tt,RV,0.42,E.back);
+    hkV2.style.color = tt<RV ? C.dim2 : C.red;
+    hkV2.style.opacity = tt<RV ? 0.42 : lerp(0.42,1,rv);
     hkV2.style.transformOrigin='left center';
     hkV2.style.transform='scale('+lerp(0.90,1,rv)+')';
-    hkL2.style.color = t<2.40?C.dim2:C.dim;
+    hkL2.style.color = tt<RV?C.dim2:C.dim;
   } else show(hook,0);
 
-  /* ── КАРТОЧКА: 5,0–21,3 ── */
-  const cardOn = btw(t,4.90,21.40);
+  /* ── БЛОКИ 4–7 · карточка расчёта ── */
+  const cardOn = btw(tt,CARD-0.05,CARD_OUT+0.40);
   if(cardOn){
-    const inP=seg(t,4.90,0.45,E.back);
-    const dimUnder = lerp(1,0.13,seg(t,18.00,0.42,E.io));
-    show(card,seg(t,4.90,0.28,E.io)*(1-seg(t,21.05,0.30,E.io))*dimUnder,
+    const inP=seg(tt,CARD,0.45,E.back);
+    const dimUnder = lerp(1,0.13,seg(tt,TOT,0.42,E.io));
+    show(card,seg(tt,CARD,0.28,E.io)*(1-seg(tt,CARD_OUT,0.30,E.io))*dimUnder,
          lerp(34,0,inP),lerp(0.975,1,inP));
     card.style.transformOrigin='center top';
 
-    const grey = t>=8.20;
+    const grey = tt>=ROWON[1];
     const def=[
-      {on:6.00, lab:'на руки',            v:80000,  dot:C.dim,   col:()=>grey?C.dim2:C.ink,  labCol:()=>grey?C.dim2:C.dim, pil:''},
-      {on:8.20, lab:'начислено',          v:92000,  dot:C.ink,   col:()=>t>=11.0?C.dim2:C.ink, labCol:()=>t>=11.0?C.dim2:C.dim, pil:'+ НДФЛ 13%', pilC:C.red},
-      {on:11.00,lab:'страховые взносы',   v:27600,  dot:C.red,   col:()=>C.red, labCol:()=>C.dim, pil:'30% от начисленного', pilC:C.red},
-      {on:15.60,lab:'рабочее место',      v:14400,  dot:C.red,   col:()=>C.red, labCol:()=>C.dim, pil:''}
+      {on:ROWON[0], lab:'на руки',          v:80000, dot:C.dim, col:()=>grey?C.dim2:C.ink,
+       labCol:()=>grey?C.dim2:C.dim, pil:''},
+      {on:ROWON[1], lab:'начислено',        v:92000, dot:C.ink, col:()=>tt>=ROWON[2]?C.dim2:C.ink,
+       labCol:()=>tt>=ROWON[2]?C.dim2:C.dim, pil:'+ НДФЛ 13%', pilC:C.red},
+      {on:ROWON[2], lab:'страховые взносы', v:27600, dot:C.red, col:()=>C.red,
+       labCol:()=>C.dim, pil:'30% от начисленного', pilC:C.red},
+      {on:ROWON[3], lab:'рабочее место',    v:14400, dot:C.red, col:()=>C.red,
+       labCol:()=>C.dim, pil:''}
     ];
     def.forEach((d,i)=>{
-      const r=R[i], o=seg(t,d.on,0.30,E.io);
+      const r=R[i], o=seg(tt,d.on,0.30,E.io);
       r.w.style.opacity=1;
       r.val.style.opacity=o; r.dot.style.opacity=o;
-      r.val.style.transform='translateY('+lerp(12,0,seg(t,d.on,0.42,E.out))+'px)';
-      const cnt=seg(t,d.on,0.55,E.out);
+      r.val.style.transform='translateY('+lerp(12,0,seg(tt,d.on,0.42,E.out))+'px)';
+      const cnt=seg(tt,d.on,0.55,E.out);
       r.val.textContent=ru(d.v*cnt)+' ₽';
       r.val.style.color=d.col();
       r.lab.textContent=d.lab;
-      const pre=seg(t,5.05+i*0.09,0.3,E.io);
+      const pre=seg(tt,CARD+0.15+i*0.09,0.3,E.io);
       r.lab.style.opacity=Math.max(pre,o);
       r.lab.style.color = o<0.02 ? C.dim2 : d.labCol();
       r.dot.style.background=d.dot;
       r.base.style.opacity = i===3 ? 0 : lerp(0.55,0.3,o);
       if(d.pil){r.pil.style.display='block';r.pil.textContent=d.pil;
         r.pil.style.color=d.pilC;r.pil.style.background='rgba(240,82,77,.13)';
-        r.pil.style.opacity=seg(t,d.on+0.25,0.3,E.io)*(1-seg(t,d.on+3.4,0.4,E.io));}
+        r.pil.style.opacity=seg(tt,d.on+0.25,0.3,E.io)*(1-seg(tt,d.on+3.4,0.4,E.io));}
       else r.pil.style.display='none';
     });
 
-    const sO=seg(t,13.80,0.35,E.io);
+    const sO=seg(tt,SUBON,0.35,E.io);
     subRule.style.opacity=Math.max(0.35,sO);
-    subW.style.opacity=1; subLab.style.opacity=Math.max(seg(t,5.4,0.3,E.io),sO);
+    subW.style.opacity=1; subLab.style.opacity=Math.max(seg(tt,CARD+0.5,0.3,E.io),sO);
     subLab.style.color=sO>0.5?C.dim:C.dim2; subVal.style.opacity=sO;
-    subVal.textContent=ru(119600*seg(t,13.80,0.5,E.out))+' ₽';
-    wp.style.opacity=seg(t,15.90,0.35,E.io);
+    subVal.textContent=ru(119600*seg(tt,SUBON,0.5,E.out))+' ₽';
+    wp.style.opacity=seg(tt,at(6,0.70),0.35,E.io);
   } else show(card,0);
 
-  /* ── ИТОГ: 18,0–21,3 ── */
-  const scrimO = btw(t,17.95,21.40) ? seg(t,18.00,0.35,E.io)*(1-seg(t,21.05,0.30,E.io)) : 0;
+  /* ── БЛОК 7 · итог ── */
+  const totOn=btw(tt,TOT-0.05,CARD_OUT+0.40);
+  const scrimO = totOn ? seg(tt,TOT,0.35,E.io)*(1-seg(tt,CARD_OUT,0.30,E.io)) : 0;
   totScrim.style.opacity=scrimO; totScrim.style.display=scrimO<=0.001?'none':'block';
-  const totOn=btw(t,17.95,21.40);
   if(totOn){
-    const p=seg(t,18.00,0.42,E.back);
-    show(tot,seg(t,18.00,0.25,E.io)*(1-seg(t,21.05,0.30,E.io)),lerp(18,0,p));
+    const p=seg(tt,TOT,0.42,E.back);
+    show(tot,seg(tt,TOT,0.25,E.io)*(1-seg(tt,CARD_OUT,0.30,E.io)),lerp(18,0,p));
     totRule.style.background=C.red;
     totVal.style.color=C.red;
-    totVal.textContent=ru(lerp(119600,134000,seg(t,18.00,0.55,E.out)))+' ₽';
+    totVal.textContent=ru(lerp(119600,134000,seg(tt,TOT,0.55,E.out)))+' ₽';
     totPil.style.color=C.red;totPil.style.background='rgba(240,82,77,.13)';
-    totPil.style.opacity=seg(t,18.55,0.3,E.io);
+    totPil.style.opacity=seg(tt,TOT+0.55,0.3,E.io);
   } else show(tot,0);
 
-  /* ── ВСПЫШКА: 21,3–23,4 ── */
-  const fO = seg(t,21.30,0.14,E.io) * (1-seg(t,23.06,0.32,E.io));
+  /* ── БЛОК 8 · вспышка, смена акта ── */
+  const fO = seg(tt,FL,0.14,E.io) * (1-seg(tt,FL_OUT,0.32,E.io));
   flash.style.opacity=fO; flash.style.display=fO<=0.001?'none':'block';
-  const ftO = seg(t,21.52,0.26,E.io)*(1-seg(t,22.95,0.25,E.io));
-  show(fTxt,ftO,lerp(16,0,seg(t,21.52,0.5,E.out)));
+  const ftO = seg(tt,FL+0.22,0.26,E.io)*(1-seg(tt,FL_OUT-0.08,0.25,E.io));
+  show(fTxt,ftO,lerp(16,0,seg(tt,FL+0.22,0.5,E.out)));
 
-  /* ── ШКАЛА: 23,4–29,7 ── */
-  const scOn=btw(t,23.35,29.75);
+  /* ── БЛОК 9 · шкала рабочих дней ── */
+  const scOn=btw(tt,SC-0.05,SC_OUT+0.40);
   if(scOn){
-    show(scale,seg(t,23.40,0.28,E.io)*(1-seg(t,29.40,0.30,E.io)));
-    const fill=Math.round(247*seg(t,23.55,1.9,E.io));
-    const redP=seg(t,25.80,0.9,E.io);
+    show(scale,seg(tt,SC,0.28,E.io)*(1-seg(tt,SC_OUT,0.30,E.io)));
+    /* клетки заполняются ровно к концу «почти двести пятьдесят рабочих дней» */
+    const fillDur=Math.max(0.8, at(9,0.45)-(SC+0.15));
+    const fill=Math.round(247*seg(tt,SC+0.15,fillDur,E.io));
+    const CUT=at(9,0.55);                      // «минус отпуск и больничные»
+    const redP=seg(tt,CUT,0.9,E.io);
     const redN=Math.round(36*redP);
     ticks.forEach((d,i)=>{
       const lit=i<fill;
       const isRed = i>=247-redN;
       d.style.background = !lit?'#1A211F' : isRed?C.red : C.green;
-      d.style.opacity = !lit?1 : isRed?1 : (t>=25.8?0.5:1);
+      d.style.opacity = !lit?1 : isRed?1 : (tt>=CUT?0.5:1);
     });
-    scLegend.innerHTML = t>=25.95
+    const legOn=CUT+0.15;
+    scLegend.innerHTML = tt>=legOn
       ? '<span style="color:'+C.red+'">28 отпуск</span> &nbsp;·&nbsp; <span style="color:'+C.red+'">8 больничных</span>'
       : '&nbsp;';
-    scLegend.style.opacity=seg(t,25.95,0.3,E.io);
-    const bO=seg(t,28.00,0.3,E.io), bP=seg(t,28.00,0.42,E.back);
+    scLegend.style.opacity=seg(tt,legOn,0.3,E.io);
+    const BIG=at(9,0.80);                      // «двести одиннадцать»
+    const bO=seg(tt,BIG,0.3,E.io), bP=seg(tt,BIG,0.42,E.back);
     scBig.style.opacity=bO; scSub.style.opacity=bO;
     scBig.style.transform='scale('+lerp(0.88,1,bP)+')';scBig.style.transformOrigin='left center';
-    scBig.textContent=ru(211*seg(t,28.00,0.5,E.out));
+    scBig.textContent=ru(211*seg(tt,BIG,0.5,E.out));
   } else show(scale,0);
 
-  /* ── СТОЛБИКИ: 29,8–33,0 ── */
-  const brOn=btw(t,29.75,33.05);
+  /* ── БЛОК 10 · столбики ── */
+  const brOn=btw(tt,BR-0.05,BR_OUT+0.35);
   if(brOn){
-    show(bars,seg(t,29.80,0.28,E.io)*(1-seg(t,32.70,0.30,E.io)));
-    const g1=seg(t,29.95,0.6,E.out), g2=seg(t,30.60,0.8,E.out);
+    show(bars,seg(tt,BR,0.28,E.io)*(1-seg(tt,BR_OUT,0.30,E.io)));
+    const g1=seg(tt,BR+0.15,0.6,E.out), g2=seg(tt,at(10,0.35),0.8,E.out);
     b1.cap.textContent='как вы считаете'; b1.num.textContent=ru(3890*g1)+' ₽';
     b1.num.style.color=C.dim; b1.col.style.background='#2A322F';
     const h1=Math.round(BH*(3890/7620)*g1);
@@ -422,30 +509,30 @@ window.seek=function(T){
     b2.num.style.bottom=px(h2+18); b2.num.style.top='auto';
     b2.cap.style.bottom=px(h2+96); b2.cap.style.top='auto';
 
-    const xP=seg(t,32.00,0.4,E.back);
-    bx2.style.opacity=seg(t,32.00,0.25,E.io)*(1-seg(t,32.70,0.3,E.io));
+    const X2=at(10,0.68);                      // «в два раза больше»
+    const xP=seg(tt,X2,0.4,E.back);
+    bx2.style.opacity=seg(tt,X2,0.25,E.io)*(1-seg(tt,BR_OUT,0.3,E.io));
     bx2.style.transform='scale('+lerp(0.7,1,xP)+')';
     bx2.style.display='block';
   } else {show(bars,0);bx2.style.opacity=0;bx2.style.display='none';}
 
-  /* ── МСП: 33,0–35,4 ── */
-  const mOn=btw(t,32.95,35.45);
+  /* ── БЛОК 11 · льготный тариф ── */
+  const mOn=btw(tt,MS-0.05,MS_OUT+0.40);
   if(mOn){
-    const p=seg(t,33.00,0.42,E.back);
-    show(msp,seg(t,33.00,0.28,E.io)*(1-seg(t,35.10,0.30,E.io)),lerp(24,0,p));
-    mspItems.forEach((w,i)=>{w.style.opacity=seg(t,33.35+i*0.28,0.3,E.io);});
+    const p=seg(tt,MS,0.42,E.back);
+    show(msp,seg(tt,MS,0.28,E.io)*(1-seg(tt,MS_OUT,0.30,E.io)),lerp(24,0,p));
+    mspItems.forEach((w,i)=>{w.style.opacity=seg(tt,at(11,0.20)+i*0.26,0.3,E.io);});
   } else show(msp,0);
 
-  /* ── CTA: 35,4–38,0 ── */
-  const cOn=t>=35.35;
-  if(cOn){
-    const p=seg(t,35.40,0.45,E.back);
-    show(cta,seg(t,35.40,0.3,E.io),lerp(26,0,p));
-    ctaPil.style.opacity=seg(t,35.85,0.3,E.io);
-    ctaEcho.style.opacity=seg(t,36.40,0.5,E.io);
+  /* ── БЛОК 12 · CTA, картинка возвращается к началу ── */
+  if(tt>=CT-0.05){
+    const p=seg(tt,CT,0.45,E.back);
+    show(cta,seg(tt,CT,0.3,E.io),lerp(26,0,p));
+    ctaPil.style.opacity=seg(tt,CT+0.45,0.3,E.io);
+    ctaEcho.style.opacity=seg(tt,at(12,0.55),0.5,E.io);
   } else show(cta,0);
 
-  drawCaption(T); drawFooter(t);
+  drawCaption(tt); drawFooter(tt);
 };
 
 const capFit={};                 // кегль подбирается один раз на титр и кешируется
@@ -462,28 +549,33 @@ function fitCaption(html){
   capFit[html]=size; return size;
 }
 
-function drawCaption(T){
+function onWhite(){
+  return flash.style.display!=='none' && parseFloat(flash.style.opacity||0)>0.5;
+}
+
+function drawCaption(tt){
   let idx=-1;
-  for(let i=0;i<CUES.length;i++) if(T>=CUES[i][0]) idx=i;
+  for(let i=0;i<CUES.length;i++) if(tt>=CUES[i][0]) idx=i;
   if(idx>=0 && CUES[idx][1]){
     const st=CUES[idx][0];
     const html=capHTML(CUES[idx][1]);
     cap.style.fontSize=fitCaption(html)+'px';
     cap.innerHTML=html;
-    cap.style.opacity=seg(T,st,0.16,E.io);
-    cap.style.transform='translateY('+lerp(12,0,seg(T,st,0.34,E.out))+'px)';
-    cap.style.color = (T>=28.90&&T<31.00)?'#0A0D0C':C.ink;
+    cap.style.opacity=seg(tt,st,0.16,E.io);
+    cap.style.transform='translateY('+lerp(12,0,seg(tt,st,0.34,E.out))+'px)';
+    cap.style.color = onWhite() ? '#0A0D0C' : C.ink;
     cap.style.display='block';
   } else {cap.style.opacity=0;cap.style.display='none';}
 }
 
-function drawFooter(t){
-  const onWhite = flash.style.display!=='none' && parseFloat(flash.style.opacity||0)>0.5;
-  const fu=(t>=4.80&&t<35.20)?seg(t,4.80,0.4,E.io)*(1-seg(t,35.00,0.3,E.io)):0;
-  fCalc.style.opacity=fu; fCalc.style.color=onWhite?'#9AA5A1':C.dim2;
+function drawFooter(tt){
+  const w=onWhite();
+  const fu=(tt>=CARD-0.10 && tt<CT+0.10)
+    ? seg(tt,CARD-0.10,0.4,E.io)*(1-seg(tt,CT-0.20,0.3,E.io)) : 0;
+  fCalc.style.opacity=fu; fCalc.style.color=w?'#9AA5A1':C.dim2;
   fSign.style.opacity=1;
-  fName.style.color=onWhite?'#0A0D0C':C.ink;
-  fTail.style.color=onWhite?'#5B6663':C.dim;
+  fName.style.color=w?'#0A0D0C':C.ink;
+  fTail.style.color=w?'#5B6663':C.dim;
 }
 window.seek(0);
 </script></body></html>
