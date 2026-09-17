@@ -29,9 +29,19 @@ async def main():
             out.push({t:c[0], lines:Math.round(h/lh), bottom:Math.round(r.top+h),
                       text:cap.textContent.slice(0,34)});
           }
-          seek(ROWON[2]);
-          const cardTop=card.getBoundingClientRect().top;
-          return {cues:out, cardTop:Math.round(cardTop)};
+          /* Верх основного блока под титром. У сцен он называется по-разному:
+             карточка расчёта, лента цикла, шкала. Берём тот, что есть,
+             иначе — границу сетки из регламента, раздел 5. */
+          const main = (typeof card!=='undefined' && card)
+                    || (typeof cyc!=='undefined' && cyc)
+                    || (typeof scale!=='undefined' && scale) || null;
+          let top = 516;
+          if(main){
+            seek(typeof ROWON!=='undefined' ? ROWON[ROWON.length-1] : 10);
+            const r = main.getBoundingClientRect();
+            if(r.height>0) top = r.top;
+          }
+          return {cues:out, cardTop:Math.round(top)};
         }""")
         print("верх карточки:", res["cardTop"])
         bad = 0
