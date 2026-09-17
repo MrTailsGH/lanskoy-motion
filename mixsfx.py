@@ -11,16 +11,53 @@ mixsfx.py — подмешать звуковые эффекты в готовы
 
 Кадры при этом не трогаются: видеодорожка копируется как есть. Менять
 звук можно сколько угодно, рендер не нужен.
+
+Файлы эффектов ищутся так:
+  1. в sfx-map.json по имени реплики — туда кладём соответствие
+     «наше имя» → «файл из чужого пака»;
+  2. если соответствия нет — sfx/<имя>.wav или любое другое расширение,
+     которое читает ffmpeg.
+
+Громкость каждого файла выравнивается автоматически. В чужом паке уровни
+разбросаны: один звук снят на −30 дБ, другой на −6, и без выравнивания
+половина эффектов пропадёт, а половина ударит по ушам.
 """
 
-import os, subprocess, sys, asyncio
+import json, os, re, subprocess, sys, asyncio
 from playwright.async_api import async_playwright
 import browser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SFX = os.path.join(HERE, 'sfx')
-VOICE_DB = 0        # голос не трогаем
+MAP = os.path.join(HERE, 'sfx-map.json')
 SFX_DB = -17        # эффекты заметно тише голоса: их ощущают, а не слушают
+TARGET_PEAK = -6.0  # к этому пику приводится каждый файл до общего ослабления
+EXTS = ('.wav', '.mp3', '.ogg', '.flac', '.m4a', '.aif', '.aiff')
+
+
+def find(name):
+    """Файл эффекта: сначала соответствие из sfx-map.json, потом sfx/<имя>.*"""
+    if os.path.exists(MAP):
+        m = json.load(open(MAP, encoding='utf-8'))
+        v = m.get(name)
+        if v:
+            p = v if os.path.isabs(v) else os.path.join(HERE, v)
+            if os.path.exists(p):
+                return p
+            sys.exit(f"в sfx-map.json для «{name}» указан {v}, а его нет")
+    for e in EXTS:
+        p = os.path.join(SFX, name + e)
+        if os.path.exists(p):
+            return p
+    sys.exit(f"не нашёл звук «{name}»: ни в sfx-map.json, ни в sfx/{name}.*")
+
+
+def peak_db(path):
+    """Пиковая громкость файла. Нужна, чтобы привести пак к одному уровню."""
+    r = subprocess.run(['ffmpeg', '-v', 'error', '-i', path, '-af', 'volumedetect',
+                        '-f', 'null', '-'], capture_output=True, text=True)
+    m = re.search(r'max_volume:\s*(-?[\d.]+) dB', r.stderr)
+    return float(m.group(1)) if m else 0.0
 
 
 async def cues(scene):
@@ -49,16 +86,20 @@ def main():
 
     ff = ['ffmpeg', '-y', '-v', 'error', '-i', video, '-i', voice]
     parts, mix = [], ['[1:a]']
+    gains = {}
     for i, e in enumerate(c):
-        f = os.path.join(SFX, e['s'] + '.wav')
-        if not os.path.exists(f):
-            sys.exit(f"нет звука {f}")
+        f = find(e['s'])
+        if f not in gains:
+            gains[f] = round(TARGET_PEAK - peak_db(f), 1)
         ff += ['-i', f]
         idx = i + 2
         ms = max(0, int(round(e['t'] * 1000)))
-        parts.append(f"[{idx}:a]adelay={ms}|{ms},volume={SFX_DB}dB[s{i}]")
+        # сначала выравниваем файл к общему пику, потом уводим под голос
+        parts.append(f"[{idx}:a]adelay={ms}|{ms},"
+                     f"volume={gains[f]}dB,volume={SFX_DB}dB[s{i}]")
         mix.append(f"[s{i}]")
-        print(f"  {e['t']:>6.2f}  {e['s']}")
+        print(f"  {e['t']:>6.2f}  {e['s']:<7} {os.path.basename(f):<22} "
+              f"выравнивание {gains[f]:+.1f} дБ")
 
     graph = ';'.join(parts) + ';' + ''.join(mix) + \
             f"amix=inputs={len(c)+1}:normalize=0:dropout_transition=0[a]"
