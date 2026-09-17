@@ -59,6 +59,19 @@ const T = {
 const FPS=30, DUR=T.DUR, FRAMES=Math.round(DUR*FPS);
 window.META={FPS,DUR,FRAMES};
 
+/* ═══ ОФОРМЛЕНИЕ · начало ═══ вписано tokens.py, руками не править ═══ */
+/* Структура — из HeroUI: лесенка поверхностей, разделитель прозрачностью,
+   шкала скруглений, асимметричное движение. Цвета свои: они несут смысл
+   по разделу 6 регламента. Источник — design-tokens.json. */
+const C={bg:'#0A0D0C',ink:'#FFFFFF',dim:'#6E7A76',dim2:'#49544F',
+         green:'#2FD38E',red:'#F0524D',teal:'#3FB7C9',
+         card:'#18201E',line:'rgba(255,255,255,.15)'};
+const S={c1:'#18201E',c2:'#242D2B',c3:'#38433F',c4:'#4A5551'};
+const LINE2='rgba(255,255,255,.08)';
+const RAD={sm:22,md:34,lg:40,full:9999};
+const MOT={in:0.25,out:0.14};
+/* ═══ ОФОРМЛЕНИЕ · конец ════════════════════════════════════════════ */
+
 const B=T.B;
 const bs=i=>B[i-1][0];              // начало блока i (нумерация с единицы)
 const be=i=>B[i-1][1];              // конец блока i
@@ -74,7 +87,7 @@ const before=(i,d)=>Math.max(0,bs(i)-d);
    нему, приходящий с него начинается. Длительность фейда общая и
    короткая, чтобы влезать в узкие паузы.
    ────────────────────────────────────────────────────────────────── */
-const FADE=0.22;
+const FADE=MOT.out;
 /* момент передачи — середина паузы после блока i */
 const swap=i=>{
   if(i<1) return 0;
@@ -88,8 +101,6 @@ const gone=k=>Math.max(be(k)+0.02, swap(k)-FADE);
    догас. Хочется появиться за d секунд до слова — если пауза позволяет. */
 const enter=(i,d)=>i<=1 ? Math.max(0,bs(i)-d) : Math.max(bs(i)-d, gone(i-1)+FADE);
 
-const C={bg:'#0A0D0C',ink:'#FFFFFF',dim:'#6E7A76',dim2:'#49544F',
-         green:'#2FD38E',red:'#F0524D',teal:'#3FB7C9',card:'#121716',line:'#232C29'};
 const X0=60, CW=760;                        // рабочая колонка: safe zone 9:16
 
 /* ── время ───────────────────────────────────────────────────────── */
@@ -215,7 +226,7 @@ const totSub=E_('med',{position:'relative',font:'34px "Golos Text Medium"',color
 
 /* ═══ ЦЕНА РОСТА ═════════════════════════════════════════════════ */
 const grow=E_('',{left:px(X0),top:'620px',width:px(CW),background:C.card,
-  border:'1px solid '+C.line,borderRadius:'28px',padding:'44px 44px'});
+  border:'1px solid '+C.line,borderRadius:px(RAD.lg),padding:'44px 44px'});
 const grH=E_('med',{position:'relative',font:'29px "Golos Text Medium"',letterSpacing:'.12em',
   textTransform:'uppercase',color:C.red},'рост на двадцать процентов');
 const grV=E_('blk tnum',{position:'relative',font:'110px "Golos Text Black"',color:C.red,
@@ -232,7 +243,7 @@ function bar(x,w){
   const cap=E_('med',{left:0,width:px(w),font:'27px "Golos Text Medium"',letterSpacing:'.1em',
     textTransform:'uppercase',color:C.dim,textAlign:'center'});
   const num=E_('blk tnum',{left:0,width:px(w),font:'54px "Golos Text Black"',textAlign:'center',whiteSpace:'nowrap'});
-  const col=E_('',{left:0,width:px(w),borderRadius:'14px',bottom:'0px'});
+  const col=E_('',{left:0,width:px(w),borderRadius:px(RAD.sm),bottom:'0px'});
   [cap,num,col].forEach(e=>g.appendChild(e));bars.appendChild(g);
   return {g,cap,num,col};
 }
@@ -242,7 +253,7 @@ const bx3=E_('blk',{left:px(X0+300),top:'1010px',width:'160px',font:'52px "Golos
 
 /* ═══ СОВЕТ: сократить отсрочку ══════════════════════════════════ */
 const form=E_('',{left:px(X0),top:'640px',width:px(CW),background:C.card,
-  border:'1px solid '+C.line,borderRadius:'28px',padding:'44px 44px'});
+  border:'1px solid '+C.line,borderRadius:px(RAD.lg),padding:'44px 44px'});
 const fmH=E_('med',{position:'relative',font:'29px "Golos Text Medium"',letterSpacing:'.12em',
   textTransform:'uppercase',color:C.green},'минус десять дней отсрочки');
 const fmV=E_('blk tnum',{position:'relative',font:'104px "Golos Text Black"',color:C.green,
@@ -259,7 +270,7 @@ const cta1=E_('blk',{position:'relative',font:'104px "Golos Text Black"',color:C
 const cta2=E_('blk',{position:'relative',font:'104px "Golos Text Black"',color:C.green,
   lineHeight:'1.04'},'В TELEGRAM');
 const ctaPil=E_('smb',{position:'relative',display:'inline-block',font:'36px "Golos Text SemiBold"',
-  color:C.bg,background:C.teal,padding:'16px 30px',borderRadius:'30px',marginTop:'34px'},'@lanskoy');
+  color:C.bg,background:C.teal,padding:'16px 30px',borderRadius:px(RAD.lg),marginTop:'34px'},'@lanskoy');
 const ctaEcho=E_('blk tnum',{position:'relative',font:'40px "Golos Text Black"',marginTop:'52px',
   color:C.dim2,letterSpacing:'-.01em'},'150 000 ₽ прибыли &nbsp;·&nbsp; <span style="color:#7A3B38">0 ₽ на счету</span>');
 [ctaRule,cta1,cta2,ctaPil,ctaEcho].forEach(e=>cta.appendChild(e));
