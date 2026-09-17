@@ -26,7 +26,7 @@ mixsfx.py — подмешать звуковые эффекты в готовы
    согласные.
 """
 
-import json, os, subprocess, sys, asyncio
+import json, math, os, subprocess, sys, asyncio
 from playwright.async_api import async_playwright
 import browser
 
@@ -122,16 +122,53 @@ def main():
         # слышимому месту, иначе серия отыграет до события.
         mode = c.get('m', 'peak')
         shift = meas.get('onset', 0.0) if mode == 'onset' else meas['attack']
+        # Серия щелчков должна кончиться тогда же, когда останавливается
+        # число на экране. Сцена объявляет длительность набора ключом d.
+        # Слышимая часть файла — от onset до последнего щелчка (attack),
+        # хвост затухания не в счёт.
+        #
+        # Коротко не хватает — ускоряем темпом. Не хватает сильно (шкала
+        # дней набирается две с половиной секунды) — темпом нельзя:
+        # counter на половинной скорости перестаёт быть щелчками. Тогда
+        # повторяем серию по кругу, сколько нужно, и гасим хвост.
+        tempo, chain = 1.0, ''
+        d = float(c['d']) if c.get('d') else 0.0
+        onset = meas.get('onset', 0.0)
+        series = meas['attack'] - onset
+        if d > 0 and mode == 'onset' and series > 0.05:
+            tempo = round(series / d, 3)
+            if tempo >= 0.85:                       # укладывается темпом
+                tempo = min(2.0, tempo)
+                chain = 'atempo=%s,' % tempo
+                shift = shift / tempo
+            else:                                   # укладывается повтором
+                cycle = meas['attack'] + 0.06       # один прогон серии
+                n = math.ceil((d + onset) / cycle)
+                tempo = min(1.5, max(0.85, round(n * cycle / (d + onset), 3)))
+                fin = onset / tempo + d
+                chain = ('aformat=sample_rates=48000,atrim=0:%.3f,'
+                         'asetpts=N/SR/TB,aloop=loop=%d:size=%d,'
+                         'atempo=%s,atrim=0:%.3f,'
+                         'afade=t=out:st=%.3f:d=0.10,asetpts=N/SR/TB,'
+                         % (cycle, n - 1, int(cycle * 48000), tempo,
+                            fin + 0.10, fin))
+                shift = onset / tempo
         start = max(0.0, c['t'] - shift)
         ms = int(round(start * 1000))
         ff += ['-i', os.path.join(HERE, rel)]
-        parts.append(f"[{i+2}:a]adelay={ms}|{ms},volume={gain}dB[s{i}]")
+        parts.append(f"[{i+2}:a]{chain}adelay={ms}|{ms},volume={gain}dB[s{i}]")
         mix.append(f"[s{i}]")
+        tmp = ('  повтор' if 'aloop' in chain else
+               f"  темп ×{tempo}" if abs(tempo - 1.0) > 0.01 else '')
         print(f"  событие {c['t']:>6.2f}  старт {start:>6.2f}  по {mode:<5} {c['s']:<7}"
-              f" {os.path.basename(rel):<20} {target:>6.1f} дБ  ({why})")
+              f" {os.path.basename(rel):<20} {target:>6.1f} дБ  ({why}){tmp}")
 
+    # Потолок. После прибавки в 6 дБ сумма речи и удара выходила на 0,0 дБ,
+    # а в замере по сэмплам — на +0,6: это уже клиппинг на декодере. Лимитер
+    # срезает только сами пики (порог −1 дБ), громкость остального не трогает.
     graph = ';'.join(parts) + ';' + ''.join(mix) + \
-            f"amix=inputs={len(cues)+1}:normalize=0:dropout_transition=0[a]"
+            f"amix=inputs={len(cues)+1}:normalize=0:dropout_transition=0[m];" + \
+            "[m]alimiter=limit=0.891:attack=5:release=50:level=false[a]"
     ff += ['-filter_complex', graph, '-map', '0:v', '-map', '[a]',
            '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', out]
     subprocess.run(ff, check=True)

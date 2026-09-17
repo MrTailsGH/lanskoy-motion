@@ -314,6 +314,10 @@ const CUT  = at(9,0.55);       // «минус отпуск и больничн�
 const DAYS = at(9,0.82);       // «двести одиннадцать»
 /* стоимость дня — снова на калькуляторе */
 const DAY  = at(10,0.35);      // «семь тысяч шестьсот»
+/* сколько длится набор числа на экране: столько же должна длиться
+   и серия щелчков в звуке, иначе щелчки тикают по остановившейся цифре */
+const CNT  = 0.55;                                  // счёт на калькуляторе
+const FILLDUR = Math.max(0.8, at(9,0.45)-(SC+0.15));// заполнение шкалы дней
 const TWICE= at(10,0.70);      // «в два раза больше»
 
 /* ═══ ЗВУК ═══════════════════════════════════════════════════════
@@ -324,14 +328,14 @@ const TWICE= at(10,0.70);      // «в два раза больше»
 window.SFX=[
   {t:PH,          s:'row'},                 // калькулятор пришёл
   {t:GAP,         s:'bounce'},              // 80 → 134, разрыв
-  {t:TAX,         s:'count', m:'onset'},    // 80 → 92
-  {t:INS,         s:'count', m:'onset'},    // 92 → 119,6
-  {t:PLACE,       s:'count', m:'onset'},    // 119,6 → 134
+  {t:TAX,   d:CNT, s:'count', m:'onset'},   // 80 → 92
+  {t:INS,   d:CNT, s:'count', m:'onset'},   // 92 → 119,6
+  {t:PLACE, d:CNT, s:'count', m:'onset'},   // 119,6 → 134
   {t:TOTAL,       s:'hero', a:true},        // итог
   {t:FL,          s:'flash'},               // смена акта
-  {t:SC+0.15,     s:'count', m:'onset'},    // шкала заполняется
+  {t:SC+0.15, d:FILLDUR, s:'count', m:'onset'}, // шкала заполняется
   {t:DAYS,        s:'land'},                // двести одиннадцать
-  {t:DAY,         s:'count', m:'onset'},    // семь шестьсот
+  {t:DAY,   d:CNT, s:'count', m:'onset'},   // семь шестьсот
   {t:CT,          s:'click'}                // CTA
 ];
 
@@ -436,8 +440,7 @@ window.seek=function(tt){
   /* ── БЛОКИ 9–10 · шкала дней и цена дня ── */
   if(btw(tt,SC-0.05,SC_OUT+0.40)){
     show(scale,seg(tt,SC,0.28,E.io)*(1-seg(tt,SC_OUT,FADE,E.io)));
-    const fillDur=Math.max(0.8, at(9,0.45)-(SC+0.15));
-    const fill=Math.round(247*seg(tt,SC+0.15,fillDur,E.io));
+    const fill=Math.round(247*seg(tt,SC+0.15,FILLDUR,E.io));
     const redN=Math.round(36*seg(tt,CUT,0.9,E.io));
     ticks.forEach((d,i)=>{
       const lit=i<fill, isRed=i>=247-redN;
@@ -459,8 +462,9 @@ window.seek=function(tt){
       scBig.textContent=ru(7620*seg(tt,DAY,0.55,E.out))+' ₽';
       scBig.style.color=C.red;
       scBig.style.fontSize='150px';
-      scSub.textContent = tt>=TWICE ? 'один рабочий день · вдвое против оклада'
-                                    : 'столько стоит один его день';
+      // «стоит» и «вдвое» из лексики канала убраны — и в голосе, и на экране.
+      scSub.textContent = tt>=TWICE ? 'один рабочий день · в два раза больше оклада'
+                                    : 'во столько обходится один его день';
     } else {
       scBig.textContent=ru(211*seg(tt,DAYS,0.5,E.out));
       scBig.style.color=C.green;
