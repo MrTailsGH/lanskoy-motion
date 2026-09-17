@@ -6,3 +6,7 @@ timing.json
 I-01_sotrudnik_9x16_ozvuchka.mp4
 out/
 timing-I-*.json
+
+# навыки HeroUI ставятся командой, в истории не нужны:
+# npx skills add heroui-inc/heroui
+.agents/
