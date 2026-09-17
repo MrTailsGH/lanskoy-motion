@@ -65,13 +65,28 @@ const be=i=>B[i-1][1];              // конец блока i
 const bdur=i=>be(i)-bs(i);
 const at=(i,p)=>bs(i)+bdur(i)*p;    // доля внутри блока
 const before=(i,d)=>Math.max(0,bs(i)-d);
-/* Вход акта: за d секунд до его блока, но никогда раньше, чем договорён
-   предыдущий блок. На короткой паузе акт просто въезжает позже. */
-const enter=(i,d)=>i<=1 ? Math.max(0,bs(i)-d) : Math.max(bs(i)-d, be(i-1)+0.05);
-/* Уход акта: держим картинку всю паузу и убираем ровно к приходу
-   следующего акта. На длинной паузе экран не пустует, на короткой
-   два акта не встречаются. */
-const gone=(i,next)=>Math.max(be(i)+0.05, next-0.30);
+/* ── передача экрана между актами ─────────────────────────────────
+   Пауза между блоками бывает короче, чем уход и приход вместе взятые:
+   на дорожке И-01 между обещанием и разрывом всего 0,39 с, а фейды по
+   0,32 с каждый. Если считать их независимо, акты встречаются на экране
+   и накладываются друг на друга.
+   Поэтому экран передаётся в один момент: уходящий акт гаснет ровно к
+   нему, приходящий с него начинается. Длительность фейда общая и
+   короткая, чтобы влезать в узкие паузы.
+   ────────────────────────────────────────────────────────────────── */
+const FADE=0.22;
+/* момент передачи — середина паузы после блока i */
+const swap=i=>{
+  if(i<1) return 0;
+  if(i>=B.length) return DUR;
+  const a=be(i), b=bs(i+1), m=(a+b)/2;
+  return (b-a)<0.06 ? m : Math.min(Math.max(m, a+0.03), b-0.03);
+};
+/* начало ухода акта, который кончается блоком k */
+const gone=k=>Math.max(be(k)+0.02, swap(k)-FADE);
+/* вход акта, который начинается блоком i: не раньше, чем предыдущий
+   догас. Хочется появиться за d секунд до слова — если пауза позволяет. */
+const enter=(i,d)=>i<=1 ? Math.max(0,bs(i)-d) : Math.max(bs(i)-d, gone(i-1)+FADE);
 
 const C={bg:'#0A0D0C',ink:'#FFFFFF',dim:'#6E7A76',dim2:'#49544F',
          green:'#2FD38E',red:'#F0524D',teal:'#3FB7C9',card:'#121716',line:'#232C29'};
@@ -286,15 +301,15 @@ const BR   = enter(12,0.20);   // столбики
 const FM   = enter(13,0.20);   // совет
 const CT   = enter(14,0.20);   // CTA
 
-const A0_OUT   = gone(1,A1);
-const A1_OUT   = gone(2,HK);
-const HK_OUT   = gone(3,CY);
-const CY_OUT   = gone(9,FL);       // цикл гасится героем и уходит вместе с ним
-const TOT_OUT  = gone(9,FL);
-const FL_OUT   = gone(10,GR);
-const GR_OUT   = gone(11,BR);
-const BR_OUT   = gone(12,FM);
-const FM_OUT   = gone(13,CT);
+const A0_OUT   = gone(1);
+const A1_OUT   = gone(2);
+const HK_OUT   = gone(3);
+const CY_OUT   = gone(9);       // цикл гасится героем и уходит вместе с ним
+const TOT_OUT  = gone(9);
+const FL_OUT   = gone(10);
+const GR_OUT   = gone(11);
+const BR_OUT   = gone(12);
+const FM_OUT   = gone(13);
 
 const ROWON=[bs(4)+0.10, bs(5)+0.10, bs(6)+0.10];   // 45 · 30 · −14
 const SUM  = bs(7)+0.05;      // «шестьдесят один день»
@@ -348,7 +363,7 @@ window.seek=function(tt){
   /* ── БЛОК 1 · постановка ── */
   if(tt < A0_OUT+0.40){
     const p=seg(tt,A0+0.05,0.5,E.out);
-    show(in0, seg(tt,A0,0.35,E.io)*(1-seg(tt,A0_OUT,0.32,E.io)), lerp(20,0,p));
+    show(in0, seg(tt,A0,0.35,E.io)*(1-seg(tt,A0_OUT,FADE,E.io)), lerp(20,0,p));
     i0b.style.color = tt>=at(1,0.25) ? C.ink : C.dim;
     i0c.style.opacity = seg(tt,at(1,0.42),0.4,E.io);
   } else show(in0,0);
@@ -356,7 +371,7 @@ window.seek=function(tt){
   /* ── БЛОК 2 · обещание ── */
   if(btw(tt,A1-0.05,A1_OUT+0.40)){
     const p=seg(tt,A1,0.45,E.back);
-    show(in1, seg(tt,A1,0.3,E.io)*(1-seg(tt,A1_OUT,0.32,E.io)), lerp(22,0,p));
+    show(in1, seg(tt,A1,0.3,E.io)*(1-seg(tt,A1_OUT,FADE,E.io)), lerp(22,0,p));
     i1items.forEach((it,i)=>{
       it.w.style.opacity=seg(tt,at(2,0.10)+i*0.05,0.3,E.io);
       it.d.style.background = i===3 ? C.red : C.dim;
@@ -367,7 +382,7 @@ window.seek=function(tt){
 
   /* ── БЛОК 3 · разрыв ── */
   if(tt < HK_OUT+0.50){
-    show(hook,1-seg(tt,HK_OUT,0.40,E.io),0,1);
+    show(hook,1-seg(tt,HK_OUT,FADE,E.io),0,1);
     hkV1.style.transformOrigin='left center';
     hkV1.style.transform='scale('+(1+0.014*Math.max(0,1-seg(tt,HK+0.10,0.55,E.out)))+')';
     const RV=at(3,0.55);
@@ -383,7 +398,7 @@ window.seek=function(tt){
   if(btw(tt,CY-0.05,CY_OUT+0.40)){
     const inP=seg(tt,CY,0.45,E.back);
     const dimUnder = lerp(1,0.13,seg(tt,TOT,0.42,E.io));
-    show(cyc,seg(tt,CY,0.28,E.io)*(1-seg(tt,CY_OUT,0.30,E.io))*dimUnder,lerp(28,0,inP));
+    show(cyc,seg(tt,CY,0.28,E.io)*(1-seg(tt,CY_OUT,FADE,E.io))*dimUnder,lerp(28,0,inP));
     cycRows.forEach((r,i)=>{
       const g=seg(tt,ROWON[i],0.7,E.out);
       const o=seg(tt,ROWON[i],0.30,E.io);
@@ -405,11 +420,11 @@ window.seek=function(tt){
 
   /* ── БЛОКИ 8–9 · сколько заморожено ── */
   const totOn=btw(tt,TOT-0.05,TOT_OUT+0.40);
-  const scrimO = totOn ? seg(tt,TOT,0.35,E.io)*(1-seg(tt,TOT_OUT,0.30,E.io)) : 0;
+  const scrimO = totOn ? seg(tt,TOT,0.35,E.io)*(1-seg(tt,TOT_OUT,FADE,E.io)) : 0;
   totScrim.style.opacity=scrimO; totScrim.style.display=scrimO<=0.001?'none':'block';
   if(totOn){
     const p=seg(tt,HERO,0.42,E.back);
-    show(tot,seg(tt,TOT,0.25,E.io)*(1-seg(tt,TOT_OUT,0.30,E.io)));
+    show(tot,seg(tt,TOT,0.25,E.io)*(1-seg(tt,TOT_OUT,FADE,E.io)));
     totFx.style.opacity=seg(tt,DAY,0.3,E.io);
     totFx.textContent = tt>=bs(9) ? '28 000 ₽ × 61 день' : '28 000 ₽ в день';
     const hO=seg(tt,HERO,0.28,E.io);
@@ -420,7 +435,7 @@ window.seek=function(tt){
   } else show(tot,0);
 
   /* ── БЛОК 10 · вспышка ── */
-  const fO = seg(tt,FL,0.14,E.io) * (1-seg(tt,FL_OUT,0.32,E.io));
+  const fO = seg(tt,FL,0.14,E.io) * (1-seg(tt,FL_OUT,FADE,E.io));
   flash.style.opacity=fO; flash.style.display=fO<=0.001?'none':'block';
   const ftO = seg(tt,FL+0.20,0.26,E.io)*(1-seg(tt,FL_OUT-0.08,0.25,E.io));
   show(fTxt,ftO,lerp(16,0,seg(tt,FL+0.20,0.5,E.out)));
@@ -428,7 +443,7 @@ window.seek=function(tt){
   /* ── БЛОК 11 · цена роста ── */
   if(btw(tt,GR-0.05,GR_OUT+0.40)){
     const p=seg(tt,GR,0.42,E.back);
-    show(grow,seg(tt,GR,0.28,E.io)*(1-seg(tt,GR_OUT,0.30,E.io)),lerp(24,0,p));
+    show(grow,seg(tt,GR,0.28,E.io)*(1-seg(tt,GR_OUT,FADE,E.io)),lerp(24,0,p));
     const nO=seg(tt,NEED,0.3,E.io);
     grV.style.opacity=nO; grS.style.opacity=nO;
     grV.textContent='+'+ru(350000*seg(tt,NEED,0.55,E.out))+' ₽';
@@ -436,7 +451,7 @@ window.seek=function(tt){
 
   /* ── БЛОК 12 · прибыль против заморозки ── */
   if(btw(tt,BR-0.05,BR_OUT+0.35)){
-    show(bars,seg(tt,BR,0.3,E.io)*(1-seg(tt,BR_OUT,0.32,E.io)));
+    show(bars,seg(tt,BR,0.3,E.io)*(1-seg(tt,BR_OUT,FADE,E.io)));
     const g1=seg(tt,BR+0.15,0.6,E.out), g2=seg(tt,at(12,0.15),0.8,E.out);
     b1.cap.textContent='прибыль за месяц'; b1.num.textContent=ru(150000*g1)+' ₽';
     b1.num.style.color=C.green; b1.col.style.background='#2A6B52';
@@ -451,7 +466,7 @@ window.seek=function(tt){
     b2.cap.style.bottom=px(h2+86); b2.cap.style.top='auto';
 
     const xP=seg(tt,X23,0.4,E.back);
-    bx3.style.opacity=seg(tt,X23,0.25,E.io)*(1-seg(tt,BR_OUT,0.3,E.io));
+    bx3.style.opacity=seg(tt,X23,0.25,E.io)*(1-seg(tt,BR_OUT,FADE,E.io));
     bx3.style.transform='scale('+lerp(0.7,1,xP)+')';
     bx3.style.display='block';
   } else {show(bars,0);bx3.style.opacity=0;bx3.style.display='none';}
@@ -459,7 +474,7 @@ window.seek=function(tt){
   /* ── БЛОК 13 · совет ── */
   if(btw(tt,FM-0.05,FM_OUT+0.40)){
     const p=seg(tt,FM,0.42,E.back);
-    show(form,seg(tt,FM,0.28,E.io)*(1-seg(tt,FM_OUT,0.30,E.io)),lerp(24,0,p));
+    show(form,seg(tt,FM,0.28,E.io)*(1-seg(tt,FM_OUT,FADE,E.io)),lerp(24,0,p));
     fmV.style.opacity=seg(tt,FM+0.40,0.3,E.io);
   } else show(form,0);
 

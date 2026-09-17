@@ -67,13 +67,28 @@ const be=i=>B[i-1][1];              // конец блока i
 const bdur=i=>be(i)-bs(i);
 const at=(i,p)=>bs(i)+bdur(i)*p;    // доля внутри блока
 const before=(i,d)=>Math.max(0,bs(i)-d);
-/* Вход акта: за d секунд до его блока, но никогда раньше, чем договорён
-   предыдущий блок. На короткой паузе акт просто въезжает позже. */
-const enter=(i,d)=>i<=1 ? Math.max(0,bs(i)-d) : Math.max(bs(i)-d, be(i-1)+0.05);
-/* Уход акта: держим картинку всю паузу и убираем ровно к приходу
-   следующего акта. На длинной паузе экран не пустует, на короткой
-   два акта не встречаются. */
-const gone=(i,next)=>Math.max(be(i)+0.05, next-0.30);
+/* ── передача экрана между актами ─────────────────────────────────
+   Пауза между блоками бывает короче, чем уход и приход вместе взятые:
+   на дорожке И-01 между обещанием и разрывом всего 0,39 с, а фейды по
+   0,32 с каждый. Если считать их независимо, акты встречаются на экране
+   и накладываются друг на друга.
+   Поэтому экран передаётся в один момент: уходящий акт гаснет ровно к
+   нему, приходящий с него начинается. Длительность фейда общая и
+   короткая, чтобы влезать в узкие паузы.
+   ────────────────────────────────────────────────────────────────── */
+const FADE=0.22;
+/* момент передачи — середина паузы после блока i */
+const swap=i=>{
+  if(i<1) return 0;
+  if(i>=B.length) return DUR;
+  const a=be(i), b=bs(i+1), m=(a+b)/2;
+  return (b-a)<0.06 ? m : Math.min(Math.max(m, a+0.03), b-0.03);
+};
+/* начало ухода акта, который кончается блоком k */
+const gone=k=>Math.max(be(k)+0.02, swap(k)-FADE);
+/* вход акта, который начинается блоком i: не раньше, чем предыдущий
+   догас. Хочется появиться за d секунд до слова — если пауза позволяет. */
+const enter=(i,d)=>i<=1 ? Math.max(0,bs(i)-d) : Math.max(bs(i)-d, gone(i-1)+FADE);
 
 const C={bg:'#0A0D0C',ink:'#FFFFFF',dim:'#6E7A76',dim2:'#49544F',
          green:'#2FD38E',red:'#F0524D',teal:'#3FB7C9',card:'#121716',line:'#232C29'};
@@ -273,14 +288,14 @@ const SC   = enter(11,0.25);   // шкала клиентов, блоки 11–1
 const FM   = enter(14,0.20);   // порог потерь
 const CT   = enter(15,0.20);   // CTA
 
-const A0_OUT   = gone(1,A1);
-const A1_OUT   = gone(2,HK);
-const HK_OUT   = gone(3,CARD);
-const CARD_OUT = gone(8,BR);
-const BR_OUT   = gone(9,FL);
-const FL_OUT   = gone(10,SC);
-const SC_OUT   = gone(13,FM);
-const FM_OUT   = gone(14,CT);
+const A0_OUT   = gone(1);
+const A1_OUT   = gone(2);
+const HK_OUT   = gone(3);
+const CARD_OUT = gone(8);
+const BR_OUT   = gone(9);
+const FL_OUT   = gone(10);
+const SC_OUT   = gone(13);
+const FM_OUT   = gone(14);
 
 /* карточка: на какой доле какого блока набегает строка */
 const ROWON=[at(4,0.12), at(4,0.34), at(4,0.58)];   // цена · себестоимость · продажи
@@ -347,7 +362,7 @@ window.seek=function(tt){
   /* ── БЛОК 1 · постановка ── */
   if(tt < A0_OUT+0.40){
     const p=seg(tt,A0+0.05,0.5,E.out);
-    show(in0, seg(tt,A0,0.35,E.io)*(1-seg(tt,A0_OUT,0.32,E.io)), lerp(20,0,p));
+    show(in0, seg(tt,A0,0.35,E.io)*(1-seg(tt,A0_OUT,FADE,E.io)), lerp(20,0,p));
     i0b.style.color = tt>=at(1,0.28) ? C.ink : C.dim;      // «на треть»
     i0c.style.opacity = seg(tt,at(1,0.45),0.4,E.io);
   } else show(in0,0);
@@ -355,7 +370,7 @@ window.seek=function(tt){
   /* ── БЛОК 2 · обещание ── */
   if(btw(tt,A1-0.05,A1_OUT+0.40)){
     const p=seg(tt,A1,0.45,E.back);
-    show(in1, seg(tt,A1,0.3,E.io)*(1-seg(tt,A1_OUT,0.32,E.io)), lerp(22,0,p));
+    show(in1, seg(tt,A1,0.3,E.io)*(1-seg(tt,A1_OUT,FADE,E.io)), lerp(22,0,p));
     i1items.forEach((it,i)=>{
       it.w.style.opacity=seg(tt,at(2,0.10)+i*0.05,0.3,E.io);
       it.d.style.background = i===3 ? C.green : C.dim;
@@ -366,7 +381,7 @@ window.seek=function(tt){
 
   /* ── БЛОК 3 · разрыв ── */
   if(tt < HK_OUT+0.50){
-    show(hook,1-seg(tt,HK_OUT,0.40,E.io),0,1);
+    show(hook,1-seg(tt,HK_OUT,FADE,E.io),0,1);
     hkV1.style.transformOrigin='left center';
     hkV1.style.transform='scale('+(1+0.014*Math.max(0,1-seg(tt,HK+0.10,0.55,E.out)))+')';
     const RV=at(3,0.50);
@@ -382,7 +397,7 @@ window.seek=function(tt){
   const cardOn = btw(tt,CARD-0.05,CARD_OUT+0.40);
   if(cardOn){
     const inP=seg(tt,CARD,0.45,E.back);
-    show(card,seg(tt,CARD,0.28,E.io)*(1-seg(tt,CARD_OUT,0.30,E.io)),
+    show(card,seg(tt,CARD,0.28,E.io)*(1-seg(tt,CARD_OUT,FADE,E.io)),
          lerp(34,0,inP),lerp(0.975,1,inP));
     card.style.transformOrigin='center top';
 
@@ -438,7 +453,7 @@ window.seek=function(tt){
 
   /* ── БЛОК 9 · тот же десяток, эффект в три раза ── */
   if(btw(tt,BR-0.05,BR_OUT+0.35)){
-    show(bars,seg(tt,BR,0.3,E.io)*(1-seg(tt,BR_OUT,0.32,E.io)));
+    show(bars,seg(tt,BR,0.3,E.io)*(1-seg(tt,BR_OUT,FADE,E.io)));
     const g1=seg(tt,BR+0.15,0.6,E.out), g2=seg(tt,at(9,0.25),0.8,E.out);
     b1.cap.textContent='рост продаж'; b1.num.textContent='+'+Math.round(10*g1)+'%';
     b1.num.style.color=C.dim; b1.col.style.background='#2A322F';
@@ -453,20 +468,20 @@ window.seek=function(tt){
     b2.cap.style.bottom=px(h2+100); b2.cap.style.top='auto';
 
     const xP=seg(tt,X33,0.4,E.back);
-    bx3.style.opacity=seg(tt,X33,0.25,E.io)*(1-seg(tt,BR_OUT,0.3,E.io));
+    bx3.style.opacity=seg(tt,X33,0.25,E.io)*(1-seg(tt,BR_OUT,FADE,E.io));
     bx3.style.transform='scale('+lerp(0.7,1,xP)+')';
     bx3.style.display='block';
   } else {show(bars,0);bx3.style.opacity=0;bx3.style.display='none';}
 
   /* ── БЛОК 10 · вспышка ── */
-  const fO = seg(tt,FL,0.14,E.io) * (1-seg(tt,FL_OUT,0.32,E.io));
+  const fO = seg(tt,FL,0.14,E.io) * (1-seg(tt,FL_OUT,FADE,E.io));
   flash.style.opacity=fO; flash.style.display=fO<=0.001?'none':'block';
   const ftO = seg(tt,FL+0.20,0.26,E.io)*(1-seg(tt,FL_OUT-0.08,0.25,E.io));
   show(fTxt,ftO,lerp(16,0,seg(tt,FL+0.20,0.5,E.out)));
 
   /* ── БЛОКИ 11–13 · шкала клиентов ── */
   if(btw(tt,SC-0.05,SC_OUT+0.40)){
-    show(scale,seg(tt,SC,0.28,E.io)*(1-seg(tt,SC_OUT,0.30,E.io)));
+    show(scale,seg(tt,SC,0.28,E.io)*(1-seg(tt,SC_OUT,FADE,E.io)));
     const fill=Math.round(100*seg(tt,SC+0.15,0.8,E.io));
     const lost=Math.round(10*seg(tt,LOSE10,0.7,E.io)) + Math.round(15*seg(tt,LOSE25,0.9,E.io));
     ticks.forEach((d,i)=>{
@@ -492,7 +507,7 @@ window.seek=function(tt){
   /* ── БЛОК 14 · порог потерь ── */
   if(btw(tt,FM-0.05,FM_OUT+0.40)){
     const p=seg(tt,FM,0.42,E.back);
-    show(form,seg(tt,FM,0.28,E.io)*(1-seg(tt,FM_OUT,0.30,E.io)),lerp(24,0,p));
+    show(form,seg(tt,FM,0.28,E.io)*(1-seg(tt,FM_OUT,FADE,E.io)),lerp(24,0,p));
     fmR.style.opacity=seg(tt,FM+0.35,0.3,E.io);
   } else show(form,0);
 

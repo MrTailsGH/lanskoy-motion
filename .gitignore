@@ -4,3 +4,5 @@ timing.json
 
 # готовые ролики в историю не кладём — вопрос открыт, пункт 3 плана
 I-01_sotrudnik_9x16_ozvuchka.mp4
+out/
+timing-I-*.json
