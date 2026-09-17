@@ -35,10 +35,12 @@ MAP = os.path.join(HERE, 'sfx-map.json')
 INDEX = os.path.join(HERE, 'sfx-index.json')
 EXTS = ('.mp3', '.wav', '.ogg', '.flac', '.m4a', '.aif', '.aiff')
 
-# уровни под голос Станислава, из assets/sfx/SFX.md
-DB_SPEECH = -22.0     # эффект звучит под речью
-DB_PAUSE  = -16.0     # эффект в паузе между блоками
-DB_ACCENT = -11.0     # главное число, единственное место где эффект главнее
+# Уровни под голос Станислава. Отсчёт от рекомендаций assets/sfx/SFX.md,
+# поднято на 6 дБ: по первой пробе эффекты оказались слишком тихими.
+# Общую добавку можно дать ключом --gain, не трогая код.
+DB_SPEECH = -16.0     # эффект звучит под речью
+DB_PAUSE  = -10.0     # эффект в паузе между блоками
+DB_ACCENT =  -5.0     # главное число, единственное место где эффект главнее
 DB_BRIGHT = -3.0      # добавка ярким: они спорят с согласными
 BRIGHT_HZ = 3000
 
@@ -88,6 +90,10 @@ def main():
     if len(sys.argv) < 4:
         print(__doc__); sys.exit(1)
     name, video, out = sys.argv[1], sys.argv[2], sys.argv[3]
+    extra = 0.0
+    if '--gain' in sys.argv:
+        extra = float(sys.argv[sys.argv.index('--gain') + 1].replace(',', '.'))
+        print(f"общая добавка: {extra:+.1f} дБ")
     scene = os.path.join(HERE, name + '.html')
     voice = os.path.join(HERE, 'voice', 'I-' + name[1:] + '.mp3')
 
@@ -110,14 +116,18 @@ def main():
         if meas['hz'] > BRIGHT_HZ:
             target += DB_BRIGHT
             why += ', яркий'
-        gain = round(target - meas['peak'], 1)
-        # на событие должен попасть пик, а не начало файла
-        start = max(0.0, c['t'] - meas['attack'])
+        gain = round(target + extra - meas['peak'], 1)
+        # По какому месту файла равнять. У удара с хвостом — по пику.
+        # У звука-серии пик сидит в хвосте, и равнять надо по первому
+        # слышимому месту, иначе серия отыграет до события.
+        mode = c.get('m', 'peak')
+        shift = meas.get('onset', 0.0) if mode == 'onset' else meas['attack']
+        start = max(0.0, c['t'] - shift)
         ms = int(round(start * 1000))
         ff += ['-i', os.path.join(HERE, rel)]
         parts.append(f"[{i+2}:a]adelay={ms}|{ms},volume={gain}dB[s{i}]")
         mix.append(f"[s{i}]")
-        print(f"  пик {c['t']:>6.2f}  старт {start:>6.2f}  {c['s']:<7}"
+        print(f"  событие {c['t']:>6.2f}  старт {start:>6.2f}  по {mode:<5} {c['s']:<7}"
               f" {os.path.basename(rel):<20} {target:>6.1f} дБ  ({why})")
 
     graph = ';'.join(parts) + ';' + ''.join(mix) + \
