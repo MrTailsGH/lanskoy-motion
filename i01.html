@@ -15,18 +15,17 @@
   .tnum{font-variant-numeric:tabular-nums}
 </style></head>
 <body><div id="stage"></div>
-<body><div id="stage"></div>
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   И-01 «Сотрудник за 80 стоит 134» · 1080×1920 · 30 fps · калькулятор
+   И-01 «Сотрудник за 80 стоит 134» · 1080×1920 · 30 fps
    Всё состояние — чистая функция window.seek(t). CSS-анимаций нет.
    Длина ролика не назначается: её задаёт дорожка через объект T.
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ═══ ТАЙМИНГ · начало ══════════════════════════════════════════ */
 const T = {
-  src: "I-01.mp3 + хвост 1.40 с",
-  DUR: 43.93,
+  src: "I-01.mp3 + хвост 3.50 с",
+  DUR: 46.03,
   B: [
   [  0.00,   2.64]   /*  1 */,
   [  2.83,   4.43]   /*  2 */,
@@ -144,58 +143,18 @@ const grid=E_('',{left:0,top:0,width:'1080px',height:'1920px',opacity:'.30',
   backgroundImage:'url(assets/backgrounds/bg-black.jpg)',backgroundSize:'cover',
   mixBlendMode:'screen',pointerEvents:'none'});
 
-/* ═══ КАЛЬКУЛЯТОР ════════════════════════════════════════════════
-   Настоящий экран iOS из пака. Весь язык канала держится на том, что
-   зритель верит цифре, которая стоит в интерфейсе, — до сих пор
-   интерфейс я рисовал сам, теперь он настоящий.
-
-   Исходник 1934×3916, корпус x 18…1914. Показываем верх: рамку,
-   статусную строку и число. Низ с клавиатурой уводим в затухание,
-   иначе телефон выглядит обрезанным.
-
-   Число «24 210» с картинки глушится чёрным (фон экрана там чистый
-   #000, шва не видно) и поверх пишется своё.
-   ═══════════════════════════════════════════════════════════════ */
-const SRCW=1934, SRCH=3916, BODY_X=18, BODY_Y=19, BODY_W=1896;
-const PH_W=690;                          // ширина телефона на сцене
-const PS=PH_W/BODY_W;                    // масштаб 0,364
-const PH_H=Math.round(2380*PS);          // до второго ряда клавиш
-/* положение числа внутри коробки, посчитано из исходника */
-const NUM_RIGHT=Math.round((BODY_W-1679+BODY_X)*PS);
-const NUM_TOP  =Math.round((1128-BODY_Y)*PS);
-const NUM_H    =Math.round(316*PS);
-
-const phone=E_('',{left:px(Math.round((1080-PH_W)/2)),top:'430px',
-  width:px(PH_W),height:px(PH_H),overflow:'hidden',
-  borderRadius:px(Math.round(180*PS))});
-const phImg=E_('',{left:px(-BODY_X*PS),top:px(-BODY_Y*PS),
-  width:px(Math.round(SRCW*PS)),height:px(Math.round(SRCH*PS)),
-  backgroundImage:'url(assets/calculator/iphone-calculator-24210.png)',
-  backgroundSize:'100% 100%'});
-phone.appendChild(phImg);
-/* заглушка поверх исходного «24 210»: фон экрана там чистый чёрный */
-const phMask=E_('',{left:px(Math.round(40*PS)),top:px(NUM_TOP-34),
-  width:px(Math.round(1810*PS)),height:px(NUM_H+70),background:'#000'});
-phone.appendChild(phMask);
-/* лента операции — выше числа, как выражение на калькуляторе */
-const phTape=E_('',{right:px(NUM_RIGHT),top:px(NUM_TOP-96),
-  font:'300 44px "Golos Text", system-ui, sans-serif',color:'#8A8A8E',
-  whiteSpace:'nowrap',letterSpacing:'-.01em',lineHeight:'1'},'');
-phone.appendChild(phTape);
-/* своё число */
-const phNum=E_('',{right:px(NUM_RIGHT),top:px(NUM_TOP-Math.round(NUM_H*0.30)),
-  font:'300 '+Math.round(NUM_H*1.34)+'px "Golos Text", system-ui, sans-serif',
-  color:'#FFFFFF',whiteSpace:'nowrap',letterSpacing:'-.02em',lineHeight:'1'},'0');
-phone.appendChild(phNum);
-/* низ уводим в фон, чтобы срез не читался как обрез */
-const phFade=E_('',{left:0,bottom:0,width:px(PH_W),height:'190px',
-  background:'linear-gradient(180deg, rgba(10,13,12,0) 0%, rgba(10,13,12,.86) 62%, #0A0D0C 100%)',
-  pointerEvents:'none'});
-phone.appendChild(phFade);
-
-/* Ленты расчёта под телефоном нет намеренно: её роль играет строка
-   операции на самом экране — «80 000 + 12 000». Дублировать то, что
-   уже стоит в интерфейсе, значит отнимать место и внимание. */
+/* ═══ ХУК: два числа ═════════════════════════════════════════════ */
+const hook=E_('',{left:px(X0),top:'560px',width:px(CW)});
+const hkL1=E_('med',{position:'relative',font:'34px "Golos Text Medium"',letterSpacing:'.14em',
+  color:C.dim,textTransform:'uppercase'},'вы платите');
+const hkV1=E_('blk tnum',{position:'relative',font:'128px "Golos Text Black"',whiteSpace:'nowrap',color:C.ink,
+  letterSpacing:'-.02em',marginTop:'10px',lineHeight:'1'},'80 000 ₽');
+const hkGap=E_('',{position:'relative',height:'2px',background:C.line,margin:'54px 0 44px 0',width:px(CW)});
+const hkL2=E_('med',{position:'relative',font:'34px "Golos Text Medium"',letterSpacing:'.14em',
+  color:C.dim,textTransform:'uppercase'},'вы тратите');
+const hkV2=E_('blk tnum',{position:'relative',font:'128px "Golos Text Black"',whiteSpace:'nowrap',color:C.dim2,
+  letterSpacing:'-.02em',marginTop:'10px',lineHeight:'1'},'134 000 ₽');
+[hkL1,hkV1,hkGap,hkL2,hkV2].forEach(e=>hook.appendChild(e));
 
 /* ═══ СЦЕНА 0 · ПОСТАНОВКА ═══════════════════════════════════════ */
 const in0=E_('',{left:px(X0),top:'440px',width:px(CW)});
@@ -205,55 +164,222 @@ const i0b=E_('blk',{position:'relative',font:'96px "Golos Text Black"',color:C.d
   lineHeight:'1.04',letterSpacing:'-.01em',marginTop:'12px'},'ЗА ВОСЕМЬДЕСЯТ<br>ТЫСЯЧ');
 const i0r=E_('',{position:'relative',height:'3px',width:'140px',background:C.line,margin:'44px 0 30px 0'});
 const i0c=E_('med',{position:'relative',font:'38px "Golos Text Medium"',color:C.dim,
-  lineHeight:'1.34'},'на руки, как договорились.');
+  lineHeight:'1.34'},'на руки, как договорились.<br>все довольны.');
 [i0a,i0b,i0r,i0c].forEach(e=>in0.appendChild(e));
 
-/* Подписей под телефоном нет: они садились на футер, а по бюджету
-   чтения на блок итога (2,0 с) и так остаётся около шести слов —
-   их занимает титр. Число стоит на экране, этого довольно. */
+/* ═══ СЦЕНА 1 · ОБЕЩАНИЕ ═════════════════════════════════════════ */
+const in1=E_('',{left:px(X0),top:'420px',width:px(CW)});
+const i1a=E_('blk',{position:'relative',font:'84px "Golos Text Black"',color:C.ink,
+  lineHeight:'1.05',letterSpacing:'-.01em'},'СЧИТАЕМ,<br>ВО СКОЛЬКО ОН<br><span style="color:#2FD38E">ОБХОДИТСЯ</span>');
+const i1r=E_('',{position:'relative',height:'3px',width:'140px',background:C.green,margin:'44px 0 34px 0'});
+const i1items=[];
+['оклад и налоги','взносы','рабочее место','реальные рабочие дни'].forEach(x=>{
+  const w=E_('',{position:'relative',height:'58px'});
+  const d=E_('',{left:0,top:'18px',width:'10px',height:'10px',borderRadius:'5px',background:C.dim});
+  const l=E_('med',{left:'28px',top:'0px',font:'34px "Golos Text Medium"',color:C.dim},x);
+  w.appendChild(d);w.appendChild(l);in1.appendChild(w);i1items.push({w,d,l});
+});
+in1.insertBefore(i1r,in1.firstChild);in1.insertBefore(i1a,in1.firstChild);
+/* Подпись «до последнего рубля · нормы 2026 года» снята: блок обещания
+   длится около двух секунд, на неё физически не остаётся времени. */
+const i1s=E_('med',{position:'relative',font:'30px "Golos Text Medium"',color:C.dim2,
+  marginTop:'28px',letterSpacing:'.04em',display:'none'},'до последнего рубля · нормы 2026 года');
+in1.appendChild(i1s);
 
-/* ═══ ШКАЛА РАБОЧИХ ДНЕЙ ═════════════════════════════════════════ */
+/* ═══ КАРТОЧКА РАСЧЁТА ═══════════════════════════════════════════ */
+const card=E_('',{left:px(X0),top:'516px',width:px(CW),
+  background:C.card,border:'1px solid '+C.line,borderRadius:px(RAD.lg),padding:'30px 34px'});
+function row(h){
+  const w=E_('',{position:'relative',height:px(h||122)});
+  const base=E_('',{left:0,bottom:'10px',width:'100%',height:'1px',background:C.line,opacity:.55});
+  const dot=E_('',{left:0,top:'15px',width:'12px',height:'12px',borderRadius:'6px'});
+  const lab=E_('med',{left:'26px',top:'4px',font:'28px "Golos Text Medium"',
+    letterSpacing:'.11em',textTransform:'uppercase',whiteSpace:'nowrap'});
+  const val=E_('blk tnum',{left:0,top:'44px',font:'64px "Golos Text Black"',letterSpacing:'-.01em',whiteSpace:'nowrap'});
+  const pil=E_('smb',{right:0,top:'52px',font:'25px "Golos Text SemiBold"',padding:'10px 18px',
+    borderRadius:px(RAD.full),whiteSpace:'nowrap'});
+  [base,dot,lab,val,pil].forEach(e=>w.appendChild(e));card.appendChild(w);
+  return {w,dot,lab,val,pil,base};
+}
+const R3=[row(),row(),row()];
+/* подытог прямых расходов идёт ПОСЛЕ первых трёх строк */
+const subRule=E_('',{position:'relative',height:'2px',background:C.dim2,width:'100%',marginTop:'10px'});
+card.appendChild(subRule);
+const subW=E_('',{position:'relative',height:'102px'});
+const subLab=E_('med',{left:0,top:'34px',font:'27px "Golos Text Medium"',letterSpacing:'.11em',
+  textTransform:'uppercase',color:C.dim},'прямые расходы');
+const subVal=E_('blk tnum',{right:0,top:'16px',font:'56px "Golos Text Black"',color:C.ink},'119 600 ₽');
+subW.appendChild(subLab);subW.appendChild(subVal);card.appendChild(subW);
+/* четвёртая строка — рабочее место — после подытога */
+const R4=row(122);
+/* Разбивка рабочего места (аренда · техника · софт) снята: блок про него
+   длится 2,4 с, из них сама разбивка успевала побыть меньше секунды.
+   Три колонки мелкого текста за это время не читаются. Цифры перенести
+   в пост Телеграма, там их можно рассмотреть. */
+const wp=E_('',{position:'relative',height:'58px',marginTop:'2px',display:'none'});
+[['АРЕНДА','7 400'],['ТЕХНИКА','5 000'],['СОФТ И СВЯЗЬ','2 000']].forEach((pair,i)=>{
+  const c=E_('',{left:px(i*231),top:0,width:'220px'});
+  const k=E_('med',{left:0,top:0,font:'21px "Golos Text Medium"',color:C.dim2,
+    letterSpacing:'.14em',whiteSpace:'nowrap'},pair[0]);
+  const v=E_('smb tnum',{left:0,top:'26px',font:'28px "Golos Text SemiBold"',color:C.dim,
+    whiteSpace:'nowrap'},pair[1]+' ₽');
+  c.appendChild(k);c.appendChild(v);wp.appendChild(c);
+});
+card.appendChild(wp);
+const R=[R3[0],R3[1],R3[2],R4];
+
+const totScrim=E_('',{left:0,top:0,width:'1080px',height:'1920px',background:'rgba(10,13,12,.93)'});
+/* ═══ ИТОГ ═══════════════════════════════════════════════════════ */
+const tot=E_('',{left:px(X0),top:'640px',width:px(CW)});
+const totRule=E_('',{position:'relative',height:'4px',width:'130px',background:C.red});
+const totLab=E_('med',{position:'relative',font:'31px "Golos Text Medium"',letterSpacing:'.14em',
+  textTransform:'uppercase',color:C.dim,marginTop:'26px'},'итого в месяц. на одного');
+const totVal=E_('blk tnum',{position:'relative',font:'138px "Golos Text Black"',letterSpacing:'-.03em',whiteSpace:'nowrap',
+  marginTop:'8px',lineHeight:'1.02'},'134 000 ₽');
+const totPil=E_('smb',{position:'relative',display:'inline-block',font:'32px "Golos Text SemiBold"',
+  padding:'14px 26px',borderRadius:px(RAD.full),marginTop:'26px'},'× 1,7 к окладу');
+[totRule,totLab,totVal,totPil].forEach(e=>tot.appendChild(e));
+
+/* ═══ ШКАЛА 247 ══════════════════════════════════════════════════ */
 const COLS=19, ROWS=13, TW=34, TH=17, GX=6, GY=8;
-const scale=E_('',{left:px(X0),top:'560px',width:px(CW)});
+const scale=E_('',{left:px(X0),top:'600px',width:px(CW)});
 const scHead=E_('med',{position:'relative',font:'30px "Golos Text Medium"',letterSpacing:'.13em',
   textTransform:'uppercase',color:C.dim},'рабочих дней в 2026');
-const scGrid=E_('',{position:'relative',width:px(COLS*TW+(COLS-1)*GX),
-  height:px(ROWS*TH+(ROWS-1)*GY),marginTop:'26px'});
+const scGrid=E_('',{position:'relative',width:px(COLS*TW+(COLS-1)*GX),height:px(ROWS*TH+(ROWS-1)*GY),marginTop:'26px'});
 const ticks=[];
 for(let i=0;i<247;i++){
   const c=i%COLS, r=(i/COLS)|0;
   const d=E_('',{left:px(c*(TW+GX)),top:px(r*(TH+GY)),width:px(TW),height:px(TH),borderRadius:'4px'});
   scGrid.appendChild(d);ticks.push(d);
 }
-const scLegend=E_('med',{position:'relative',font:'27px "Golos Text Medium"',color:C.dim,
-  marginTop:'24px',letterSpacing:'.03em'});
+const scLegend=E_('med',{position:'relative',font:'27px "Golos Text Medium"',color:C.dim,marginTop:'24px',letterSpacing:'.03em'});
 const scBig=E_('blk tnum',{position:'relative',font:'196px "Golos Text Black"',color:C.green,
   letterSpacing:'-.02em',marginTop:'18px',lineHeight:'1'},'211');
-const scSub=E_('med',{position:'relative',font:'29px "Golos Text Medium"',color:C.dim,
-  marginTop:'-4px'},'дней он реально работает');
+const scSub=E_('med',{position:'relative',font:'29px "Golos Text Medium"',color:C.dim,marginTop:'-4px'},'дней он реально работает');
 [scHead,scGrid,scLegend,scBig,scSub].forEach(e=>scale.appendChild(e));
 
-/* ═══ ЛЬГОТНЫЙ ТАРИФ ═════════════════════════════════════════════ */
-const msp=E_('',{left:px(X0),top:'640px',width:px(CW),background:C.card,
+/* ═══ СТОЛБИКИ ═══════════════════════════════════════════════════ */
+const BH=560;
+const bars=E_('',{left:px(X0),top:'570px',width:px(CW),height:px(BH+190)});
+function bar(x,w){
+  const g=E_('',{left:px(x),top:0,width:px(w),height:px(BH+190)});
+  const cap=E_('med',{left:0,top:0,width:px(w),font:'28px "Golos Text Medium"',letterSpacing:'.1em',
+    textTransform:'uppercase',color:C.dim,textAlign:'center'});
+  const num=E_('blk tnum',{left:0,width:px(w),font:'62px "Golos Text Black"',textAlign:'center'});
+  const col=E_('',{left:0,width:px(w),borderRadius:px(RAD.sm),bottom:'0px'});
+  [cap,num,col].forEach(e=>g.appendChild(e));bars.appendChild(g);
+  return {g,cap,num,col};
+}
+const b1=bar(0,320), b2=bar(440,320);
+const bx2=E_('blk',{left:px(X0+320),top:'1010px',width:'120px',font:'70px "Golos Text Black"',
+  color:C.red,textAlign:'center'},'×2');
+
+/* ═══ КАРТОЧКА МСП ═══════════════════════════════════════════════ */
+const msp=E_('',{left:px(X0),top:'620px',width:px(CW),background:C.card,
   border:'1px solid '+C.line,borderRadius:px(RAD.lg),padding:'44px 44px'});
 const mspH=E_('med',{position:'relative',font:'29px "Golos Text Medium"',letterSpacing:'.12em',
   textTransform:'uppercase',color:C.green},'льготный тариф мсп');
 const mspT=E_('blk',{position:'relative',font:'64px "Golos Text Black"',color:C.ink,
   marginTop:'18px',lineHeight:'1.12'},'три условия<br>сразу');
-[mspH,mspT].forEach(e=>msp.appendChild(e));
+const mspItems=[];
+/* Три условия списком сняты: блок длится 2,3 с, а на карточке с ними
+   пятнадцать слов. Остаются заголовок и «три условия сразу» — ровно то,
+   что успевает прочитаться, и ровно то, что говорит диктор: проверьте.
+   Сами условия — в посте Телеграма. */
+['в реестре МСП','ОКВЭД из перечня','≥ 70% дохода по нему'].forEach(s=>{
+  const w=E_('',{position:'relative',height:'76px',marginTop:'18px',display:'none'});
+  const d=E_('',{left:0,top:'22px',width:'12px',height:'12px',borderRadius:'6px',background:C.green});
+  const x=E_('med',{left:'32px',top:'4px',font:'40px "Golos Text Medium"',color:C.ink},s);
+  w.appendChild(d);w.appendChild(x);msp.appendChild(w);mspItems.push(w);
+});
+msp.insertBefore(mspT,msp.firstChild);msp.insertBefore(mspH,msp.firstChild);
 
-/* ═══ CTA ════════════════════════════════════════════════════════ */
-const cta=E_('',{left:px(X0),top:'620px',width:px(CW)});
-const ctaRule=E_('',{position:'relative',height:'3px',width:'120px',background:C.teal});
-const cta1=E_('blk',{position:'relative',font:'104px "Golos Text Black"',color:C.ink,
-  marginTop:'36px',lineHeight:'1.04'},'РАЗБОРЫ ЦИФР');
-const cta2=E_('blk',{position:'relative',font:'104px "Golos Text Black"',color:C.green,
-  lineHeight:'1.04'},'В TELEGRAM');
-const ctaPil=E_('smb',{position:'relative',display:'inline-block',font:'36px "Golos Text SemiBold"',
-  color:C.bg,background:C.teal,padding:'16px 30px',borderRadius:px(RAD.full),marginTop:'34px'},'@lanskoy');
-const ctaEcho=E_('blk tnum',{position:'relative',font:'44px "Golos Text Black"',marginTop:'52px',
-  color:C.dim2,letterSpacing:'-.01em'},'80 000 ₽ &nbsp;→&nbsp; <span style="color:#7A3B38">134 000 ₽</span>');
-[ctaRule,cta1,cta2,ctaPil,ctaEcho].forEach(e=>cta.appendChild(e));
+/* ═══ CTA · переход в канал ══════════════════════════════════════
+   Формат взят у ролика-образца: не плашка с призывом, а карточка
+   профиля — тот самый экран, который зритель увидит, когда откроет
+   канал. Узнавание работает лучше уговоров: человек уже видел это
+   место. Стилистика наша — тёмная лесенка поверхностей, зелёный
+   акцент, Golos; из образца взяты только шевроны, порядок появления
+   и нижняя пилюля со ссылкой.
+   Всё внутри карточки лежит в своей системе координат, поэтому
+   собственный конструктор: E_ кладёт в сцену, N_ — в родителя.  */
+const N_=(par,cls,css,txt)=>{const d=document.createElement('div');
+  d.className='abs '+(cls||'');Object.assign(d.style,css||{});
+  if(txt!==undefined)d.innerHTML=txt;par.appendChild(d);return d;};
+
+const PLANE='<svg width="42" height="42" viewBox="0 0 24 24" fill="none">'+
+  '<path d="M21.5 3.2 2.6 10.5c-.9.35-.88 1.63.03 1.95l4.7 1.63 1.8 5.4c.28.85 1.4 1.03 1.94.32'+
+  'l2.5-3.28 4.85 3.56c.6.44 1.46.12 1.62-.61l3.2-14.8c.17-.8-.62-1.47-1.74-1.47z" fill="#0A0D0C"/></svg>';
+const LINKI='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" style="vertical-align:-6px">'+
+  '<path d="M10 13.6a4 4 0 0 0 5.66 0l2.6-2.6a4 4 0 1 0-5.66-5.66l-1.2 1.2M14 10.4a4 4 0 0 0-5.66 0'+
+  'l-2.6 2.6a4 4 0 1 0 5.66 5.66l1.2-1.2" stroke="#3FB7C9" stroke-width="2" stroke-linecap="round"/></svg>';
+
+const cta=E_('',{left:0,top:0,width:'1080px',height:'1920px'});
+
+/* шевроны: «туда, вверх» — единственное движение, которое зритель
+   должен повторить пальцем */
+const chev=N_(cta,'',{left:0,top:'240px',width:'1080px',height:'86px'});
+const chevD=[0,1].map(i=>N_(chev,'',{left:'517px',top:(i*34)+'px',width:'46px',height:'46px',
+  borderTop:'9px solid '+C.dim,borderRight:'9px solid '+C.dim,borderRadius:'4px',
+  transform:'rotate(-45deg)'}));
+
+const ctaH=N_(cta,'',{left:0,top:'336px',width:'1080px',height:'88px',display:'flex',
+  alignItems:'center',justifyContent:'center',gap:'20px'});
+const ctaIco=N_(ctaH,'',{position:'relative',width:'70px',height:'70px',borderRadius:'50%',
+  background:C.teal,display:'flex',alignItems:'center',justifyContent:'center'},PLANE);
+const ctaW1=N_(ctaH,'blk',{position:'relative',font:'68px "Golos Text Black"',color:C.ink,
+  letterSpacing:'.01em'},'TELEGRAM');
+const ctaW2=N_(cta,'blk',{left:0,top:'426px',width:'1080px',textAlign:'center',
+  font:'68px "Golos Text Black"',color:C.green},'ССЫЛКА В ПРОФИЛЕ');
+
+/* карточка профиля */
+const PC={x:100,y:536,w:880,h:600};
+const pcard=N_(cta,'',{left:px(PC.x),top:px(PC.y),width:px(PC.w),height:px(PC.h),
+  background:S.c1,border:'1px solid '+LINE2,borderRadius:px(RAD.lg),
+  boxShadow:'0 30px 80px rgba(0,0,0,.45)'});
+const pcHead=N_(pcard,'',{left:0,top:0,width:px(PC.w),height:'170px'});
+const pcAva=N_(pcHead,'',{left:'40px',top:'40px',width:'120px',height:'120px',borderRadius:'50%',
+  background:S.c2,border:'1px solid '+LINE2,display:'flex',alignItems:'center',
+  justifyContent:'center'});
+N_(pcAva,'blk',{position:'relative',font:'46px "Golos Text Black"',color:C.green,
+  letterSpacing:'.02em'},'ЕЛ');
+const pcName=N_(pcHead,'blk',{left:'190px',top:'52px',font:'44px "Golos Text Black"',
+  color:C.ink,whiteSpace:'nowrap'},'Егор Ланской');
+const pcNick=N_(pcHead,'med',{left:'190px',top:'108px',font:'32px "Golos Text Medium"',
+  color:C.dim},'@lanskoy');
+
+const PILLS=['разборы','цифры','без воды'];
+let pxx=40;
+const pcPills=PILLS.map(t=>{
+  const el=N_(pcard,'smb',{left:px(pxx),top:'190px',font:'30px "Golos Text SemiBold"',
+    color:C.dim,background:S.c2,border:'1px solid '+LINE2,borderRadius:px(RAD.sm),
+    padding:'12px 24px',whiteSpace:'nowrap'},t);
+  pxx += t.length*17 + 74;         // ширину знает шрифт, шаг считаем по буквам
+  return el;
+});
+const pcDesc=N_(pcard,'med',{left:'40px',top:'286px',width:'800px',
+  font:'32px "Golos Text Medium"',color:'#9AA5A1',lineHeight:'1.38'},
+  'разбираю деньги бизнеса в цифрах:<br>что сходится, а что только кажется');
+const pcLink=N_(pcard,'med',{left:'40px',top:'404px',display:'inline-block',
+  font:'32px "Golos Text Medium"',color:C.teal,background:'rgba(63,183,201,.13)',
+  borderRadius:px(RAD.sm),padding:'12px 22px',whiteSpace:'nowrap'},
+  LINKI+'&nbsp; t.me/lanskoy');
+/* зелёная в кадре одна — нижний адрес. Кнопка в карточке тише:
+   иначе два зелёных пятна спорят, и глаз не знает, куда идти. */
+const pcBtn1=N_(pcard,'smb',{left:'40px',top:'492px',font:'34px "Golos Text SemiBold"',
+  color:C.green,border:'2px solid '+C.green,borderRadius:px(RAD.full),padding:'19px 45px',
+  whiteSpace:'nowrap'},'подписаться');
+const pcBtn2=N_(pcard,'smb',{left:'350px',top:'492px',font:'34px "Golos Text SemiBold"',
+  color:C.ink,border:'1px solid '+C.line,borderRadius:px(RAD.full),padding:'19px 46px',
+  whiteSpace:'nowrap'},'открыть');
+
+/* нижняя пилюля — то, что должно остаться в голове после ролика */
+const ctaPil=N_(cta,'blk',{left:0,top:'1170px',width:'1080px',height:'92px',
+  display:'flex',alignItems:'center',justifyContent:'center'});
+const ctaPilIn=N_(ctaPil,'blk',{position:'relative',display:'flex',alignItems:'center',
+  gap:'18px',font:'42px "Golos Text Black"',color:C.bg,background:C.green,
+  borderRadius:px(RAD.full),padding:'22px 46px',letterSpacing:'.02em'},
+  PLANE+'<span>T.ME/LANSKOY</span>');
 
 /* ═══ ТИТР ═══════════════════════════════════════════════════════ */
 const cap=E_('blk',{left:px(X0),top:'258px',width:px(CW),height:'200px',font:'76px "Golos Text Black"',
@@ -281,82 +407,85 @@ const fTail=E_('med',{left:'168px',top:'2px',font:'25px "Golos Text Medium"',
 fSign.appendChild(fName);fSign.appendChild(fTail);
 
 /* ═══ ЯКОРЯ АКТОВ ════════════════════════════════════════════════
-   Калькулятор — становой хребет ролика: он приходит на «считаем» и
-   живёт до итога, считая на глазах. Уходит только на вспышке.
+   Момент, когда акт выезжает на экран: чуть раньше своего блока,
+   чтобы картинка была на месте к первому слову.
    ═══════════════════════════════════════════════════════════════ */
 const A0   = enter(1,0.20);    // постановка
-const PH   = enter(2,0.35);    // калькулятор въезжает, на экране ноль
+const A1   = enter(2,0.30);    // обещание
+const HK   = enter(3,0.40);    // разрыв
+const CARD = enter(4,0.45);    // карточка расчёта
+const TOT  = enter(7,0.15);    // итог
 const FL   = enter(8,0.30);    // вспышка
-const SC   = enter(9,0.25);    // шкала рабочих дней
-const MS   = enter(11,0.20);   // льготный тариф
+const SC   = enter(9,0.25);    // шкала
+const BR   = enter(10,0.15);   // столбики
+const MS   = enter(11,0.20);   // МСП
 const CT   = enter(12,0.20);   // CTA
+/* сколько заполняется шкала дней: столько же должна длиться и серия
+   щелчков, иначе звук тикает по остановившейся цифре */
+const FILLDUR = Math.max(0.8, at(9,0.45)-(SC+0.15));
 
-const A0_OUT = gone(1);
-const PH_OUT = gone(7);        // телефон живёт блоки 2–7
-const FL_OUT = gone(8);
-const SC_OUT = gone(10);
-const MS_OUT = gone(11);
+/* когда акт уходит — ровно к приходу следующего */
+const A0_OUT   = gone(1);
+const A1_OUT   = gone(2);
+const HK_OUT   = gone(3);
+const CARD_OUT = gone(7);
+const FL_OUT   = gone(8);
+const SC_OUT   = gone(9);
+const BR_OUT   = gone(10);
+const MS_OUT   = gone(11);
 
-/* ── что показывает экран калькулятора ────────────────────────────
-   Значение и строка операции меняются по ходу расчёта. Каждый шаг
-   привязан к доле блока, то есть к слову диктора. */
-const PAY  = bs(3)+0.10;       // «вы платите ему восемьдесят»
-const GAP  = at(3,0.55);       // «а тратите — сто тридцать четыре»
-const BACK = bs(4)+0.05;       // «на руки восемьдесят» — возврат к базе
-const TAX  = at(4,0.45);       // «начислить надо девяносто две»
-const INS  = at(5,0.30);       // «взносы — почти двадцать восемь»
-const SUM1 = at(5,0.80);       // «уже сто двадцать»
-const PLACE= at(6,0.45);       // «ещё четырнадцать»
-const TOTAL= bs(7)+0.05;       // «сто тридцать четыре тысячи в месяц»
-
-/* шкала */
-const CUT  = at(9,0.55);       // «минус отпуск и больничные»
-const DAYS = at(9,0.82);       // «двести одиннадцать»
-/* стоимость дня — снова на калькуляторе */
-const DAY  = at(10,0.35);      // «семь тысяч шестьсот»
-/* сколько длится набор числа на экране: столько же должна длиться
-   и серия щелчков в звуке, иначе щелчки тикают по остановившейся цифре */
-const CNT  = 0.55;                                  // счёт на калькуляторе
-const FILLDUR = Math.max(0.8, at(9,0.45)-(SC+0.15));// заполнение шкалы дней
-const TWICE= at(10,0.70);      // «в два раза больше»
+/* строки карточки: на какой доле какого блока набегает значение */
+const ROWON=[bs(4)+0.05, at(4,0.42), at(5,0.30), at(6,0.45)];
+const SUBON=at(5,0.72);         // подытог «прямые расходы»
 
 /* ═══ ЗВУК ═══════════════════════════════════════════════════════
-   Реплики привязаны к тем же якорям. m:'onset' — для звука-серии:
-   щелчки counter должны начаться вместе с числом, а не кончиться
-   до него. a:true — акцент, единственное место громче голоса.
+   Сцена сама говорит, когда что звучит. Времена берутся из тех же
+   якорей, что двигают картинку, поэтому подгонять на слух нечего:
+   звук не может разъехаться с изображением по определению.
+   Собирает дорожку mixsfx.py, пересъёмка кадров для этого не нужна.
    ═══════════════════════════════════════════════════════════════ */
 window.SFX=[
-  {t:PH,          s:'row'},                 // калькулятор пришёл
-  {t:GAP,         s:'bounce'},              // 80 → 134, разрыв
-  {t:TAX,   d:CNT, s:'count', m:'onset'},   // 80 → 92
-  {t:INS,   d:CNT, s:'count', m:'onset'},   // 92 → 119,6
-  {t:PLACE, d:CNT, s:'count', m:'onset'},   // 119,6 → 134
-  {t:TOTAL,       s:'hero', a:true},        // итог
-  {t:FL,          s:'flash'},               // смена акта
-  {t:SC+0.15, d:FILLDUR, s:'count', m:'onset'}, // шкала заполняется
-  {t:DAYS,        s:'land'},                // двести одиннадцать
-  {t:DAY,   d:CNT, s:'count', m:'onset'},   // семь шестьсот
-  {t:CT,          s:'click'}                // CTA
+  /* Прорежено против первой версии: в референсном ролике около семи
+     явных эффектов в минуту, у меня было девятнадцать. Оставлены только
+     те, что отмечают событие, а не сопровождают каждое движение.
+     {a:true} — акцент, единственное место, где эффект главнее голоса. */
+  {t:ROWON[2], d:0.55, s:'count', m:'onset'},  // взносы: число набегает
+                                         // d — сколько длится набор на экране:
+                                         // под него подгоняется длина серии
+                                         // m:'onset' — серия щелчков должна
+                                         // начаться вместе с числом, а не
+                                         // кончиться до него
+  {t:SUBON,       s:'row'},              // подытог встал
+  {t:TOT,         s:'hero', a:true},     // сто тридцать четыре тысячи
+  {t:FL,          s:'flash'},            // смена акта
+  {t:SC+0.15, d:FILLDUR, s:'count', m:'onset'},  // шкала заполняется
+  {t:at(9,0.80),  s:'land'},             // двести одиннадцать
+  {t:at(10,0.68), s:'bounce'},           // в два раза больше
+  {t:CT,          s:'click'},            // CTA: указатель вверх
+  {t:CT+1.84,     s:'land'}             // адрес канала встал
 ];
 
-/* ═══ ТИТРЫ ══════════════════════════════════════════════════════ */
-const FLASH_OUT = FL_OUT+0.32;
+/* ═══ ТИТРЫ ══════════════════════════════════════════════════════
+   Каждый титр привязан к блоку дорожки: либо к его началу, либо к
+   доле внутри него. Абсолютных секунд здесь нет.
+   ═══════════════════════════════════════════════════════════════ */
+const FLASH_OUT = FL_OUT+0.32;                // когда белое поле ушло
 const CUES=[
  [0.00,                        ''],
- [PAY,                         'ВЫ ПЛАТИТЕ ЕМУ'],
- [GAP,                         'А ТРАТИТЕ —|СТО ТРИДЦАТЬ ЧЕТЫРЕ.|r'],
- [BACK,                        'НА РУКИ —|ВОСЕМЬДЕСЯТ.|w'],
- [TAX,                         'НАЧИСЛИТЬ НАДО|ДЕВЯНОСТО ДВЕ.|w'],
- [INS,                         'СВЕРХУ ВЗНОСЫ:|ТРИДЦАТЬ ПРОЦЕНТОВ|r'],
- [SUM1,                        'ЭТО УЖЕ|СТО ДВАДЦАТЬ.|w'],
- [PLACE,                       'ПЛЮС РАБОЧЕЕ МЕСТО:|ЕЩЁ ЧЕТЫРНАДЦАТЬ.|r'],
- [TOTAL,                       'СТО ТРИДЦАТЬ ЧЕТЫРЕ|ТЫСЯЧИ В МЕСЯЦ|r'],
+ [bs(3),                       'ВЫ ПЛАТИТЕ ЕМУ'],
+ [at(3,0.50),                  'А ТРАТИТЕ|СТО ТРИДЦАТЬ ЧЕТЫРЕ.|r'],
+ [bs(4),                       'НА РУКИ —|ВОСЕМЬДЕСЯТ.|w'],
+ [at(4,0.42),                  'НАЧИСЛИТЬ НАДО|ДЕВЯНОСТО ДВЕ.|w'],
+ [bs(5),                       'СВЕРХУ ВЗНОСЫ:|ТРИДЦАТЬ ПРОЦЕНТОВ|r'],
+ [at(5,0.72),                  'ЭТО УЖЕ|СТО ДВАДЦАТЬ.|w'],
+ [bs(6),                       'ПЛЮС РАБОЧЕЕ МЕСТО:|ЕЩЁ ЧЕТЫРНАДЦАТЬ.|r'],
+ [bs(7),                       'СТО ТРИДЦАТЬ ЧЕТЫРЕ|ТЫСЯЧИ В МЕСЯЦ|r'],
  [FL,                          ''],
  [Math.max(bs(9),FLASH_OUT),   'В ГОДУ|247 РАБОЧИХ ДНЕЙ|w'],
- [CUT,                         'МИНУС ОТПУСК.|МИНУС БОЛЬНИЧНЫЕ.|r'],
- [DAYS,                        'ОСТАЁТСЯ|ДВЕСТИ ОДИННАДЦАТЬ.|g'],
+ [at(9,0.55),                  'МИНУС ОТПУСК.|МИНУС БОЛЬНИЧНЫЕ.|r'],
+ [at(9,0.80),                  'ОСТАЁТСЯ|ДВЕСТИ ОДИННАДЦАТЬ.|g'],
  [bs(10),                      'ЕГО РАБОЧИЙ ДЕНЬ —|СЕМЬ ШЕСТЬСОТ.|r'],
- [TWICE,                       'В ДВА РАЗА БОЛЬШЕ.'],
+ [at(10,0.68),                 'В ДВА РАЗА БОЛЬШЕ.'],
  [bs(11),                      'ПРОВЕРЬТЕ|ЛЬГОТНЫЙ ТАРИФ.|g'],
  [CT,                          '']
 ];
@@ -372,78 +501,129 @@ function capHTML(s){
 /* ═══ SEEK ═══════════════════════════════════════════════════════ */
 function show(el,o,y,s){
   el.style.opacity=o;
-  el.style.transform='translate(0px,'+(y||0)+'px)'+(s?' scale('+s+')':'');
+  el.style.transform='translate('+0+'px,'+(y||0)+'px)'+(s?' scale('+s+')':'');
   el.style.display=o<=0.001?'none':'block';
 }
-function hideMain(){[phone,flash,fTxt,scale,msp,cta]
+function hideMain(){[hook,card,tot,totScrim,flash,fTxt,scale,bars,bx2,msp,cta]
   .forEach(e=>{e.style.opacity=0;e.style.display='none';});}
-
-/* сколько показывает калькулятор в момент tt */
-function screenValue(tt){
-  if(tt < PAY)  return 0;
-  if(tt < GAP)  return 80000;
-  if(tt < BACK) return lerp(80000,134000,seg(tt,GAP,0.45,E.out));
-  if(tt < TAX)  return 80000;
-  if(tt < INS)  return lerp(80000,92000,seg(tt,TAX,0.55,E.out));
-  if(tt < PLACE)return lerp(92000,119600,seg(tt,INS,0.55,E.out));
-  if(tt < TOTAL)return lerp(119600,134000,seg(tt,PLACE,0.55,E.out));
-  return 134000;
-}
-function screenTape(tt){
-  if(tt>=TOTAL) return '';
-  if(tt>=PLACE) return '119 600 + 14 400';
-  if(tt>=INS)   return '92 000 + 27 600';
-  if(tt>=TAX)   return '80 000 + 12 000';
-  if(tt>=BACK)  return 'на руки';
-  if(tt>=GAP)   return '';
-  if(tt>=PAY)   return 'оклад на руки';
-  return '';
-}
 
 window.seek=function(tt){
   glow.style.opacity = 0.55 + 0.45*Math.sin(tt*0.42);
   vign.style.opacity = 1;
-  grid.style.opacity = 0.30;
 
   /* ── БЛОК 1 · постановка ── */
   if(tt < A0_OUT+0.40){
     const p=seg(tt,A0+0.05,0.5,E.out);
     show(in0, seg(tt,A0,0.35,E.io)*(1-seg(tt,A0_OUT,FADE,E.io)), lerp(20,0,p));
     i0b.style.color = tt>=at(1,0.45) ? C.ink : C.dim;
-    i0c.style.opacity = seg(tt,at(1,0.60),0.4,E.io);
+    i0c.style.opacity = seg(tt,at(1,0.58),0.4,E.io);
   } else show(in0,0);
 
-  /* ── БЛОКИ 2–7 · калькулятор считает ── */
-  const phOn = btw(tt,PH-0.05,PH_OUT+0.40);
-  if(phOn){
-    const inP=seg(tt,PH,0.45,E.back);
-    const o=seg(tt,PH,0.30,E.io)*(1-seg(tt,PH_OUT,FADE,E.io));
-    show(phone,o,lerp(40,0,inP),lerp(0.965,1,inP));
-    phone.style.transformOrigin='center top';
+  /* ── БЛОК 2 · обещание ── */
+  if(btw(tt,A1-0.05,A1_OUT+0.40)){
+    const p=seg(tt,A1,0.45,E.back);
+    show(in1, seg(tt,A1,0.3,E.io)*(1-seg(tt,A1_OUT,FADE,E.io)), lerp(22,0,p));
+    i1items.forEach((it,i)=>{
+      const o=seg(tt,at(2,0.10)+i*0.05,0.3,E.io);   // почти разом: список сканируют, а не читают
+      it.w.style.opacity=o; it.d.style.background = i===3 ? C.green : C.dim;
+    });
+  } else show(in1,0);
 
-    const v=screenValue(tt);
-    phNum.textContent = ru(v);
-    phNum.style.color = (tt>=GAP&&tt<BACK) ? '#FF453A' : '#FFFFFF';
-    phTape.textContent = screenTape(tt);
-    phTape.style.opacity = tt>=BACK ? 1 : 0.85;
+  if(tt < HK-0.05){ hideMain(); drawCaption(tt); drawFooter(tt); return; }
 
+  /* ── БЛОК 3 · разрыв: 80 против 134 ── */
+  if(tt < HK_OUT+0.50){
+    show(hook,1-seg(tt,HK_OUT,FADE,E.io),0,1);
+    hkV1.style.transformOrigin='left center';
+    hkV1.style.transform='scale('+(1+0.014*Math.max(0,1-seg(tt,HK+0.10,0.55,E.out)))+')';
+    const RV=at(3,0.50);                       // «а тратите — сто тридцать четыре»
+    const rv=seg(tt,RV,0.42,E.back);
+    hkV2.style.color = tt<RV ? C.dim2 : C.red;
+    hkV2.style.opacity = tt<RV ? 0.42 : lerp(0.42,1,rv);
+    hkV2.style.transformOrigin='left center';
+    hkV2.style.transform='scale('+lerp(0.90,1,rv)+')';
+    hkL2.style.color = tt<RV?C.dim2:C.dim;
+  } else show(hook,0);
 
+  /* ── БЛОКИ 4–7 · карточка расчёта ── */
+  const cardOn = btw(tt,CARD-0.05,CARD_OUT+0.40);
+  if(cardOn){
+    const inP=seg(tt,CARD,0.45,E.back);
+    const dimUnder = lerp(1,0.13,seg(tt,TOT,0.42,E.io));
+    show(card,seg(tt,CARD,0.28,E.io)*(1-seg(tt,CARD_OUT,FADE,E.io))*dimUnder,
+         lerp(34,0,inP),lerp(0.975,1,inP));
+    card.style.transformOrigin='center top';
 
-  } else show(phone,0);
+    const grey = tt>=ROWON[1];
+    const def=[
+      {on:ROWON[0], lab:'на руки',          v:80000, dot:C.dim, col:()=>grey?C.dim2:C.ink,
+       labCol:()=>grey?C.dim2:C.dim, pil:''},
+      {on:ROWON[1], lab:'начислено',        v:92000, dot:C.ink, col:()=>tt>=ROWON[2]?C.dim2:C.ink,
+       labCol:()=>tt>=ROWON[2]?C.dim2:C.dim, pil:'+ НДФЛ 13%', pilC:C.red},
+      {on:ROWON[2], lab:'страховые взносы', v:27600, dot:C.red, col:()=>C.red,
+       labCol:()=>C.dim, pil:'30% от начисленного', pilC:C.red},
+      {on:ROWON[3], lab:'рабочее место',    v:14400, dot:C.red, col:()=>C.red,
+       labCol:()=>C.dim, pil:''}
+    ];
+    def.forEach((d,i)=>{
+      const r=R[i], o=seg(tt,d.on,0.30,E.io);
+      r.w.style.opacity=1;
+      r.val.style.opacity=o; r.dot.style.opacity=o;
+      r.val.style.transform='translateY('+lerp(12,0,seg(tt,d.on,0.42,E.out))+'px)';
+      const cnt=seg(tt,d.on,0.55,E.out);
+      r.val.textContent=ru(d.v*cnt)+' ₽';
+      r.val.style.color=d.col();
+      r.lab.textContent=d.lab;
+      const pre=seg(tt,CARD+0.15+i*0.09,0.3,E.io);
+      r.lab.style.opacity=Math.max(pre,o);
+      r.lab.style.color = o<0.02 ? C.dim2 : d.labCol();
+      r.dot.style.background=d.dot;
+      r.base.style.opacity = i===3 ? 0 : lerp(0.55,0.3,o);
+      if(d.pil){r.pil.style.display='block';r.pil.textContent=d.pil;
+        r.pil.style.color=d.pilC;r.pil.style.background='rgba(240,82,77,.13)';
+        r.pil.style.opacity=seg(tt,d.on+0.25,0.3,E.io)*(1-seg(tt,d.on+3.4,0.4,E.io));}
+      else r.pil.style.display='none';
+    });
 
-  /* ── БЛОК 8 · вспышка ── */
+    const sO=seg(tt,SUBON,0.35,E.io);
+    subRule.style.opacity=Math.max(0.35,sO);
+    subW.style.opacity=1; subLab.style.opacity=Math.max(seg(tt,CARD+0.5,0.3,E.io),sO);
+    subLab.style.color=sO>0.5?C.dim:C.dim2; subVal.style.opacity=sO;
+    subVal.textContent=ru(119600*seg(tt,SUBON,0.5,E.out))+' ₽';
+  } else show(card,0);
+
+  /* ── БЛОК 7 · итог ── */
+  const totOn=btw(tt,TOT-0.05,CARD_OUT+0.40);
+  const scrimO = totOn ? seg(tt,TOT,0.35,E.io)*(1-seg(tt,CARD_OUT,FADE,E.io)) : 0;
+  totScrim.style.opacity=scrimO; totScrim.style.display=scrimO<=0.001?'none':'block';
+  if(totOn){
+    const p=seg(tt,TOT,0.42,E.back);
+    show(tot,seg(tt,TOT,0.25,E.io)*(1-seg(tt,CARD_OUT,FADE,E.io)),lerp(18,0,p));
+    totRule.style.background=C.red;
+    totVal.style.color=C.red;
+    totVal.textContent=ru(lerp(119600,134000,seg(tt,TOT,0.55,E.out)))+' ₽';
+    totPil.style.color=C.red;totPil.style.background='rgba(240,82,77,.13)';
+    totPil.style.opacity=seg(tt,TOT+0.55,0.3,E.io);
+  } else show(tot,0);
+
+  /* ── БЛОК 8 · вспышка, смена акта ── */
   const fO = seg(tt,FL,0.14,E.io) * (1-seg(tt,FL_OUT,FADE,E.io));
   flash.style.opacity=fO; flash.style.display=fO<=0.001?'none':'block';
-  const ftO = seg(tt,FL+0.18,0.26,E.io)*(1-seg(tt,FL_OUT-0.06,0.22,E.io));
-  show(fTxt,ftO,lerp(16,0,seg(tt,FL+0.18,0.5,E.out)));
+  const ftO = seg(tt,FL+0.22,0.26,E.io)*(1-seg(tt,FL_OUT-0.08,0.25,E.io));
+  show(fTxt,ftO,lerp(16,0,seg(tt,FL+0.22,0.5,E.out)));
 
-  /* ── БЛОКИ 9–10 · шкала дней и цена дня ── */
-  if(btw(tt,SC-0.05,SC_OUT+0.40)){
+  /* ── БЛОК 9 · шкала рабочих дней ── */
+  const scOn=btw(tt,SC-0.05,SC_OUT+0.40);
+  if(scOn){
     show(scale,seg(tt,SC,0.28,E.io)*(1-seg(tt,SC_OUT,FADE,E.io)));
+    /* клетки заполняются ровно к концу «почти двести пятьдесят рабочих дней» */
     const fill=Math.round(247*seg(tt,SC+0.15,FILLDUR,E.io));
-    const redN=Math.round(36*seg(tt,CUT,0.9,E.io));
+    const CUT=at(9,0.55);                      // «минус отпуск и больничные»
+    const redP=seg(tt,CUT,0.9,E.io);
+    const redN=Math.round(36*redP);
     ticks.forEach((d,i)=>{
-      const lit=i<fill, isRed=i>=247-redN;
+      const lit=i<fill;
+      const isRed = i>=247-redN;
       d.style.background = !lit?'#1A211F' : isRed?C.red : C.green;
       d.style.opacity = !lit?1 : isRed?1 : (tt>=CUT?0.5:1);
     });
@@ -452,59 +632,111 @@ window.seek=function(tt){
       ? '<span style="color:'+C.red+'">28 отпуск</span> &nbsp;·&nbsp; <span style="color:'+C.red+'">8 больничных</span>'
       : '&nbsp;';
     scLegend.style.opacity=seg(tt,legOn,0.3,E.io);
-
-    /* после «двести одиннадцать» крупное число меняется на цену дня */
-    const bO=seg(tt,DAYS,0.3,E.io), bP=seg(tt,DAYS,0.42,E.back);
+    const BIG=at(9,0.80);                      // «двести одиннадцать»
+    const bO=seg(tt,BIG,0.3,E.io), bP=seg(tt,BIG,0.42,E.back);
     scBig.style.opacity=bO; scSub.style.opacity=bO;
-    scBig.style.transformOrigin='left center';
-    scBig.style.transform='scale('+lerp(0.88,1,bP)+')';
-    if(tt>=DAY){
-      scBig.textContent=ru(7620*seg(tt,DAY,0.55,E.out))+' ₽';
-      scBig.style.color=C.red;
-      scBig.style.fontSize='150px';
-      // «стоит» и «вдвое» из лексики канала убраны — и в голосе, и на экране.
-      scSub.textContent = tt>=TWICE ? 'один рабочий день · в два раза больше оклада'
-                                    : 'во столько обходится один его день';
-    } else {
-      scBig.textContent=ru(211*seg(tt,DAYS,0.5,E.out));
-      scBig.style.color=C.green;
-      scBig.style.fontSize='196px';
-      scSub.textContent='дней он реально работает';
-    }
+    scBig.style.transform='scale('+lerp(0.88,1,bP)+')';scBig.style.transformOrigin='left center';
+    scBig.textContent=ru(211*seg(tt,BIG,0.5,E.out));
   } else show(scale,0);
 
+  /* ── БЛОК 10 · столбики ── */
+  const brOn=btw(tt,BR-0.05,BR_OUT+0.35);
+  if(brOn){
+    show(bars,seg(tt,BR,0.28,E.io)*(1-seg(tt,BR_OUT,FADE,E.io)));
+    const g1=seg(tt,BR+0.15,0.6,E.out), g2=seg(tt,at(10,0.35),0.8,E.out);
+    b1.cap.textContent='как вы считаете'; b1.num.textContent=ru(3890*g1)+' ₽';
+    b1.num.style.color=C.dim; b1.col.style.background='#2A322F';
+    const h1=Math.round(BH*(3890/7620)*g1);
+    b1.col.style.height=px(h1); b1.col.style.bottom='0px';
+    b1.num.style.bottom=px(h1+18); b1.num.style.top='auto';
+    b1.cap.style.bottom=px(h1+96); b1.cap.style.top='auto';
+
+    b2.cap.textContent='как есть'; b2.num.textContent=ru(7620*g2)+' ₽';
+    b2.num.style.color=C.red; b2.col.style.background=C.red;
+    const h2=Math.round(BH*g2);
+    b2.col.style.height=px(h2); b2.col.style.bottom='0px';
+    b2.num.style.bottom=px(h2+18); b2.num.style.top='auto';
+    b2.cap.style.bottom=px(h2+96); b2.cap.style.top='auto';
+
+    const X2=at(10,0.68);                      // «в два раза больше»
+    const xP=seg(tt,X2,0.4,E.back);
+    bx2.style.opacity=seg(tt,X2,0.25,E.io)*(1-seg(tt,BR_OUT,FADE,E.io));
+    bx2.style.transform='scale('+lerp(0.7,1,xP)+')';
+    bx2.style.display='block';
+  } else {show(bars,0);bx2.style.opacity=0;bx2.style.display='none';}
+
   /* ── БЛОК 11 · льготный тариф ── */
-  if(btw(tt,MS-0.05,MS_OUT+0.40)){
+  const mOn=btw(tt,MS-0.05,MS_OUT+0.40);
+  if(mOn){
     const p=seg(tt,MS,0.42,E.back);
     show(msp,seg(tt,MS,0.28,E.io)*(1-seg(tt,MS_OUT,FADE,E.io)),lerp(24,0,p));
+    mspItems.forEach(w=>{w.style.opacity=1;});
   } else show(msp,0);
 
-  /* ── БЛОК 12 · CTA ── */
+  /* ── БЛОК 12 · CTA: профиль канала собирается по шагам ──
+     Порядок тот же, что в образце: сначала указатель и вывеска, потом
+     карточка, потом её содержимое — метки, описание, ссылка, кнопки, —
+     и в конце адрес. Зритель успевает прочитать по одной вещи за раз. */
   if(tt>=CT-0.05){
-    const p=seg(tt,CT,0.45,E.back);
-    show(cta,seg(tt,CT,0.3,E.io),lerp(26,0,p));
-    ctaPil.style.opacity=seg(tt,CT+0.45,0.3,E.io);
-    ctaEcho.style.opacity=seg(tt,at(12,0.55),0.5,E.io);
+    show(cta,seg(tt,CT,0.22,E.io));
+
+    /* шевроны дышат вверх: движение подсказывает жест */
+    const puls=Math.sin((tt-CT)*5.2);
+    chev.style.opacity=seg(tt,CT,0.3,E.io);
+    chevD.forEach((d,i)=>{
+      d.style.opacity=0.45+0.55*Math.max(0,Math.sin((tt-CT)*5.2-i*0.5));
+      d.style.transform='translateY('+(puls*4)+'px) rotate(-45deg)';
+    });
+    show(ctaH ,seg(tt,CT+0.05,0.3,E.io),lerp(18,0,seg(tt,CT+0.05,0.4,E.out)));
+    ctaH.style.display=seg(tt,CT+0.05,0.3,E.io)<=0.001?'none':'flex';
+    show(ctaW2,seg(tt,CT+0.20,0.3,E.io),lerp(18,0,seg(tt,CT+0.20,0.4,E.out)));
+
+    const cO=seg(tt,CT+0.32,0.30,E.io);
+    show(pcard,cO,lerp(34,0,seg(tt,CT+0.32,0.5,E.out)),lerp(0.94,1,seg(tt,CT+0.32,0.5,E.back)));
+    pcard.style.transformOrigin='50% 0%';
+
+    const hO=seg(tt,CT+0.52,0.28,E.io);
+    pcAva.style.opacity=hO; pcName.style.opacity=hO; pcNick.style.opacity=hO;
+    pcName.style.transform='translateY('+lerp(10,0,seg(tt,CT+0.52,0.4,E.out))+'px)';
+
+    pcPills.forEach((el,i)=>{
+      const on=CT+0.74+i*0.12;
+      el.style.opacity=seg(tt,on,0.24,E.io);
+      el.style.transform='translateY('+lerp(12,0,seg(tt,on,0.34,E.out))+'px)';
+    });
+    show(pcDesc,seg(tt,CT+1.14,0.30,E.io),lerp(10,0,seg(tt,CT+1.14,0.4,E.out)));
+    show(pcLink,seg(tt,CT+1.36,0.28,E.io),lerp(10,0,seg(tt,CT+1.36,0.4,E.out)));
+    pcLink.style.display=seg(tt,CT+1.36,0.28,E.io)<=0.001?'none':'inline-block';
+    const bO=seg(tt,CT+1.56,0.28,E.io);
+    pcBtn1.style.opacity=bO; pcBtn2.style.opacity=bO;
+    pcBtn1.style.transform='scale('+lerp(0.92,1,seg(tt,CT+1.56,0.42,E.back))+')';
+
+    show(ctaPil,seg(tt,CT+1.84,0.30,E.io));
+    ctaPil.style.display=seg(tt,CT+1.84,0.30,E.io)<=0.001?'none':'flex';
+    ctaPilIn.style.transform='scale('+lerp(0.90,1,seg(tt,CT+1.84,0.46,E.back))+')';
   } else show(cta,0);
 
   drawCaption(tt); drawFooter(tt);
 };
 
-const capFit={};
+const capFit={};                 // кегль подбирается один раз на титр и кешируется
 function fitCaption(html){
   if(capFit[html]!==undefined) return capFit[html];
   let size=76;
   cap.style.display='block'; cap.style.opacity='0'; cap.innerHTML=html;
   while(size>48){
     cap.style.fontSize=size+'px';
-    if(cap.scrollHeight <= size*1.08*2+2) break;
+    const lh=size*1.08;
+    if(cap.scrollHeight <= lh*2+2) break;
     size-=2;
   }
   capFit[html]=size; return size;
 }
+
 function onWhite(){
   return flash.style.display!=='none' && parseFloat(flash.style.opacity||0)>0.5;
 }
+
 function drawCaption(tt){
   let idx=-1;
   for(let i=0;i<CUES.length;i++) if(tt>=CUES[i][0]) idx=i;
@@ -519,10 +751,11 @@ function drawCaption(tt){
     cap.style.display='block';
   } else {cap.style.opacity=0;cap.style.display='none';}
 }
+
 function drawFooter(tt){
   const w=onWhite();
-  const fu=(tt>=PH-0.10 && tt<CT+0.10)
-    ? seg(tt,PH-0.10,0.4,E.io)*(1-seg(tt,CT-0.20,0.3,E.io)) : 0;
+  const fu=(tt>=CARD-0.10 && tt<CT+0.10)
+    ? seg(tt,CARD-0.10,0.4,E.io)*(1-seg(tt,CT-0.20,0.3,E.io)) : 0;
   fCalc.style.opacity=fu; fCalc.style.color=w?'#9AA5A1':C.dim2;
   fSign.style.opacity=1;
   fName.style.color=w?'#0A0D0C':C.ink;
