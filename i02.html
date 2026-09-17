@@ -301,10 +301,15 @@ const cap=E_('blk',{left:px(X0),top:'258px',width:px(CW),height:'200px',font:'76
 /* ═══ ФУТЕР ══════════════════════════════════════════════════════ */
 const fCalc=E_('med',{left:px(X0),top:'1318px',width:'900px',font:'25px "Golos Text Medium"',
   color:C.dim2,letterSpacing:'.05em'},'расчёт: цена 1000 ₽ · себестоимость 700 ₽ · скидка 20%');
-const fSign=E_('',{left:px(X0),top:'1356px',width:'900px'});
-const fName=E_('blk',{left:0,top:0,font:'28px "Golos Text Black"',color:C.ink,
+/* Подпись — строка, а не две координаты. Раньше хвост стоял на
+   жёстких 168 px, и разделитель наезжал на «Й»: «ЛАНСКОЙ» в Black
+   с разрядкой .16em шире этих 168. Ширину знает шрифт — пусть он её
+   и держит. */
+const fSign=E_('',{left:px(X0),top:'1356px',width:'900px',display:'flex',
+  alignItems:'baseline',gap:'16px'});
+const fName=E_('blk',{position:'relative',font:'28px "Golos Text Black"',color:C.ink,
   letterSpacing:'.16em'},'ЛАНСКОЙ');
-const fTail=E_('med',{left:'168px',top:'2px',font:'25px "Golos Text Medium"',
+const fTail=E_('med',{position:'relative',font:'25px "Golos Text Medium"',
   color:C.dim,letterSpacing:'.05em'},'· про деньги без воды');
 fSign.appendChild(fName);fSign.appendChild(fTail);
 
