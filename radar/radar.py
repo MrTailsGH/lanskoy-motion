@@ -326,6 +326,27 @@ def main():
             print(f"  {ch['handle']:24} ОШИБКА: {str(e)[:60]}", file=sys.stderr)
         time.sleep(1.2)
 
+    # Провалившийся прогон не должен портить историю. Снимок без роликов,
+    # записанный поверх нормального, обнуляет прирост — главную метрику
+    # радара, — и следующий удачный прогон покажет рост «с нуля».
+    # Так уже случилось 18.09.2026: контейнер без доступа к youtube.com
+    # получил 403 на все 24 канала и записал пустой снимок вместе с пустым
+    # отчётом. Поэтому теперь пустой результат — это ошибка, а не результат.
+    total = sum(len(h["shorts"]) for h in scan)
+    if total == 0:
+        print("Ни один канал не открылся — история и отчёт не тронуты.", file=sys.stderr)
+        print("Если это 403 на CONNECT, у контейнера закрыт доступ к youtube.com.",
+              file=sys.stderr)
+        sys.exit(1)
+
+    # Частичный обвал тоже опасен: пропавшие каналы выпадут из прироста.
+    # Меньше половины прошлого объёма — повод остановиться и посмотреть.
+    prev_total = sum(len(v) for v in prev.values())
+    if prev_total and total < prev_total // 2:
+        print(f"Снято {total} роликов против {prev_total} в прошлом прогоне — "
+              f"похоже на сбой сети. История и отчёт не тронуты.", file=sys.stderr)
+        sys.exit(1)
+
     snapshot = {h["handle"]: {v: s["views"] for v, s in h["shorts"].items()} for h in scan}
     hist["snapshots"].append({
         "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
