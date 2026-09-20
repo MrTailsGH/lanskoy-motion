@@ -42,21 +42,30 @@ jobs:
       - name: Инструменты
         shell: bash
         run: |
-          python -m pip install -q -U yt-dlp
-          ffmpeg -version | head -1
+          # На Windows команда может называться python, python3 или py —
+          # зависит от того, как ставили. Находим один раз и кладём в
+          # окружение шага, чтобы дальше не гадать.
+          PY=$(command -v python || command -v python3 || command -v py) || {
+            echo 'Python не найден в PATH раннера'; exit 1; }
+          echo "PY=$PY" >> "$GITHUB_ENV"
+          # numpy нужен razbor.py для покадровых замеров, yt-dlp — качать.
+          "$PY" -m pip install -q -U yt-dlp numpy
+          ffmpeg -version | head -1 || {
+            echo 'ffmpeg не найден в PATH раннера — winget install Gyan.FFmpeg'; exit 1; }
 
       - name: Снять ролики
         shell: bash
         run: |
           if [ -n "${{ inputs.url }}" ]; then
-            python snimok.py --url "${{ inputs.url }}"
+            "$PY" snimok.py --url "${{ inputs.url }}"
           else
-            python snimok.py --top "${{ inputs.top || 5 }}"
+            "$PY" snimok.py --top "${{ inputs.top || 5 }}"
           fi
 
       - name: Сводка
         shell: bash
-        run: python svodka.py Primeri --out Primeri/SVODKA.md
+        run: |
+          "$PY" svodka.py Primeri --out Primeri/SVODKA.md
 
       - name: Отчёт на страницу запуска
         if: always()
