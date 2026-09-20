@@ -25,20 +25,24 @@
 /* ═══ ТАЙМИНГ · начало ══════════════════════════════════════════ */
 const T = {
   src: "I-01.mp3 + хвост 3.50 с",
-  DUR: 46.03,
+  DUR: 54.02,
   B: [
-  [  0.00,   2.64]   /*  1 */,
-  [  2.83,   4.43]   /*  2 */,
-  [  4.82,   8.69]   /*  3 */,
-  [  9.10,  14.96]   /*  4 */,
-  [ 16.10,  20.97]   /*  5 */,
-  [ 21.39,  23.76]   /*  6 */,
-  [ 24.09,  26.06]   /*  7 */,
-  [ 26.50,  27.61]   /*  8 */,
-  [ 27.97,  33.73]   /*  9 */,
-  [ 34.20,  38.26]   /* 10 */,
-  [ 38.77,  41.07]   /* 11 */,
-  [ 41.41,  42.52]   /* 12 */
+  [  0.00,   4.31]   /*  1 */,
+  [  4.61,   6.52]   /*  2 */,
+  [  6.77,   8.17]   /*  3 */,
+  [  8.84,  12.32]   /*  4 */,
+  [ 13.05,  15.34]   /*  5 */,
+  [ 15.98,  18.76]   /*  6 */,
+  [ 19.15,  23.88]   /*  7 */,
+  [ 24.32,  25.33]   /*  8 */,
+  [ 25.72,  28.70]   /*  9 */,
+  [ 29.11,  31.75]   /* 10 */,
+  [ 32.37,  35.87]   /* 11 */,
+  [ 36.33,  39.36]   /* 12 */,
+  [ 39.95,  41.45]   /* 13 */,
+  [ 41.67,  45.39]   /* 14 */,
+  [ 45.75,  48.32]   /* 15 */,
+  [ 48.84,  50.39]   /* 16 */
   ]
 };
 /* ═══ ТАЙМИНГ · конец ═══════════════════════════════════════════ */
@@ -159,18 +163,29 @@ const grid=E_('',{left:0,top:0,width:'1080px',height:'1920px',opacity:'.30',
 
 /* ═══ ХУК: два числа ═════════════════════════════════════════════ */
 const hook=E_('',{left:px(X0),top:'560px',width:px(CW)});
-const hkL1=E_('med',{position:'relative',font:'34px "Golos Text Medium"',letterSpacing:'.14em',
-  color:C.dim,textTransform:'uppercase'},'вы платите');
-const hkV1=E_('blk tnum',{position:'relative',font:'128px "Golos Text Black"',whiteSpace:'nowrap',color:C.ink,
-  letterSpacing:'-.02em',marginTop:'10px',lineHeight:'1'},'80 000 ₽');
-const hkGap=E_('',{position:'relative',height:'2px',background:C.line,margin:'54px 0 44px 0',width:px(CW)});
-const hkL2=E_('med',{position:'relative',font:'34px "Golos Text Medium"',letterSpacing:'.14em',
-  color:C.dim,textTransform:'uppercase'},'вы тратите');
-const hkV2=E_('blk tnum',{position:'relative',font:'128px "Golos Text Black"',whiteSpace:'nowrap',color:C.dim2,
-  letterSpacing:'-.02em',marginTop:'10px',lineHeight:'1'},'134 000 ₽');
-[hkL1,hkV1,hkGap,hkL2,hkV2].forEach(e=>hook.appendChild(e));
+/* Три строки вместо двух: получаете — отдают — государству. Третья
+   и есть новая рамка ролика, ради которой он переписан. Кегль со 128
+   снижен до 112, отбивки сжаты: три строки должны уложиться выше
+   подвала, иначе повторится наложение, за которое уже прилетело. */
+const hkRow=(lab,val,col)=>{
+  const L=E_('med',{position:'relative',font:'32px "Golos Text Medium"',letterSpacing:'.14em',
+    color:C.dim,textTransform:'uppercase'},lab);
+  const V=E_('blk tnum',{position:'relative',font:'112px "Golos Text Black"',whiteSpace:'nowrap',
+    color:col,letterSpacing:'-.02em',marginTop:'8px',lineHeight:'1'},val);
+  hook.appendChild(L);hook.appendChild(V);
+  return {L,V};
+};
+const hkGap=()=>hook.appendChild(E_('',{position:'relative',height:'2px',
+  background:C.line,margin:'34px 0 28px 0',width:px(CW)}));
+const hk1=hkRow('вы получаете','80 000 ₽',C.ink);      hkGap();
+const hk2=hkRow('за вас отдают','134 000 ₽',C.dim2);   hkGap();
+const hk3=hkRow('из них государству','39 540 ₽',C.dim2);
+const hkL1=hk1.L, hkV1=hk1.V, hkL2=hk2.L, hkV2=hk2.V, hkL3=hk3.L, hkV3=hk3.V;
 
-/* ═══ СЦЕНА 0 · ПОСТАНОВКА ═══════════════════════════════════════ */
+/* ═══ СЦЕНА 0 · ПОСТАНОВКА ═══════════════════════════════════════
+   Новый текст начинается сразу с двух чисел — постановки и обещания
+   отдельными актами больше нет, блок 1 и есть хук. Элементы оставлены
+   в файле: они понадобятся, если вернёмся к длинному заходу. */
 const in0=E_('',{left:px(X0),top:'440px',width:px(CW)});
 const i0a=E_('blk',{position:'relative',font:'96px "Golos Text Black"',color:C.ink,
   lineHeight:'1.04',letterSpacing:'-.01em'},'ВЫ НАНЯЛИ<br>ЧЕЛОВЕКА');
@@ -254,63 +269,67 @@ const totPil=E_('smb',{position:'relative',display:'inline-block',font:'32px "Go
   padding:'14px 26px',borderRadius:px(RAD.full),marginTop:'26px'},'× 1,7 к окладу');
 [totRule,totLab,totVal,totPil].forEach(e=>tot.appendChild(e));
 
-/* ═══ ШКАЛА 247 ══════════════════════════════════════════════════ */
-const COLS=19, ROWS=13, TW=34, TH=17, GX=6, GY=8;
-const scale=E_('',{left:px(X0),top:'600px',width:px(CW)});
-const scHead=E_('med',{position:'relative',font:'30px "Golos Text Medium"',letterSpacing:'.13em',
-  textTransform:'uppercase',color:C.dim},'рабочих дней в 2026');
-const scGrid=E_('',{position:'relative',width:px(COLS*TW+(COLS-1)*GX),height:px(ROWS*TH+(ROWS-1)*GY),marginTop:'26px'});
-const ticks=[];
-for(let i=0;i<247;i++){
-  const c=i%COLS, r=(i/COLS)|0;
-  const d=E_('',{left:px(c*(TW+GX)),top:px(r*(TH+GY)),width:px(TW),height:px(TH),borderRadius:'4px'});
-  scGrid.appendChild(d);ticks.push(d);
+/* ═══ РАЗДЕЛ: КУДА УХОДЯТ СТО ТРИДЦАТЬ ЧЕТЫРЕ ════════════════════
+   Главный кадр нового ролика. Полная цена раскладывается на три доли,
+   ширины честные — пропорциональны деньгам, а не нарисованы на глаз. */
+const SPLIT=[
+  {lab:'вам на руки',  v:80000, c:C.green},
+  {lab:'государству',  v:39540, c:C.red},
+  {lab:'рабочее место',v:14400, c:'#4A5551'},
+];
+const SPSUM=SPLIT.reduce((a,x)=>a+x.v,0);
+const sp=E_('',{left:px(X0),top:'600px',width:px(CW)});
+const spHead=E_('med',{position:'relative',font:'30px "Golos Text Medium"',letterSpacing:'.13em',
+  textTransform:'uppercase',color:C.dim},'сто тридцать четыре тысячи');
+const spBar=E_('',{position:'relative',width:px(CW),height:'96px',marginTop:'26px'});
+const spSegs=[]; { let x=0;
+  SPLIT.forEach((d,i)=>{
+    const w=CW*d.v/SPSUM - (i<SPLIT.length-1?8:0);
+    const el=E_('',{left:px(x),top:0,width:px(w),height:'96px',background:d.c,
+      borderRadius:px(RAD.sm),transformOrigin:'left center'});
+    spBar.appendChild(el); spSegs.push(el); x+=w+8;
+  });
 }
-const scLegend=E_('med',{position:'relative',font:'27px "Golos Text Medium"',color:C.dim,marginTop:'24px',letterSpacing:'.03em'});
-const scBig=E_('blk tnum',{position:'relative',font:'196px "Golos Text Black"',color:C.green,
-  letterSpacing:'-.02em',marginTop:'18px',lineHeight:'1'},'211');
-const scSub=E_('med',{position:'relative',font:'29px "Golos Text Medium"',color:C.dim,marginTop:'-4px'},'дней он реально работает');
-[scHead,scGrid,scLegend,scBig,scSub].forEach(e=>scale.appendChild(e));
-
-/* ═══ СТОЛБИКИ ═══════════════════════════════════════════════════ */
-const BH=526;
-const bars=E_('',{left:px(X0),top:'570px',width:px(CW),height:px(BH+190)});
-function bar(x,w){
-  const g=E_('',{left:px(x),top:0,width:px(w),height:px(BH+190)});
-  const cap=E_('med',{left:0,top:0,width:px(w),font:'28px "Golos Text Medium"',letterSpacing:'.1em',
-    textTransform:'uppercase',color:C.dim,textAlign:'center'});
-  const num=E_('blk tnum',{left:0,width:px(w),font:'62px "Golos Text Black"',textAlign:'center'});
-  const col=E_('',{left:0,width:px(w),borderRadius:px(RAD.sm),bottom:'0px'});
-  [cap,num,col].forEach(e=>g.appendChild(e));bars.appendChild(g);
-  return {g,cap,num,col};
-}
-const b1=bar(0,320), b2=bar(440,320);
-const bx2=E_('blk',{left:px(X0+320),top:'1010px',width:'120px',font:'70px "Golos Text Black"',
-  color:C.red,textAlign:'center'},'×2');
-
-/* ═══ КАРТОЧКА МСП ═══════════════════════════════════════════════ */
-const msp=E_('',{left:px(X0),top:'620px',width:px(CW),background:C.card,
-  border:'1px solid '+C.line,borderRadius:px(RAD.lg),padding:'44px 44px'});
-const mspH=E_('med',{position:'relative',font:'29px "Golos Text Medium"',letterSpacing:'.12em',
-  textTransform:'uppercase',color:C.green},'льготный тариф мсп');
-const mspT=E_('blk',{position:'relative',font:'64px "Golos Text Black"',color:C.ink,
-  marginTop:'18px',lineHeight:'1.12'},'проверьте<br>все три');
-const mspItems=[];
-/* Было «три условия сразу» — и Егор справедливо сказал, что по ролику
-   непонятно, что делать. Абстракция вместо действия: зритель уходит,
-   не зная, куда смотреть.
-   Теперь на карточке ровно то, что надо открыть и сверить. Условия
-   вернулись, но не строками прозы, а короткими пилюлями: список
-   сканируют, а не читают, поэтому бюджет чтения он не ломает —
-   шесть коротких слов вместо пятнадцати. Полный чек-лист с порядком
-   действий остаётся в Телеграме. */
-['реестр МСП','ОКВЭД из перечня','70% дохода'].forEach(s=>{
-  const w=E_('',{position:'relative',height:'62px',marginTop:'14px'});
-  const d=E_('',{left:0,top:'18px',width:'12px',height:'12px',borderRadius:'6px',background:C.green});
-  const x=E_('med',{left:'32px',top:0,font:'36px "Golos Text Medium"',color:C.ink},s);
-  w.appendChild(d);w.appendChild(x);msp.appendChild(w);mspItems.push(w);
+const spLeg=E_('',{position:'relative',width:px(CW),height:'110px',marginTop:'22px'});
+const spLegs=SPLIT.map((d,i)=>{
+  const w=E_('',{left:px(i*(CW/3)),top:0,width:px(CW/3-10)});
+  const t=E_('med',{position:'relative',font:'26px "Golos Text Medium"',color:C.dim},d.lab);
+  const v=E_('blk tnum',{position:'relative',font:'44px "Golos Text Black"',color:d.c,marginTop:'6px'},
+    ru(d.v)+' ₽');
+  w.appendChild(t);w.appendChild(v);spLeg.appendChild(w);return w;
 });
-msp.insertBefore(mspT,msp.firstChild);msp.insertBefore(mspH,msp.firstChild);
+const spBig=E_('blk tnum',{position:'relative',font:'186px "Golos Text Black"',color:C.red,
+  letterSpacing:'-.02em',marginTop:'26px',lineHeight:'1'},'40%');
+const spSub=E_('med',{position:'relative',font:'30px "Golos Text Medium"',color:C.dim,marginTop:'2px'},
+  'вашей цены мимо вас');
+[spHead,spBar,spLeg,spBig,spSub].forEach(e=>sp.appendChild(e));
+
+/* ═══ ПРИБАВКА: ЧТО ПРОСИТЬ ══════════════════════════════════════
+   Второй акт. Одно сравнение: сколько просит зритель и во что это
+   обходится работодателю. Больше в кадре ничего. */
+const rs=E_('',{left:px(X0),top:'640px',width:px(CW)});
+const rsHead=E_('med',{position:'relative',font:'30px "Golos Text Medium"',letterSpacing:'.13em',
+  textTransform:'uppercase',color:C.dim},'прибавка десять тысяч');
+const rsWrap=E_('',{position:'relative',width:px(CW),height:'210px',marginTop:'30px'});
+const rsCard=(x,lab,val,col,bg)=>{
+  const w=E_('',{left:px(x),top:0,width:'330px',height:'186px',background:bg,
+    border:'1px solid '+LINE2,borderRadius:px(RAD.lg),padding:'32px 34px'});
+  const t=E_('med',{position:'relative',font:'26px "Golos Text Medium"',color:C.dim},lab);
+  /* 76 px переносило «+10 000 ₽» на вторую строку: в карточке 330 px
+     с полями остаётся 262. Кегль 58 и запрет переноса — число должно
+     читаться одной строкой, иначе сравнение рассыпается. */
+  const v=E_('blk tnum',{position:'relative',font:'58px "Golos Text Black"',color:col,
+    marginTop:'18px',lineHeight:'1',whiteSpace:'nowrap'},val);
+  w.appendChild(t);w.appendChild(v);rsWrap.appendChild(w);return {w,v};
+};
+const rsA=rsCard(0,'вам на руки','+10 000 ₽',C.green,S.c1);
+const rsB=rsCard(430,'работодателю','+14 900 ₽',C.red,S.c1);
+const rsArrow=E_('blk',{left:'350px',top:'70px',width:'60px',font:'56px "Golos Text Black"',
+  color:C.dim,textAlign:'center'},'→');
+rsWrap.appendChild(rsArrow);
+const rsNote=E_('med',{position:'relative',width:px(CW),font:'30px "Golos Text Medium"',
+  color:C.dim,marginTop:'26px'},'работодатель считает во втором числе');
+[rsHead,rsWrap,rsNote].forEach(e=>rs.appendChild(e));
 
 /* ═══ CTA · переход в канал ══════════════════════════════════════
    Формат взят у ролика-образца: не плашка с призывом, а карточка
@@ -406,8 +425,8 @@ const cap=E_('blk',{left:px(X0),top:'258px',width:px(CW),height:'200px',font:'76
 /* ═══ ВСПЫШКА ════════════════════════════════════════════════════ */
 const flash=E_('',{left:0,top:0,width:'1080px',height:'1920px',background:'#FFFFFF'});
 const fTxt=E_('',{left:px(X0),top:'760px',width:px(CW)});
-const fT1=E_('blk',{position:'relative',font:'84px "Golos Text Black"',color:'#0A0D0C',lineHeight:'1.06'},
-  'но это<br>не вся цена');
+const fT1=E_('blk',{position:'relative',font:'80px "Golos Text Black"',color:'#0A0D0C',lineHeight:'1.06'},
+  'сорок процентов<br>вашей цены');
 /* Вторая строка вспышки снята: блок длится 1,1 с, за это время читается
    только крупная строка — она же то, что говорит диктор. */
 const fT2=E_('med',{position:'relative',font:'34px "Golos Text Medium"',color:'#5B6663',marginTop:'26px',lineHeight:'1.35',display:'none'},
@@ -445,10 +464,10 @@ fSign.appendChild(fName);fSign.appendChild(fTail);
    тянется поперёк стыка, накрывая его движением. Ширина сегментов
    пропорциональна длине акта, заполнение идёт непрерывно. */
 const RAIL=[
-  {t:()=>0,     e:()=>HK_OUT},     // вопрос
-  {t:()=>CARD,  e:()=>FL},         // расчёт
-  {t:()=>SC,    e:()=>MS},         // цена дня
-  {t:()=>MS,    e:()=>CT},         // что делать
+  {t:()=>0,     e:()=>HK_OUT},     // три числа
+  {t:()=>CARD,  e:()=>SP},         // расчёт
+  {t:()=>SP,    e:()=>RS},         // раздел
+  {t:()=>RS,    e:()=>CT},         // повышение
 ];
 const rail=E_('',{left:px(X0),top:'246px',width:px(CW),height:'5px'});
 const railSeg=RAIL.map(()=>{
@@ -488,36 +507,35 @@ function drawRail(tt){
    Момент, когда акт выезжает на экран: чуть раньше своего блока,
    чтобы картинка была на месте к первому слову.
    ═══════════════════════════════════════════════════════════════ */
-const A0   = enter(1,0.20);    // постановка
-const A1   = enter(2,0.30);    // обещание
-const HK   = enter(3,0.40);    // разрыв
+/* Дорожка переписана под тренды радара, блоков стало 16.
+   Акты: хук (1–3) → карточка расчёта (4–10) → раздел (11) →
+   вспышка (12) → прибавка (13–15) → CTA (16). */
+const HK   = enter(1,0.20);    // хук: три числа
+const PROM = at(3,0.10);       // «смотрите, как это устроено»
 const CARD = enter(4,0.45);    // карточка расчёта
-const TOT  = enter(7,0.15);    // итог
-const FL   = enter(8,0.30);    // вспышка
-const SC   = enter(9,0.25);    // шкала
-const BR   = enter(10,0.15);   // столбики
-const MS   = enter(11,0.20);   // МСП
-const CT   = enter(12,0.20);   // CTA
-/* сколько заполняется шкала дней: столько же должна длиться и серия
-   щелчков, иначе звук тикает по остановившейся цифре */
-const FILLDUR = Math.max(0.8, at(9,0.45)-(SC+0.15));
+const TOT  = bs(10)+0.05;      // итог сто тридцать четыре
+const SP   = enter(11,0.30);   // раздел на три доли
+const FL   = enter(12,0.30);   // вспышка
+const RS   = enter(13,0.25);   // прибавка
+const CT   = enter(16,0.20);   // CTA
 
 /* когда акт уходит — ровно к приходу следующего */
-/* у каждого акта своя длительность ухода — по его паузе */
-const A0_F=fadeOut(1), A1_F=fadeOut(2), HK_F=fadeOut(3), CARD_F=fadeOut(7),
-      FL_F=fadeOut(8), SC_F=fadeOut(9), BR_F=fadeOut(10), MS_F=fadeOut(11);
-const A0_OUT   = gone(1);
-const A1_OUT   = gone(2);
+const HK_F=fadeOut(3), CARD_F=fadeOut(10), SP_F=fadeOut(11),
+      FL_F=fadeOut(12), RS_F=fadeOut(15);
 const HK_OUT   = gone(3);
-const CARD_OUT = gone(7);
-const FL_OUT   = gone(8);
-const SC_OUT   = gone(9);
-const BR_OUT   = gone(10);
-const MS_OUT   = gone(11);
+const CARD_OUT = gone(10);
+const SP_OUT   = gone(11);
+const FL_OUT   = gone(12);
+const RS_OUT   = gone(15);
 
-/* строки карточки: на какой доле какого блока набегает значение */
-const ROWON=[bs(4)+0.05, at(4,0.42), at(5,0.30), at(6,0.45)];
-const SUBON=at(5,0.72);         // подытог «прямые расходы»
+/* строки карточки: на какой доле какого блока набегает значение.
+   Налог отдельной строкой не делаем — он пилюля на «начислено»:
+   в кадре и так четыре строки, пятая ломает высоту. */
+const ROWON=[bs(4)+0.05, at(4,0.55), at(7,0.45), at(9,0.40)];
+const TAXON=bs(6)+0.10;         // «двенадцать тысяч»
+const SUBON=bs(8)+0.05;         // «уже сто двадцать»
+/* сколько заполняется полоса раздела */
+const SPFILL=0.9;
 
 /* ═══ ЗВУК ═══════════════════════════════════════════════════════
    Сцена сама говорит, когда что звучит. Времена берутся из тех же
@@ -526,24 +544,18 @@ const SUBON=at(5,0.72);         // подытог «прямые расходы�
    Собирает дорожку mixsfx.py, пересъёмка кадров для этого не нужна.
    ═══════════════════════════════════════════════════════════════ */
 window.SFX=[
-  /* Прорежено против первой версии: в референсном ролике около семи
-     явных эффектов в минуту, у меня было девятнадцать. Оставлены только
-     те, что отмечают событие, а не сопровождают каждое движение.
-     {a:true} — акцент, единственное место, где эффект главнее голоса. */
-  {t:ROWON[2], d:0.55, s:'count', m:'onset'},  // взносы: число набегает
-                                         // d — сколько длится набор на экране:
-                                         // под него подгоняется длина серии
-                                         // m:'onset' — серия щелчков должна
-                                         // начаться вместе с числом, а не
-                                         // кончиться до него
-  {t:SUBON,       s:'row'},              // подытог встал
-  {t:TOT,         s:'hero', a:true},     // сто тридцать четыре тысячи
-  {t:FL,          s:'flash'},            // смена акта
-  {t:SC+0.15, d:FILLDUR, s:'count', m:'onset'},  // шкала заполняется
-  {t:at(9,0.80),  s:'land'},             // двести одиннадцать
-  {t:at(10,0.68), s:'bounce'},           // в два раза больше
-  {t:CT,          s:'click'},            // CTA: указатель вверх
-  {t:CT+1.84,     s:'land'}             // адрес канала встал
+  /* Семь эффектов на пятьдесят секунд — плотность референса.
+     d — сколько длится набор числа на экране: под него подгоняется
+     длина серии щелчков, иначе счётчик тикает по замершей цифре. */
+  {t:ROWON[2], d:0.55, s:'count', m:'onset'},   // взносы набегают
+  {t:SUBON,        s:'row'},                    // подытог встал
+  {t:TOT,          s:'hero', a:true},           // сто тридцать четыре
+  {t:SP+0.15, d:SPFILL, s:'count', m:'onset'},  // полоса делится
+  {t:at(11,0.62),  s:'land'},                   // «государству — почти сорок»
+  {t:FL,           s:'flash'},                  // смена акта
+  {t:at(14,0.55),  s:'bounce'},                 // «вы просите пятнадцать»
+  {t:CT,           s:'click'},                  // CTA
+  {t:CT+1.84,      s:'land'}                    // адрес канала встал
 ];
 
 /* ═══ ТИТРЫ ══════════════════════════════════════════════════════
@@ -553,21 +565,24 @@ window.SFX=[
 const FLASH_OUT = FL_OUT+0.32;                // когда белое поле ушло
 const CUES=[
  [0.00,                        ''],
- [bs(3),                       'ВЫ ПЛАТИТЕ ЕМУ'],
- [at(3,0.50),                  'А ТРАТИТЕ|СТО ТРИДЦАТЬ ЧЕТЫРЕ.|r'],
- [bs(4),                       'НА РУКИ —|ВОСЕМЬДЕСЯТ.|w'],
- [at(4,0.42),                  'НАЧИСЛИТЬ НАДО|ДЕВЯНОСТО ДВЕ.|w'],
- [bs(5),                       'СВЕРХУ ВЗНОСЫ:|ТРИДЦАТЬ ПРОЦЕНТОВ|r'],
- [at(5,0.72),                  'ЭТО УЖЕ|СТО ДВАДЦАТЬ.|w'],
- [bs(6),                       'ПЛЮС РАБОЧЕЕ МЕСТО:|ЕЩЁ ЧЕТЫРНАДЦАТЬ.|r'],
- [bs(7),                       'СТО ТРИДЦАТЬ ЧЕТЫРЕ|ТЫСЯЧИ В МЕСЯЦ|r'],
+ [bs(1)+0.10,                  'ВЫ ПОЛУЧАЕТЕ|ВОСЕМЬДЕСЯТ.|w'],
+ [at(1,0.55),                  'ЗА ВАС ОТДАЮТ|СТО ТРИДЦАТЬ ЧЕТЫРЕ.|r'],
+ [bs(2)+0.05,                  'ПОЧТИ СОРОК —|ГОСУДАРСТВУ.|r'],
+ [PROM,                        'СМОТРИТЕ,|КАК ЭТО УСТРОЕНО.|w'],
+ [bs(4),                       'НАЧИСЛИТЬ НАДО|ДЕВЯНОСТО ДВЕ.|w'],
+ [bs(5),                       '|НАЛОГ ИДЁТ СВЕРХУ.|w'],
+ [bs(6),                       'ДВЕНАДЦАТЬ ТЫСЯЧ|ВЫ НЕ ВИДЕЛИ.|r'],
+ [bs(7),                       'ВЗНОСЫ —|ТРИДЦАТЬ ПРОЦЕНТОВ.|r'],
+ [bs(8),                       '|УЖЕ СТО ДВАДЦАТЬ.|w'],
+ [bs(9),                       'ПЛЮС МЕСТО|И ТЕХНИКА.|r'],
+ [bs(10),                      'СТО ТРИДЦАТЬ ЧЕТЫРЕ|ТЫСЯЧИ В МЕСЯЦ.|r'],
+ [bs(11),                      '|ВАМ — ВОСЕМЬДЕСЯТ.|w'],
+ [at(11,0.62),                 'ГОСУДАРСТВУ —|ПОЧТИ СОРОК.|r'],
  [FL,                          ''],
- [Math.max(bs(9),FLASH_OUT),   'В ГОДУ|247 РАБОЧИХ ДНЕЙ|w'],
- [at(9,0.55),                  'МИНУС ОТПУСК.|МИНУС БОЛЬНИЧНЫЕ.|r'],
- [at(9,0.80),                  'ОСТАЁТСЯ|ДВЕСТИ ОДИННАДЦАТЬ.|g'],
- [bs(10),                      'ЕГО РАБОЧИЙ ДЕНЬ —|СЕМЬ ШЕСТЬСОТ.|r'],
- [at(10,0.68),                 'В ДВА РАЗА БОЛЬШЕ.'],
- [bs(11),                      'ПРОВЕРЬТЕ|ЛЬГОТНЫЙ ТАРИФ.|g'],
+ [Math.max(bs(13),FLASH_OUT),  'ВЫВОД|ПРО ПОВЫШЕНИЕ.|w'],
+ [bs(14),                      '|ПРОСИТЕ НЕ ДЕСЯТЬ.|w'],
+ [at(14,0.55),                 '|ПРОСИТЕ ПЯТНАДЦАТЬ.|g'],
+ [bs(15),                      '|СЧИТАЙТЕ КАК ОН.|w'],
  [CT,                          '']
 ];
 function capHTML(s){
@@ -600,7 +615,7 @@ function show(el,o,y,s){
     : 'blur('+((1-o)*13).toFixed(1)+'px) brightness('+(0.45+0.55*o).toFixed(2)+')';
   el.style.display=o<=0.001?'none':'block';
 }
-function hideMain(){[hook,card,tot,totScrim,flash,fTxt,scale,bars,bx2,msp,cta]
+function hideMain(){[hook,card,tot,totScrim,flash,fTxt,sp,rs,cta]
   .forEach(e=>{e.style.opacity=0;e.style.display='none';});}
 
 window.seek=function(tt){
@@ -608,38 +623,29 @@ window.seek=function(tt){
   glow.style.opacity = 0.55 + 0.45*Math.sin(tt*0.42);
   vign.style.opacity = 1;
 
-  /* ── БЛОК 1 · постановка ── */
-  if(tt < A0_OUT+0.40){
-    const p=seg(tt,A0+0.05,0.5,E.out);
-    show(in0, seg(tt,A0,TR.inn,E.io)*(1-seg(tt,A0_OUT,A0_F,E.io)), lerp(20,0,p));
-    i0b.style.color = tt>=at(1,0.45) ? C.ink : C.dim;
-    i0c.style.opacity = seg(tt,at(1,0.58),0.4,E.io);
-  } else show(in0,0);
+  /* Постановка и обещание отдельными актами сняты: новый текст
+     начинается сразу с трёх чисел. Элементы гасим раз и навсегда. */
+  show(in0,0); show(in1,0);
+  if(tt < HK-0.05){ hideMain(); drawCaption(tt); drawFooter(tt); drawRail(tt); return; }
 
-  /* ── БЛОК 2 · обещание ── */
-  if(btw(tt,A1-0.05,A1_OUT+0.40)){
-    const p=seg(tt,A1,0.45,E.back);
-    show(in1, seg(tt,A1,TR.inn,E.io)*(1-seg(tt,A1_OUT,A1_F,E.io)), lerp(22,0,p));
-    i1items.forEach((it,i)=>{
-      const o=seg(tt,at(2,0.10)+i*0.05,0.3,E.io);   // почти разом: список сканируют, а не читают
-      it.w.style.opacity=o; it.d.style.background = i===3 ? C.green : C.dim;
-    });
-  } else show(in1,0);
-
-  if(tt < HK-0.05){ hideMain(); drawCaption(tt); drawFooter(tt); return; }
-
-  /* ── БЛОК 3 · разрыв: 80 против 134 ── */
+  /* ── БЛОКИ 1–3 · хук: три числа ── */
   if(tt < HK_OUT+0.50){
     show(hook,1-seg(tt,HK_OUT,HK_F,E.io),0,1);
-    hkV1.style.transformOrigin='left center';
-    hkV1.style.transform='scale('+(1+0.014*Math.max(0,1-seg(tt,HK+0.10,0.55,E.out)))+')';
-    const RV=at(3,0.50);                       // «а тратите — сто тридцать четыре»
+    const RV=at(1,0.55);                       // «за вас отдают сто тридцать четыре»
     const rv=seg(tt,RV,0.42,E.back);
     hkV2.style.color = tt<RV ? C.dim2 : C.red;
-    hkV2.style.opacity = tt<RV ? 0.42 : lerp(0.42,1,rv);
+    hkV2.style.opacity = tt<RV ? 0.40 : lerp(0.40,1,rv);
     hkV2.style.transformOrigin='left center';
     hkV2.style.transform='scale('+lerp(0.90,1,rv)+')';
     hkL2.style.color = tt<RV?C.dim2:C.dim;
+
+    const GV=bs(2)+0.05;                       // «почти сорок — государству»
+    const gv=seg(tt,GV,0.42,E.back);
+    hkV3.style.color = tt<GV ? C.dim2 : C.red;
+    hkV3.style.opacity = tt<GV ? 0.28 : lerp(0.28,1,gv);
+    hkV3.style.transformOrigin='left center';
+    hkV3.style.transform='scale('+lerp(0.90,1,gv)+')';
+    hkL3.style.color = tt<GV?C.dim2:C.dim;
   } else show(hook,0);
 
   /* ── БЛОКИ 4–7 · карточка расчёта ── */
@@ -655,8 +661,11 @@ window.seek=function(tt){
     const def=[
       {on:ROWON[0], lab:'на руки',          v:80000, dot:C.dim, col:()=>grey?C.dim2:C.ink,
        labCol:()=>grey?C.dim2:C.dim, pil:''},
+      /* Пилюля ждёт своего блока: диктор называет налог отдельно
+         («двенадцать тысяч, вы их не видели»), и число должно выйти
+         на этих словах, а не вместе со строкой начисления. */
       {on:ROWON[1], lab:'начислено',        v:92000, dot:C.ink, col:()=>tt>=ROWON[2]?C.dim2:C.ink,
-       labCol:()=>tt>=ROWON[2]?C.dim2:C.dim, pil:'+ НДФЛ 13%', pilC:C.red},
+       labCol:()=>tt>=ROWON[2]?C.dim2:C.dim, pil:'налог 12 000 ₽', pilC:C.red, pilOn:TAXON},
       {on:ROWON[2], lab:'страховые взносы', v:27600, dot:C.red, col:()=>C.red,
        labCol:()=>C.dim, pil:'30% от начисленного', pilC:C.red},
       {on:ROWON[3], lab:'рабочее место',    v:14400, dot:C.red, col:()=>C.red,
@@ -678,7 +687,9 @@ window.seek=function(tt){
       r.base.style.opacity = i===3 ? 0 : lerp(0.55,0.3,o);
       if(d.pil){r.pil.style.display='block';r.pil.textContent=d.pil;
         r.pil.style.color=d.pilC;r.pil.style.background='rgba(240,82,77,.13)';
-        r.pil.style.opacity=seg(tt,d.on+0.25,0.3,E.io)*(1-seg(tt,d.on+3.4,0.4,E.io));}
+        const pOn = d.pilOn!==undefined ? d.pilOn : d.on+0.25;
+        const pOff = d.pilOn!==undefined ? at(7,0.30) : d.on+3.4;
+        r.pil.style.opacity=seg(tt,pOn,0.3,E.io)*(1-seg(tt,pOff,0.4,E.io));}
       else r.pil.style.display='none';
     });
 
@@ -709,67 +720,37 @@ window.seek=function(tt){
   const ftO = seg(tt,FL+0.22,0.26,E.io)*(1-seg(tt,FL_OUT-0.08,0.25,E.io));
   show(fTxt,ftO,lerp(16,0,seg(tt,FL+0.22,0.5,E.out)));
 
-  /* ── БЛОК 9 · шкала рабочих дней ── */
-  const scOn=btw(tt,SC-0.05,SC_OUT+0.40);
-  if(scOn){
-    show(scale,seg(tt,SC,TR.inn,E.io)*(1-seg(tt,SC_OUT,SC_F,E.io)));
-    /* клетки заполняются ровно к концу «почти двести пятьдесят рабочих дней» */
-    const fill=Math.round(247*seg(tt,SC+0.15,FILLDUR,E.io));
-    const CUT=at(9,0.55);                      // «минус отпуск и больничные»
-    const redP=seg(tt,CUT,0.9,E.io);
-    const redN=Math.round(36*redP);
-    ticks.forEach((d,i)=>{
-      const lit=i<fill;
-      const isRed = i>=247-redN;
-      d.style.background = !lit?'#1A211F' : isRed?C.red : C.green;
-      d.style.opacity = !lit?1 : isRed?1 : (tt>=CUT?0.5:1);
+  /* ── БЛОК 11 · раздел: куда уходят сто тридцать четыре ── */
+  const spOn=btw(tt,SP-0.05,SP_OUT+0.40);
+  if(spOn){
+    show(sp,seg(tt,SP,TR.inn,E.io)*(1-seg(tt,SP_OUT,SP_F,E.io)));
+    /* доли выезжают слева направо, одна за другой: глаз успевает
+       прочитать, что зелёное — ваше, а красное нет */
+    spSegs.forEach((el,i)=>{
+      const on=SP+0.15+i*0.18;
+      el.style.transform='scaleX('+seg(tt,on,0.34,E.out).toFixed(3)+')';
     });
-    const legOn=CUT+0.15;
-    scLegend.innerHTML = tt>=legOn
-      ? '<span style="color:'+C.red+'">28 отпуск</span> &nbsp;·&nbsp; <span style="color:'+C.red+'">8 больничных</span>'
-      : '&nbsp;';
-    scLegend.style.opacity=seg(tt,legOn,0.3,E.io);
-    const BIG=at(9,0.80);                      // «двести одиннадцать»
+    spLegs.forEach((w,i)=>{ w.style.opacity=seg(tt,SP+0.30+i*0.18,0.26,E.io); });
+    const BIG=at(11,0.62);                     // «государству — почти сорок»
     const bO=seg(tt,BIG,0.3,E.io), bP=seg(tt,BIG,0.42,E.back);
-    scBig.style.opacity=bO; scSub.style.opacity=bO;
-    scBig.style.transform='scale('+lerp(0.88,1,bP)+')';scBig.style.transformOrigin='left center';
-    scBig.textContent=ru(211*seg(tt,BIG,0.5,E.out));
-  } else show(scale,0);
+    spBig.style.opacity=bO; spSub.style.opacity=bO;
+    spBig.style.transformOrigin='left center';
+    spBig.style.transform='scale('+lerp(0.88,1,bP)+')';
+  } else show(sp,0);
 
-  /* ── БЛОК 10 · столбики ── */
-  const brOn=btw(tt,BR-0.05,BR_OUT+0.35);
-  if(brOn){
-    show(bars,seg(tt,BR,TR.inn,E.io)*(1-seg(tt,BR_OUT,BR_F,E.io)));
-    const g1=seg(tt,BR+0.15,0.6,E.out), g2=seg(tt,at(10,0.35),0.8,E.out);
-    b1.cap.textContent='как вы считаете'; b1.num.textContent=ru(3890*g1)+' ₽';
-    b1.num.style.color=C.dim; b1.col.style.background='#2A322F';
-    const h1=Math.round(BH*(3890/7620)*g1);
-    b1.col.style.height=px(h1); b1.col.style.bottom='0px';
-    b1.num.style.bottom=px(h1+18); b1.num.style.top='auto';
-    b1.cap.style.bottom=px(h1+96); b1.cap.style.top='auto';
-
-    b2.cap.textContent='как есть'; b2.num.textContent=ru(7620*g2)+' ₽';
-    b2.num.style.color=C.red; b2.col.style.background=C.red;
-    const h2=Math.round(BH*g2);
-    b2.col.style.height=px(h2); b2.col.style.bottom='0px';
-    b2.num.style.bottom=px(h2+18); b2.num.style.top='auto';
-    b2.cap.style.bottom=px(h2+96); b2.cap.style.top='auto';
-
-    const X2=at(10,0.68);                      // «в два раза больше»
-    const xP=seg(tt,X2,0.4,E.back);
-    bx2.style.opacity=seg(tt,X2,0.25,E.io)*(1-seg(tt,BR_OUT,BR_F,E.io));
-    bx2.style.transform='scale('+lerp(0.7,1,xP)+')';
-    bx2.style.display='block';
-  } else {show(bars,0);bx2.style.opacity=0;bx2.style.display='none';}
-
-  /* ── БЛОК 11 · льготный тариф ── */
-  const mOn=btw(tt,MS-0.05,MS_OUT+0.40);
-  if(mOn){
-    const p=seg(tt,MS,0.42,E.back);
-    show(msp,seg(tt,MS,TR.inn,E.io)*(1-seg(tt,MS_OUT,MS_F,E.io)),lerp(24,0,p));
-    /* условия проявляются по одному: взгляд успевает пройти список */
-    mspItems.forEach((w,i)=>{ w.style.opacity=seg(tt,MS+0.25+i*0.16,0.22,E.io); });
-  } else show(msp,0);
+  /* ── БЛОКИ 13–15 · прибавка ── */
+  const rsOn=btw(tt,RS-0.05,RS_OUT+0.40);
+  if(rsOn){
+    const p=seg(tt,RS,0.42,E.back);
+    show(rs,seg(tt,RS,TR.inn,E.io)*(1-seg(tt,RS_OUT,RS_F,E.io)),lerp(22,0,p));
+    /* второе число приходит позже первого — на словах «вы просите пятнадцать» */
+    const B=at(14,0.55);
+    const bp=seg(tt,B,0.42,E.back);
+    rsB.w.style.opacity=seg(tt,B,0.26,E.io);
+    rsB.w.style.transform='scale('+lerp(0.92,1,bp)+')';
+    rsArrow.style.opacity=seg(tt,B-0.12,0.3,E.io);
+    rsNote.style.opacity=seg(tt,bs(15),0.3,E.io);
+  } else show(rs,0);
 
   /* ── БЛОК 12 · CTA: профиль канала собирается по шагам ──
      Порядок тот же, что в образце: сначала указатель и вывеска, потом
