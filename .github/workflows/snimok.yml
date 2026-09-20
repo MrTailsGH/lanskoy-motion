@@ -1,0 +1,80 @@
+name: Снимок чужих роликов
+
+# Управление здесь, в GitHub: расписание, кнопка запуска, логи, коммиты.
+# Выполняется на своём раннере — компьютере Егора, зарегистрированном в
+# репозитории. Так нужно не из прихоти:
+#
+#   проба 20.09.2026 (workflow «Проба · пустит ли YouTube раннер»)
+#   показала, что облачный раннер GitHub получает от YouTube
+#   «Sign in to confirm you're not a bot» и на метаданных, и на
+#   скачивании. Домашний адрес такой проверки не вызывает.
+#
+# То есть в облаке живёт всё, кроме самого скачивания, а компьютер
+# нужен только включённым — руками в терминал лезть больше не надо.
+
+on:
+  schedule:
+    # 06:40 UTC по понедельникам — 09:40 по Москве, после ночного радара.
+    - cron: '40 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      top:
+        description: 'Сколько роликов взять из свежего RADAR.md'
+        default: '5'
+      url:
+        description: 'Или один конкретный ролик по ссылке (тогда top не важен)'
+        required: false
+        default: ''
+
+concurrency:
+  group: snimok
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  snimok:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Инструменты
+        shell: bash
+        run: |
+          python -m pip install -q -U yt-dlp
+          ffmpeg -version | head -1
+
+      - name: Снять ролики
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.url }}" ]; then
+            python snimok.py --url "${{ inputs.url }}"
+          else
+            python snimok.py --top "${{ inputs.top || 5 }}"
+          fi
+
+      - name: Сводка
+        shell: bash
+        run: python svodka.py Primeri --out Primeri/SVODKA.md
+
+      - name: Отчёт на страницу запуска
+        if: always()
+        shell: bash
+        run: cat Primeri/SVODKA.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Коммит
+        shell: bash
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Primeri
+          git diff --cached --quiet && { echo 'нового нет'; exit 0; }
+          git commit -m "Разбор чужих роликов: снимок $(date -u '+%Y-%m-%d %H:%M UTC')
+
+          Кадры, субтитры и замеры. Видео не коммитим — оно удалено
+          сразу после измерения.
+
+          [skip ci]"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
