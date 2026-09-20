@@ -10,3 +10,5 @@ timing-I-*.json
 # навыки HeroUI ставятся командой, в истории не нужны:
 # npx skills add heroui-inc/heroui
 .agents/
+pult/logi/
+

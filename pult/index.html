@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Пульт цеха</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0D0C'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%232FD38E' stroke-width='3'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0A0D0C; --ink:#fff; --dim:#6E7A76; --dim2:#49544F;
+  --green:#2FD38E; --red:#F0524D; --teal:#3FB7C9;
+  --c1:#18201E; --c2:#242D2B; --c3:#38433F;
+  --line:rgba(255,255,255,.15); --line2:rgba(255,255,255,.08);
+  --r:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.5 -apple-system,"Segoe UI",Roboto,Inter,Arial,sans-serif}
+a{color:var(--teal)}
+.obolochka{max-width:1180px;margin:0 auto;padding:24px 16px 80px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;margin-bottom:6px}
+h1{font-size:26px;margin:0;letter-spacing:-.02em}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);
+   margin:34px 0 12px;font-weight:600}
+.put{color:var(--dim2);font-size:13px}
+.instr{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line2);
+  color:var(--dim)}
+.tag.da{color:var(--green);border-color:rgba(47,211,142,.35)}
+.tag.net{color:var(--red);border-color:rgba(240,82,77,.35)}
+.setka{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+.karta{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r);padding:14px}
+.karta h3{margin:0 0 4px;font-size:16px}
+.zachem{color:var(--dim);font-size:13px;margin:0 0 12px}
+.ryad{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;border:0;border-radius:10px;padding:8px 14px;cursor:pointer;
+  background:var(--c3);color:var(--ink);transition:filter .15s}
+button:hover:not(:disabled){filter:brightness(1.25)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.glav{background:var(--green);color:#06130D;font-weight:600}
+button.stop{background:transparent;border:1px solid var(--red);color:var(--red)}
+input,select{font:inherit;background:var(--c2);color:var(--ink);border:1px solid var(--line2);
+  border-radius:10px;padding:7px 10px;min-width:0}
+input[type=number]{width:74px}
+label.gal{display:flex;gap:6px;align-items:center;color:var(--dim);font-size:13px}
+.sost{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--c2);color:var(--dim)}
+.sost.идёт{color:var(--teal);background:rgba(63,183,201,.12)}
+.sost.готово{color:var(--green);background:rgba(47,211,142,.12)}
+.sost.ошибка{color:var(--red);background:rgba(240,82,77,.12)}
+pre.log{background:#070909;border:1px solid var(--line2);border-radius:10px;margin:12px 0 0;
+  padding:10px;max-height:260px;overflow:auto;font:12px/1.45 ui-monospace,Consolas,monospace;
+  color:#c8d3cf;white-space:pre-wrap;word-break:break-word}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--dim);font-weight:500;font-size:12px;text-transform:uppercase;
+   letter-spacing:.08em;padding:6px 8px;border-bottom:1px solid var(--line2)}
+td{padding:8px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.shag{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c3);margin-right:5px}
+.shag.est{background:var(--green)}
+.shagi{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--dim)}
+.shagi span.est{color:var(--ink)}
+video{width:100%;border-radius:10px;background:#000;display:block}
+.primer{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden}
+.primer img{width:100%;display:block;aspect-ratio:9/16;object-fit:cover;background:#000}
+.primer .telo{padding:10px 12px}
+.chisla{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13px;color:var(--dim);margin-top:6px}
+.chisla b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+pre.md{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r);padding:14px;
+  max-height:420px;overflow:auto;font:12.5px/1.6 ui-monospace,Consolas,monospace;
+  color:#c8d3cf;white-space:pre-wrap}
+.zapusk{display:flex;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line2)}
+.zapusk:last-child{border:0}
+.tochka{width:8px;height:8px;border-radius:50%;flex:none}
+.tochka.ok{background:var(--green)} .tochka.plohо{background:var(--red)}
+.tochka.idet{background:var(--teal);animation:puls 1.2s infinite}
+@keyframes puls{50%{opacity:.25}}
+.tihо{color:var(--dim);font-size:13px}
+@media(max-width:560px){.obolochka{padding:16px 12px 60px}h1{font-size:22px}}
+</style>
+
+<div class="obolochka">
+  <header>
+    <h1>Пульт цеха</h1>
+    <span class="put" id="put"></span>
+  </header>
+  <div class="instr" id="instr"></div>
+
+  <h2>Процессы</h2>
+  <div class="setka" id="zadachi"></div>
+
+  <h2>Ролики</h2>
+  <table><thead><tr><th>Ролик</th><th>Стадии</th><th style="width:150px">Готово</th></tr></thead>
+    <tbody id="roliki"></tbody></table>
+  <div class="setka" id="video" style="margin-top:14px"></div>
+
+  <h2>Радар</h2>
+  <div id="radar" class="tihо"></div>
+  <pre class="md" id="radarmd">…</pre>
+
+  <h2>Разборы чужих роликов</h2>
+  <div class="setka" id="primeri"></div>
+
+  <h2>GitHub</h2>
+  <div class="karta" id="gh">
+    <div class="tihо">загружаю последние запуски…</div>
+  </div>
+</div>
+
+<script>
+const REPO = 'MrTailsGH/lanskoy-motion';
+const $ = s => document.querySelector(s);
+const el = (t, k, x) => { const e = document.createElement(t); if(k) e.className = k;
+  if(x !== undefined) e.textContent = x; return e; };
+const срок = ts => ts ? new Date(ts*1000).toLocaleString('ru-RU',
+  {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+
+let СОСТ = null, ХВОСТ = {}, ОТКРЫТ = {};
+
+async function тянуть(){
+  const r = await fetch('/api/sostoyanie'); СОСТ = await r.json(); рисовать();
+}
+
+function рисовать(){
+  $('#put').textContent = СОСТ.цех;
+  const i = СОСТ.инструменты, ин = $('#instr'); ин.innerHTML='';
+  for (const [имя, есть] of Object.entries(i))
+    ин.append(el('span','tag '+(есть?'da':'net'), (есть?'✓ ':'✕ ')+имя));
+
+  рисоватьЗадачи();
+  рисоватьРолики();
+
+  const рд = СОСТ.радар;
+  $('#radar').textContent = `каналов ${рд.каналов} · снимков истории ${рд.снимков} · отчёт ${срок(рд.отчёт)}`;
+
+  const п = $('#primeri'); п.innerHTML='';
+  if(!СОСТ.primeri.length) п.append(el('div','tihо','пока ничего не разобрано'));
+  for(const v of СОСТ.primeri){
+    const к = el('div','primer');
+    if(v.кадр){ const im = el('img'); im.src = '/fayl/'+v.кадр; im.loading='lazy'; к.append(im); }
+    const т = el('div','telo'); т.append(el('div',null,v.имя));
+    const ч = el('div','chisla');
+    for(const [подпись, зн] of Object.entries(v.числа||{})){
+      if(зн === null || зн === undefined) continue;
+      ч.append(el('span',null,подпись)); ч.append(el('b',null,String(зн)));
+    }
+    т.append(ч); к.append(т); п.append(к);
+  }
+}
+
+function рисоватьЗадачи(){
+  const о = $('#zadachi');
+  for(const [zid, z] of Object.entries(СОСТ.список)){
+    let к = document.getElementById('z-'+zid);
+    if(!к){
+      к = el('div','karta'); к.id = 'z-'+zid;
+      к.append(el('h3',null,z.имя), el('p','zachem',z.зачем));
+      const ряд = el('div','ryad'); ряд.id = 'ryad-'+zid;
+
+      if(zid==='snimok'){
+        const n = el('input'); n.type='number'; n.value=2; n.min=1; n.max=20; n.id='top';
+        ряд.append(el('span','tihо','сверху'), n);
+      }
+      if(zid==='razbor'){
+        const u = el('input'); u.placeholder='https://youtube.com/watch?v=…';
+        u.id='url'; u.style.width='100%'; u.style.marginBottom='8px';
+        к.append(u);
+      }
+      if(['vyravnivanie','sborka','zvuk'].includes(zid)){
+        const s = el('select'); s.id='rolik-'+zid;
+        for(const r of СОСТ.ролики) s.append(new Option(r.имя, r.имя));
+        ряд.append(s);
+      }
+      if(['snimok','razbor'].includes(zid)){
+        const l = el('label','gal'); const c = el('input'); c.type='checkbox';
+        c.id='push-'+zid; c.checked = true;
+        l.append(c, document.createTextNode('отправить в репозиторий'));
+        ряд.append(l);
+      }
+
+      const кн = el('button','glav','Запустить'); кн.id='pusk-'+zid;
+      кн.onclick = () => пуск(zid);
+      const ст = el('button','stop','Стоп'); ст.id='stop-'+zid;
+      ст.onclick = () => fetch('/api/stop',{method:'POST',
+        headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:zid})});
+      const метка = el('span','sost'); метка.id='sost-'+zid;
+      ряд.append(кн, ст, метка);
+      к.append(ряд);
+      const лог = el('pre','log'); лог.id='log-'+zid; лог.style.display='none';
+      к.append(лог);
+      о.append(к);
+    }
+    const s = СОСТ.задачи[zid] || {статус:'ждёт'};
+    const метка = document.getElementById('sost-'+zid);
+    метка.className = 'sost ' + s.статус;
+    метка.textContent = s.статус + (s.секунд !== undefined && s.статус==='идёт' ? ` ${s.секунд} с` : '')
+      + (s.статус==='ошибка' ? ` (код ${s.код})` : '');
+    document.getElementById('pusk-'+zid).disabled = s.статус==='идёт' || нельзя(zid);
+    document.getElementById('stop-'+zid).style.display = s.статус==='идёт' ? '' : 'none';
+    if(s.статус!=='ждёт') хвостЛога(zid);
+  }
+}
+
+function нельзя(zid){
+  const i = СОСТ.инструменты;
+  if(zid==='sborka') return !(i.bash && i.node && i.ffmpeg);
+  if(zid==='zvuk') return !i.ffmpeg;
+  if(zid==='snimok'||zid==='razbor') return !(i.ytdlp && i.ffmpeg);
+  return false;
+}
+
+async function пуск(zid){
+  const п = {};
+  if(zid==='snimok') п.top = +document.getElementById('top').value;
+  if(zid==='razbor') п.url = document.getElementById('url').value;
+  if(['snimok','razbor'].includes(zid)) п.push = document.getElementById('push-'+zid).checked;
+  const с = document.getElementById('rolik-'+zid); if(с) п.rolik = с.value;
+  ХВОСТ[zid] = 0;
+  const л = document.getElementById('log-'+zid); л.textContent=''; л.style.display='';
+  const о = await (await fetch('/api/pusk',{method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id:zid, параметры:п})})).json();
+  if(о.ошибка) л.textContent = 'не вышло: ' + о.ошибка;
+  тянуть();
+}
+
+async function хвостЛога(zid){
+  const л = document.getElementById('log-'+zid);
+  const от = ХВОСТ[zid] || 0;
+  const о = await (await fetch(`/api/log?id=${zid}&ot=${от}`)).json();
+  if(о.текст){
+    л.style.display='';
+    const внизу = л.scrollTop + л.clientHeight >= л.scrollHeight - 30;
+    л.textContent += о.текст;
+    if(внизу) л.scrollTop = л.scrollHeight;
+  }
+  ХВОСТ[zid] = о.конец;
+}
+
+function рисоватьРолики(){
+  const т = $('#roliki'); т.innerHTML='';
+  for(const r of СОСТ.ролики){
+    const tr = el('tr');
+    tr.append(el('td',null,r.имя));
+    const td = el('td'); const ш = el('div','shagi');
+    for(const s of r.шаги){
+      const x = el('span', s.есть?'est':'');
+      x.append(el('i','shag'+(s.есть?' est':'')), document.createTextNode(s.имя));
+      ш.append(x);
+    }
+    td.append(ш); tr.append(td);
+    tr.append(el('td','tihо', r.готов + ' из ' + r.шаги.length +
+      (r.когда ? ' · ' + срок(r.когда) : '')));
+    т.append(tr);
+  }
+  const в = $('#video'); в.innerHTML='';
+  for(const r of СОСТ.ролики.filter(x=>x.видео)){
+    const к = el('div','karta');
+    к.append(el('div','zachem', r.имя + ' · ' + r.видео));
+    const v = document.createElement('video'); v.controls = true; v.preload='metadata';
+    v.style.maxHeight='420px'; v.style.margin='0 auto';
+    v.src = '/fayl/' + r.видео; к.append(v); в.append(к);
+  }
+}
+
+// ── GitHub: публичный репозиторий читается без ключа ──────────────────
+async function гитхаб(){
+  const о = $('#gh');
+  try{
+    const r = await fetch(`https://api.github.com/repos/${REPO}/actions/runs?per_page=8`);
+    const d = await r.json();
+    о.innerHTML='';
+    for(const з of (d.workflow_runs||[])){
+      const с = el('div','zapusk');
+      const цв = з.status!=='completed' ? 'idet' : (з.conclusion==='success'?'ok':'plohо');
+      с.append(el('i','tochka '+цв));
+      const a = document.createElement('a'); a.href = з.html_url; a.target='_blank';
+      a.textContent = з.name; с.append(a);
+      с.append(el('span','tihо', ' · ' + (з.conclusion || з.status) + ' · ' +
+        new Date(з.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',
+          hour:'2-digit',minute:'2-digit'})));
+      о.append(с);
+    }
+    const низ = el('div','ryad'); низ.style.marginTop='12px';
+    const a = document.createElement('a');
+    a.href = `https://github.com/${REPO}/actions`; a.target='_blank';
+    a.textContent = 'Открыть Actions на GitHub';
+    низ.append(a); о.append(низ);
+  }catch(e){ о.innerHTML=''; о.append(el('div','tihо','GitHub не отвечает: '+e.message)); }
+}
+
+async function радармд(){
+  const о = await (await fetch('/api/tekst?p=radar/RADAR.md')).json();
+  $('#radarmd').textContent = о.текст || 'отчёта ещё нет — запустите радар';
+}
+
+тянуть(); радармд(); гитхаб();
+setInterval(тянуть, 2000);
+setInterval(радармд, 30000);
+setInterval(гитхаб, 60000);
+</script>

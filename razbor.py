@@ -17,6 +17,12 @@ razbor.py — измерить чужой ролик и записать чис�
 
 import json, math, os, re, subprocess, sys
 import numpy as np
+# Windows-консоль отдаёт cp1251, и первая же стрелка «→» роняет скрипт
+# с UnicodeEncodeError. Проверено на раннере 20.09.2026: разбор дошёл до
+# конца, а упала печать результата. Переключаем поток на UTF-8 сразу.
+for _п in (sys.stdout, sys.stderr):
+    try: _п.reconfigure(encoding='utf-8', errors='replace')
+    except Exception: pass
 
 W, H = 96, 170            # кадр для покадровой разницы: мелкий, но хватает
 BIG_W, BIG_H = 192, 340   # для дрейфа нужна детализация повыше

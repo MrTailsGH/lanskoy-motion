@@ -12,6 +12,12 @@ svodka.py — свести замеры всех разобранных роли
 Зависимостей нет.
 """
 import json, os, statistics as st, sys
+# Windows-консоль отдаёт cp1251, и первая же стрелка «→» роняет скрипт
+# с UnicodeEncodeError. Проверено на раннере 20.09.2026: разбор дошёл до
+# конца, а упала печать результата. Переключаем поток на UTF-8 сразу.
+for _п in (sys.stdout, sys.stderr):
+    try: _п.reconfigure(encoding='utf-8', errors='replace')
+    except Exception: pass
 
 
 def load(root):

@@ -20,6 +20,12 @@ snimok.py — принести чужие ролики из радара и ос
 Нужны: yt-dlp и ffmpeg в PATH, Python 3.9+.
 """
 import json, os, re, shutil, subprocess, sys, tempfile
+# Windows-консоль отдаёт cp1251, и первая же стрелка «→» роняет скрипт
+# с UnicodeEncodeError. Проверено на раннере 20.09.2026: разбор дошёл до
+# конца, а упала печать результата. Переключаем поток на UTF-8 сразу.
+for _п in (sys.stdout, sys.stderr):
+    try: _п.reconfigure(encoding='utf-8', errors='replace')
+    except Exception: pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RADAR = os.path.join(HERE, 'radar', 'RADAR.md')
@@ -76,6 +82,20 @@ def from_radar(top):
 YTDLP = ['yt-dlp']
 
 
+def proxy():
+    """Ссылка на прокси или ВПН, если YouTube из дома не открывается.
+    Берётся из ключа --proxy или из переменной среды SNIMOK_PROXY
+    (в GitHub это секрет с тем же именем)."""
+    a = sys.argv[1:]
+    if '--proxy' in a:
+        return a[a.index('--proxy') + 1]
+    return os.environ.get('SNIMOK_PROXY', '').strip()
+
+
+# Сеть либо есть, либо нет: ждать по минуте на ролик незачем.
+SET = ['--socket-timeout', '20', '--retries', '3', '--fragment-retries', '3']
+
+
 def grab(item):
     name = f"{slug(item['канал'])}-{item['id']}"
     dest = os.path.join(OUT, name)
@@ -85,7 +105,8 @@ def grab(item):
     os.makedirs(dest, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         mp4 = os.path.join(tmp, 'v.mp4')
-        r = subprocess.run(YTDLP + ['-q', '--no-warnings',
+        ключи = SET + (['--proxy', proxy()] if proxy() else [])
+        r = subprocess.run(YTDLP + ключи + ['-q', '--no-warnings',
                             '-f', 'bv*[height<=1920][ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b',
                             '--merge-output-format', 'mp4',
                             '--write-auto-subs', '--write-subs', '--sub-langs', 'ru,en',
@@ -103,7 +124,21 @@ def grab(item):
             if 'not a bot' in err or 'Sign in to confirm' in err:
                 sys.exit('YouTube требует подтверждения, что вы не бот. Так бывает '
                          'с датацентрового адреса; с домашнего работает.')
+            # Обрыв рукопожатия — это не наша поломка и не поломка yt-dlp:
+            # так выглядит фильтрация трафика по дороге. Замерено на машине
+            # Егора 20.09.2026: оба ролика, одна и та же ошибка.
+            if ('UNEXPECTED_EOF' in err or 'EOF occurred in violation' in err
+                    or 'SSLError' in err or 'Connection reset' in err
+                    or 'Temporary failure in name resolution' in err):
+                sys.exit('Связь с YouTube рвётся на рукопожатии — трафик фильтруют '
+                         'по дороге.\nЛечится одним из двух:\n'
+                         '  1) включить ВПН на всю систему и перезапустить раннер '
+                         '(служба берёт маршруты при старте);\n'
+                         '  2) задать прокси: snimok.py --proxy socks5://127.0.0.1:1080\n'
+                         '     или переменную среды SNIMOK_PROXY (в GitHub — секрет '
+                         'с этим именем).')
             print(f"  {name}: не скачался — {err[:140]}")
+            os.rmdir(dest) if not os.listdir(dest) else None
             return None
         for f in os.listdir(tmp):                      # субтитры кладём рядом
             if f.endswith('.vtt'):
@@ -132,9 +167,18 @@ def main():
         items = from_radar(top)
         print(f'из радара взято роликов: {len(items)}')
 
+    было = [i for i in items
+            if os.path.isfile(os.path.join(OUT, f"{slug(i['канал'])}-{i['id']}",
+                                           'metrics.json'))]
     done = [n for n in (grab(i) for i in items) if n]
     if not done:
-        print('нового нет'); return
+        if len(было) == len(items):
+            print('нового нет: всё из верхушки радара уже разобрано')
+            return
+        # Ролики были, но ни один не дошёл — это отказ, а не тишина.
+        # Иначе шаг «Снять ролики» зеленеет на пустом месте, как 20.09.2026.
+        sys.exit(f'ни один ролик не скачался ({len(items) - len(было)} попыток). '
+                 'Выше написано, почему.')
 
     subprocess.run([sys.executable, os.path.join(HERE, 'svodka.py'),
                     OUT, '--out', os.path.join(OUT, 'SVODKA.md')], check=False)

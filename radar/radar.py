@@ -24,6 +24,12 @@ SHORTS RADAR — мониторинг YouTube Shorts в нише канала Л
 
 import json, os, re, sys, time, urllib.request, urllib.parse
 from datetime import datetime, timezone
+# Windows-консоль отдаёт cp1251, и первая же стрелка «→» роняет скрипт
+# с UnicodeEncodeError. Проверено на раннере 20.09.2026: разбор дошёл до
+# конца, а упала печать результата. Переключаем поток на UTF-8 сразу.
+for _п in (sys.stdout, sys.stderr):
+    try: _п.reconfigure(encoding='utf-8', errors='replace')
+    except Exception: pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHANNELS = os.path.join(HERE, "channels.json")
