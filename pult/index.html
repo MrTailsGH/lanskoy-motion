@@ -27,6 +27,13 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)
   color:var(--dim)}
 .tag.da{color:var(--green);border-color:rgba(47,211,142,.35)}
 .tag.net{color:var(--red);border-color:rgba(240,82,77,.35)}
+.versiya{margin-top:10px;font-size:13px;color:var(--dim);display:flex;gap:10px;
+  align-items:center;flex-wrap:wrap}
+.versiya .svezho{color:var(--green)}
+.versiya .staro{color:var(--teal)}
+.versiya button{padding:5px 11px;font-size:13px}
+.trevoga{margin-top:10px;padding:10px 14px;border-radius:12px;font-size:14px;
+  background:rgba(63,183,201,.1);border:1px solid rgba(63,183,201,.35);color:var(--teal)}
 .setka{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
 .karta{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r);padding:14px}
 .karta h3{margin:0 0 4px;font-size:16px}
@@ -82,6 +89,7 @@ pre.md{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r)
     <span class="put" id="put"></span>
   </header>
   <div class="instr" id="instr"></div>
+  <div id="versiya" class="versiya"></div>
 
   <h2>Процессы</h2>
   <div class="setka" id="zadachi"></div>
@@ -124,6 +132,7 @@ function рисовать(){
   for (const [имя, есть] of Object.entries(i))
     ин.append(el('span','tag '+(есть?'da':'net'), (есть?'✓ ':'✕ ')+имя));
 
+  рисоватьВерсию();
   рисоватьЗадачи();
   рисоватьРолики();
 
@@ -143,6 +152,35 @@ function рисовать(){
     }
     т.append(ч); к.append(т); п.append(к);
   }
+}
+
+let СВЕЖЕЕ = null;   // последний коммит на GitHub, если удалось спросить
+
+function рисоватьВерсию(){
+  const в = СОСТ.версия || {}, о = $('#versiya'); о.innerHTML='';
+  if(!в.коммит){ о.append(el('span',null,'папка не из git — обновлять нечем')); return; }
+  о.append(el('span',null, 'версия ' + в.коммит + ' · ' +
+    (в.когда ? new Date(в.когда).toLocaleString('ru-RU',
+      {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '')));
+  if(в.правлено) о.append(el('span','tihо','· есть правки на этой машине'));
+
+  const отстал = СВЕЖЕЕ && в.полный && СВЕЖЕЕ !== в.полный;
+  if(отстал){
+    о.append(el('span','staro','· на GitHub есть свежее'));
+    const кн = el('button',null,'Обновить'); кн.onclick = () => пуск('obnovit');
+    о.append(кн);
+  } else if(СВЕЖЕЕ){
+    о.append(el('span','svezho','· свежее некуда'));
+  }
+
+  // Сервер прочитал свой код при запуске: обновление на лету не подхватится.
+  let т = document.getElementById('trevoga');
+  if(в.устарел){
+    if(!т){ т = el('div','trevoga'); т.id='trevoga';
+      т.textContent = 'Пульт обновился, но работает по старому коду. ' +
+        'Закройте чёрное окно и откройте значок заново.';
+      о.after(т); }
+  } else if(т) т.remove();
 }
 
 function рисоватьЗадачи(){
@@ -292,6 +330,14 @@ function рисоватьРолики(){
 }
 
 // ── GitHub: публичный репозиторий читается без ключа ──────────────────
+async function свежесть(){
+  try{
+    const r = await fetch(`https://api.github.com/repos/${REPO}/commits/main`);
+    const d = await r.json();
+    if(d && d.sha){ СВЕЖЕЕ = d.sha; if(СОСТ) рисоватьВерсию(); }
+  }catch(e){ /* нет сети — молчим, версия на машине всё равно видна */ }
+}
+
 async function гитхаб(){
   const о = $('#gh');
   try{
@@ -322,8 +368,9 @@ async function радармд(){
   $('#radarmd').textContent = о.текст || 'отчёта ещё нет — запустите радар';
 }
 
-тянуть(); радармд(); гитхаб();
+тянуть(); радармд(); гитхаб(); свежесть();
 setInterval(тянуть, 2000);
 setInterval(радармд, 30000);
 setInterval(гитхаб, 60000);
+setInterval(свежесть, 120000);
 </script>

@@ -72,6 +72,12 @@ def zadacha_fayl(p):
     return cmd, CEH
 
 
+def zadacha_obnovit(p):
+    # --ff-only: если на машине кто-то правил файлы руками, обновление
+    # честно откажется, а не устроит слияние с конфликтами за спиной.
+    return ['git', 'pull', '--ff-only'], CEH
+
+
 def zadacha_svodka(p):
     return [PY, 'svodka.py', 'Primeri', '--out', 'Primeri/SVODKA.md'], CEH
 
@@ -101,6 +107,8 @@ ZADACHI = {
                          зачем='Один конкретный ролик: склейки, переходы, звук, темп.'),
     'fayl':         dict(имя='Разобрать свой файл',   делает=zadacha_fayl,
                          зачем='Ролик уже скачан и лежит в папке vhod — измерить его.'),
+    'obnovit':      dict(имя='Обновить из GitHub',   делает=zadacha_obnovit,
+                         зачем='Забрать свежие сцены, скрипты и сам пульт.'),
     'svodka':       dict(имя='Пересобрать сводку',   делает=zadacha_svodka,
                          зачем='Собрать все замеры Primeri в одну таблицу.'),
     'vyravnivanie': dict(имя='Выравнивание дорожки', делает=zadacha_vyravnivanie,
@@ -186,6 +194,37 @@ def sostoyanie_rolikov():
                                else f'out/{r}.mp4' if est(f'out/{r}.mp4') else None),
                         когда=kogda(f'out/{r}.mp4')))
     return ряд
+
+def git(*а):
+    try:
+        r = subprocess.run(['git', '-C', CEH] + list(а), capture_output=True,
+                           timeout=15)
+        return r.stdout.decode('utf-8', 'replace').strip() if r.returncode == 0 else ''
+    except Exception:
+        return ''
+
+
+СВОЙ_ВОЗРАСТ = {}
+
+
+def versiya():
+    """Что за сборка сейчас на машине и не устарел ли сам пульт.
+
+    Сервер читает pult.py один раз при запуске: после обновления он
+    продолжает работать по старому коду, пока его не перезапустят. Молча
+    это не оставляем — страница должна сказать об этом прямо."""
+    if not СВОЙ_ВОЗРАСТ:
+        for ф in ('pult/pult.py', 'pult/index.html'):
+            СВОЙ_ВОЗРАСТ[ф] = kogda(ф)
+    устарел = any(kogda(ф) != т for ф, т in СВОЙ_ВОЗРАСТ.items())
+    return dict(коммит=git('rev-parse', '--short', 'HEAD'),
+                полный=git('rev-parse', 'HEAD'),
+                ветка=git('rev-parse', '--abbrev-ref', 'HEAD'),
+                когда=git('log', '-1', '--format=%cI'),
+                заголовок=git('log', '-1', '--format=%s'),
+                правлено=bool(git('status', '--porcelain')),
+                устарел=устарел)
+
 
 def sostoyanie_radara():
     h = os.path.join(CEH, 'radar', 'history.json')
@@ -305,7 +344,7 @@ class Pult(BaseHTTPRequestHandler):
                 return self.json_otvet(dict(
                     цех=CEH, ролики=sostoyanie_rolikov(), радар=sostoyanie_radara(),
                     primeri=sostoyanie_primeri(), задачи=sostoyanie_zadach(),
-                    вход=fayly_vhoda(),
+                    вход=fayly_vhoda(), версия=versiya(),
                     инструменты=instrumenty_kesh(),
                     список={k: dict(имя=v['имя'], зачем=v['зачем']) for k, v in ZADACHI.items()}))
             if u.path == '/api/log':
