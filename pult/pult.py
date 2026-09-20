@@ -29,9 +29,20 @@ ROLIKI = ['I-01','I-02','I-03','I-04','I-05','V-01','V-02','V-03','V-04','V-05']
 def zadacha_radar(p):
     return [PY, 'radar.py', '--report', 'RADAR.md'], os.path.join(CEH, 'radar')
 
+def proxy(p):
+    """Прокси для yt-dlp. ВПН-расширение в браузере сюда не считается:
+    оно закрывает только трафик браузера, а качает отдельный процесс.
+    Годится адрес локального порта ВПН-приложения или прокси."""
+    a = (p.get('proxy') or '').strip()
+    if not a: return []
+    if not re.match(r'^(socks5h?|http|https)://[\w.\-]+:\d{2,5}$', a):
+        raise ValueError('прокси пишется так: socks5://127.0.0.1:1080')
+    return ['--proxy', a]
+
+
 def zadacha_snimok(p):
     top = max(1, min(20, int(p.get('top') or 5)))
-    cmd = [PY, 'snimok.py', '--top', str(top)]
+    cmd = [PY, 'snimok.py', '--top', str(top)] + proxy(p)
     if p.get('push'): cmd.append('--push')
     return cmd, CEH
 
@@ -39,9 +50,27 @@ def zadacha_razbor(p):
     url = (p.get('url') or '').strip()
     if not re.match(r'^https://(www\.)?(youtube\.com|youtu\.be)/[\w\-/?=&.]+$', url):
         raise ValueError('ссылка не похожа на ютуб')
-    cmd = [PY, 'snimok.py', '--url', url]
+    cmd = [PY, 'snimok.py', '--url', url] + proxy(p)
     if p.get('push'): cmd.append('--push')
     return cmd, CEH
+
+VHOD = os.path.join(CEH, 'vhod')
+
+
+def fayly_vhoda():
+    if not os.path.isdir(VHOD): return []
+    return sorted(f for f in os.listdir(VHOD)
+                  if f.lower().endswith(('.mp4', '.mov', '.mkv', '.webm')))
+
+
+def zadacha_fayl(p):
+    f = (p.get('fayl') or '').strip()
+    if f not in fayly_vhoda():
+        raise ValueError('нет такого файла в папке vhod')
+    cmd = [PY, 'snimok.py', '--fayl', os.path.join('vhod', f)]
+    if p.get('push'): cmd.append('--push')
+    return cmd, CEH
+
 
 def zadacha_svodka(p):
     return [PY, 'svodka.py', 'Primeri', '--out', 'Primeri/SVODKA.md'], CEH
@@ -70,6 +99,8 @@ ZADACHI = {
                          зачем='Скачать верхушку радара, замерить и удалить видео.'),
     'razbor':       dict(имя='Разбор по ссылке',     делает=zadacha_razbor,
                          зачем='Один конкретный ролик: склейки, переходы, звук, темп.'),
+    'fayl':         dict(имя='Разобрать свой файл',   делает=zadacha_fayl,
+                         зачем='Ролик уже скачан и лежит в папке vhod — измерить его.'),
     'svodka':       dict(имя='Пересобрать сводку',   делает=zadacha_svodka,
                          зачем='Собрать все замеры Primeri в одну таблицу.'),
     'vyravnivanie': dict(имя='Выравнивание дорожки', делает=zadacha_vyravnivanie,
@@ -274,6 +305,7 @@ class Pult(BaseHTTPRequestHandler):
                 return self.json_otvet(dict(
                     цех=CEH, ролики=sostoyanie_rolikov(), радар=sostoyanie_radara(),
                     primeri=sostoyanie_primeri(), задачи=sostoyanie_zadach(),
+                    вход=fayly_vhoda(),
                     инструменты=instrumenty_kesh(),
                     список={k: dict(имя=v['имя'], зачем=v['зачем']) for k, v in ZADACHI.items()}))
             if u.path == '/api/log':

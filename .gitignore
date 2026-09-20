@@ -12,3 +12,5 @@ timing-I-*.json
 .agents/
 pult/logi/
 
+vhod/*
+!vhod/README.md

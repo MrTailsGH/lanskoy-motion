@@ -12,6 +12,8 @@ snimok.py — принести чужие ролики из радара и ос
     python3 snimok.py --top 10        десять
     python3 snimok.py --push          сразу закоммитить и отправить
     python3 snimok.py --url ССЫЛКА    один конкретный ролик
+    python3 snimok.py --fayl vhod/x.mp4   уже скачанный файл
+    python3 snimok.py --proxy socks5://127.0.0.1:1080   через прокси
 
 Что делает: скачивает ролик, прогоняет `razbor.py`, кладёт в
 `Primeri/<канал>-<id>/` кадры, субтитры и `metrics.json`, **удаляет
@@ -96,6 +98,39 @@ def proxy():
 SET = ['--socket-timeout', '20', '--retries', '3', '--fragment-retries', '3']
 
 
+def iz_fayla(путь):
+    """Ролик уже скачан — измерить его и разложить как остальные.
+
+    Нужно там, где YouTube закрыт: браузер с ВПН приносит файл, а пульт
+    его меряет. Субтитры подхватываются, если лежат рядом с тем же именем
+    (`rolik.mp4` и `rolik.ru.vtt`), но без них тоже считается всё, кроме
+    темпа речи."""
+    if not os.path.isfile(путь):
+        sys.exit(f'нет файла {путь}')
+    основа = os.path.splitext(os.path.basename(путь))[0]
+    name = slug(основа)
+    dest = os.path.join(OUT, name)
+    if os.path.isfile(os.path.join(dest, 'metrics.json')):
+        print(f'  {name}: уже разобран, пропускаю')
+        return None
+    os.makedirs(dest, exist_ok=True)
+    рядом = os.path.dirname(os.path.abspath(путь))
+    for f in sorted(os.listdir(рядом)):
+        if f.startswith(основа) and f.lower().endswith(('.vtt', '.srt')):
+            shutil.copy(os.path.join(рядом, f), os.path.join(dest, 'subs' +
+                        os.path.splitext(f)[1].lower()))
+            break
+    subprocess.run([sys.executable, os.path.join(HERE, 'razbor.py'), путь, dest],
+                   check=False)
+    if not os.path.isfile(os.path.join(dest, 'metrics.json')):
+        sys.exit(f'{name}: разбор не дал чисел — файл битый или это не видео')
+    json.dump({'id': основа, 'название': основа, 'канал': 'свой файл',
+               'url': ''}, open(os.path.join(dest, 'meta.json'), 'w',
+                                encoding='utf-8'), ensure_ascii=False, indent=1)
+    print(f'  {name}: готово')
+    return name
+
+
 def grab(item):
     name = f"{slug(item['канал'])}-{item['id']}"
     dest = os.path.join(OUT, name)
@@ -152,11 +187,37 @@ def grab(item):
     return name
 
 
+def svesti(done, отправлять):
+    """Пересобрать сводку и, если просили, отправить в репозиторий."""
+    subprocess.run([sys.executable, os.path.join(HERE, 'svodka.py'),
+                    OUT, '--out', os.path.join(OUT, 'SVODKA.md')], check=False)
+    if отправлять:
+        subprocess.run(['git', '-C', HERE, 'add', 'Primeri'], check=False)
+        subprocess.run(['git', '-C', HERE, 'commit', '-m',
+                        f'Разбор чужих роликов: {", ".join(done)}'], check=False)
+        subprocess.run(['git', '-C', HERE, 'push'], check=False)
+        print('отправлено в репозиторий')
+    else:
+        print('готово. Отправить: git add Primeri && git commit && git push '
+              '(или запускать с --push)')
+
+
 def main():
     args = sys.argv[1:]
     global YTDLP
-    YTDLP = ytdlp_cmd(); need_ffmpeg()
     os.makedirs(OUT, exist_ok=True)
+
+    # Готовый файл качать нечем — yt-dlp тут не нужен, только ffmpeg.
+    if '--fayl' in args:
+        need_ffmpeg()
+        done = [n for n in [iz_fayla(args[args.index('--fayl') + 1])] if n]
+        if not done:
+            print('нечего разбирать: этот файл уже разобран')
+            return
+        svesti(done, '--push' in args)
+        return
+
+    YTDLP = ytdlp_cmd(); need_ffmpeg()
 
     if '--url' in args:
         url = args[args.index('--url') + 1]
@@ -180,18 +241,7 @@ def main():
         sys.exit(f'ни один ролик не скачался ({len(items) - len(было)} попыток). '
                  'Выше написано, почему.')
 
-    subprocess.run([sys.executable, os.path.join(HERE, 'svodka.py'),
-                    OUT, '--out', os.path.join(OUT, 'SVODKA.md')], check=False)
-
-    if '--push' in args:
-        subprocess.run(['git', '-C', HERE, 'add', 'Primeri'], check=False)
-        subprocess.run(['git', '-C', HERE, 'commit', '-m',
-                        f'Разбор чужих роликов: {", ".join(done)}'], check=False)
-        subprocess.run(['git', '-C', HERE, 'push'], check=False)
-        print('отправлено в репозиторий')
-    else:
-        print('готово. Отправить: git add Primeri && git commit && git push '
-              '(или запускать с --push)')
+    svesti(done, '--push' in args)
 
 
 if __name__ == '__main__':

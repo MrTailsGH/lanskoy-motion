@@ -163,12 +163,28 @@ function рисоватьЗадачи(){
         u.id='url'; u.style.width='100%'; u.style.marginBottom='8px';
         к.append(u);
       }
+      if(zid==='fayl'){
+        const s2 = el('select'); s2.id='fayl'; s2.style.flex='1 1 180px';
+        ряд.append(s2);
+      }
       if(['vyravnivanie','sborka','zvuk'].includes(zid)){
         const s = el('select'); s.id='rolik-'+zid;
         for(const r of СОСТ.ролики) s.append(new Option(r.имя, r.имя));
         ряд.append(s);
       }
       if(['snimok','razbor'].includes(zid)){
+        const pr = el('input'); pr.id='proxy-'+zid; pr.style.width='100%';
+        pr.style.marginBottom='8px';
+        pr.placeholder='прокси, если YouTube закрыт: socks5://127.0.0.1:1080';
+        pr.value = localStorage.getItem('proxy') || '';
+        pr.oninput = () => {
+          localStorage.setItem('proxy', pr.value);
+          for(const z of ['snimok','razbor']){
+            const д = document.getElementById('proxy-'+z);
+            if(д && д !== pr) д.value = pr.value;
+          }
+        };
+        к.append(pr);
         const l = el('label','gal'); const c = el('input'); c.type='checkbox';
         c.id='push-'+zid; c.checked = true;
         l.append(c, document.createTextNode('отправить в репозиторий'));
@@ -187,6 +203,17 @@ function рисоватьЗадачи(){
       к.append(лог);
       о.append(к);
     }
+    if(zid==='fayl'){
+      const в = document.getElementById('fayl');
+      const было = в.value;
+      const надо = (СОСТ.вход||[]).join('|');
+      if(в.dataset.спис !== надо){
+        в.innerHTML=''; в.dataset.спис = надо;
+        if(!(СОСТ.вход||[]).length) в.append(new Option('положите ролик в папку vhod',''));
+        for(const f of (СОСТ.вход||[])) в.append(new Option(f, f));
+        if(было) в.value = было;
+      }
+    }
     const s = СОСТ.задачи[zid] || {статус:'ждёт'};
     const метка = document.getElementById('sost-'+zid);
     метка.className = 'sost ' + s.статус;
@@ -201,7 +228,7 @@ function рисоватьЗадачи(){
 function нельзя(zid){
   const i = СОСТ.инструменты;
   if(zid==='sborka') return !(i.bash && i.node && i.ffmpeg);
-  if(zid==='zvuk') return !i.ffmpeg;
+  if(zid==='zvuk' || zid==='fayl') return !i.ffmpeg;
   if(zid==='snimok'||zid==='razbor') return !(i.ytdlp && i.ffmpeg);
   return false;
 }
@@ -210,7 +237,11 @@ async function пуск(zid){
   const п = {};
   if(zid==='snimok') п.top = +document.getElementById('top').value;
   if(zid==='razbor') п.url = document.getElementById('url').value;
-  if(['snimok','razbor'].includes(zid)) п.push = document.getElementById('push-'+zid).checked;
+  if(['snimok','razbor'].includes(zid)){
+    п.push = document.getElementById('push-'+zid).checked;
+    п.proxy = document.getElementById('proxy-'+zid).value;
+  }
+  if(zid==='fayl') п.fayl = document.getElementById('fayl').value;
   const с = document.getElementById('rolik-'+zid); if(с) п.rolik = с.value;
   ХВОСТ[zid] = 0;
   const л = document.getElementById('log-'+zid); л.textContent=''; л.style.display='';
