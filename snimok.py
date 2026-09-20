@@ -275,7 +275,17 @@ def main():
     if '--url' in args:
         url = args[args.index('--url') + 1]
         vid = re.search(r'([\w-]{8,})\s*$', url.rstrip('/')).group(1)
-        items = [{'id': vid, 'название': 'вручную', 'канал': 'вручную', 'url': url}]
+        # Спрашиваем имя канала и название: иначе папка называется
+        # «вручную-<id>» и через месяц непонятно, чей это разбор.
+        имя, название = 'вручную', 'вручную'
+        r = subprocess.run(YTDLP + ['--no-warnings', '--skip-download',
+                                    '--print', '%(uploader)s|%(title)s', url],
+                           capture_output=True)
+        строка = r.stdout.decode('utf-8', 'replace').strip()
+        if r.returncode == 0 and '|' in строка:
+            имя, название = строка.split('|', 1)
+        items = [{'id': vid, 'название': название.strip(),
+                  'канал': имя.strip(), 'url': url}]
     else:
         top = int(args[args.index('--top') + 1]) if '--top' in args else 5
         ниша = '--nisha' in args

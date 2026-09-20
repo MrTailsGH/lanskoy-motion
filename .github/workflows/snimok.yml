@@ -119,14 +119,32 @@ jobs:
           }
 
       # Коммитим только кадры, субтитры и замеры: видео snimok.py удаляет сам.
+      #
+      # SVODKA.md — файл собираемый, и мержить его нельзя: два запуска
+      # подряд пересобирают его по-своему, rebase встаёт на конфликте, а
+      # шаг при этом отчитывался успехом и работа пропадала (поймано
+      # 20.09.2026, запуск 10). Поэтому порядок такой: свою версию сводки
+      # выбрасываем, коммитим только папки роликов, забираем чужое, и
+      # только потом пересобираем сводку заново поверх общего состояния.
       - name: Коммит
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -- Primeri/SVODKA.md 2>$null
           git add Primeri
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 0) { Write-Host 'nothing new'; exit 0 }
           $stamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm')
           git commit -m "Razbor chuzhih rolikov: snimok $stamp UTC" -m "Kadry, subtitry i zamery. Video ne kommitim." -m "[skip ci]"
+          if ($LASTEXITCODE -ne 0) { throw 'commit failed' }
           git pull --rebase origin $env:GITHUB_REF_NAME
+          if ($LASTEXITCODE -ne 0) {
+            git rebase --abort 2>$null
+            throw 'rebase failed - nothing pushed'
+          }
+          & $env:PY svodka.py Primeri --out Primeri/SVODKA.md
+          git add Primeri/SVODKA.md
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) { git commit -m "Svodka: peresborka posle snimka" -m "[skip ci]" }
           git push origin "HEAD:$env:GITHUB_REF_NAME"
+          if ($LASTEXITCODE -ne 0) { throw 'push failed' }
