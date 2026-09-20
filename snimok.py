@@ -73,7 +73,17 @@ def grab(item):
                             '-o', os.path.join(tmp, 'v.%(ext)s'), item['url']],
                            capture_output=True)
         if not os.path.isfile(mp4):
-            print(f"  {name}: не скачался — {r.stderr.decode('utf-8','ignore')[:120]}")
+            err = r.stderr.decode('utf-8', 'ignore')
+            # Две разные беды, и лечатся они по-разному, поэтому и
+            # сообщения разные. Проверено запуском в контейнере 20.09.2026.
+            if 'Tunnel connection failed' in err or 'proxy' in err.lower():
+                sys.exit('YouTube закрыт сетевой политикой этого окружения '
+                         '(403 на CONNECT). snimok.py надо запускать на домашней '
+                         'машине — из облака ролики не скачать.')
+            if 'not a bot' in err or 'Sign in to confirm' in err:
+                sys.exit('YouTube требует подтверждения, что вы не бот. Так бывает '
+                         'с датацентрового адреса; с домашнего работает.')
+            print(f"  {name}: не скачался — {err[:140]}")
             return None
         for f in os.listdir(tmp):                      # субтитры кладём рядом
             if f.endswith('.vtt'):

@@ -34,3 +34,8 @@ python3 -c "import browser; print('двоичный файл:', browser.chrome()
 
 echo
 echo "готово. Проверка сцены:  python3 audit.py i01.html"
+
+# yt-dlp — для snimok.py. В этом окружении YouTube закрыт прокси и скачать
+# ничего не выйдет, но инструмент пусть стоит: сетевая политика задаётся при
+# создании окружения, и в открытом контейнере конвейер заработает без правок.
+pip install -q -U yt-dlp 2>/dev/null || true
