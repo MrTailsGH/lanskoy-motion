@@ -1,14 +1,22 @@
 name: Снимок чужих роликов
 
-# Управление здесь, в GitHub: расписание, кнопка запуска, логи, коммиты.
-# Выполняется на своём раннере — компьютере Егора. Так нужно не из прихоти:
-# проба 20.09.2026 показала, что облачный раннер GitHub получает от YouTube
-# «Sign in to confirm you're not a bot». Домашний адрес такой проверки не
-# вызывает.
+# Управление здесь, в GitHub: расписание, кнопка, логи, коммиты.
+# Выполняется на своём раннере — компьютере Егора. Проба 20.09.2026
+# показала, что облачный раннер GitHub получает от YouTube «Sign in to
+# confirm you're not a bot»; домашний адрес такой проверки не вызывает.
 #
-# Всё написано на PowerShell, а не на bash. Причина: Git для Windows кладёт
-# bash.exe в папку, которой нет в PATH, и на первой же проверке шаг падает с
-# «Имя bash не распознано». PowerShell в Windows есть всегда.
+# ВНИМАНИЕ, ДВОЕ ГРАБЛЕЙ, НА КОТОРЫХ УПАЛИ ПЕРВЫЕ ДВА ЗАПУСКА.
+#
+# 1. Windows PowerShell по умолчанию стоит ExecutionPolicy Restricted и
+#    отказывается запускать любые .ps1, а раннер передаёт каждый шаг
+#    именно временным .ps1. Отсюда -ExecutionPolicy Bypass в shell:
+#    действует только на процесс шага, политику машины не трогает.
+#
+# 2. Раннер пишет этот временный файл в UTF-8 без BOM, а Windows
+#    PowerShell 5.1 читает его как ANSI. Любая кириллица внутри блока
+#    run: превращается в кракозябры и ломает разбор скрипта — падение
+#    приходит не там, где ошибка. Поэтому ВНУТРИ run: только латиница;
+#    все объяснения живут в комментариях YAML, как этот.
 
 on:
   schedule:
@@ -36,34 +44,28 @@ jobs:
     runs-on: self-hosted
     defaults:
       run:
-        # Не просто powershell, а с обходом политики выполнения.
-        # Windows по умолчанию стоит Restricted и отказывается запускать
-        # любые .ps1 — а раннер именно так и передаёт шаги: пишет временный
-        # скрипт и зовёт его. Первый запуск 20.09.2026 упал ровно на этом.
-        # Bypass действует только на этот процесс; политика машины не
-        # меняется, лезть в настройки безопасности компьютера не нужно.
         shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
     steps:
       - uses: actions/checkout@v4
 
+      # Команда Python на Windows называется по-разному: python, python3
+      # или py. Ищем один раз и кладём в окружение шага.
+      # numpy нужен razbor.py для покадровых замеров, yt-dlp — качать.
       - name: Инструменты
         run: |
-          # Команда Python на Windows называется по-разному — ищем один раз.
           $py = (Get-Command python -ErrorAction SilentlyContinue).Source
           if (-not $py) { $py = (Get-Command py -ErrorAction SilentlyContinue).Source }
-          if (-not $py) { throw 'Python не найден в PATH раннера' }
+          if (-not $py) { throw 'Python not found in runner PATH' }
           "PY=$py" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "Python: $py"
-
-          # numpy нужен razbor.py для покадровых замеров, yt-dlp — качать.
           & $py -m pip install --quiet --upgrade yt-dlp numpy
-          if ($LASTEXITCODE -ne 0) { throw 'не поставились yt-dlp и numpy' }
-
+          if ($LASTEXITCODE -ne 0) { throw 'pip install failed (yt-dlp, numpy)' }
           if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
-            throw 'ffmpeg не найден в PATH раннера — winget install Gyan.FFmpeg'
+            throw 'ffmpeg not found in runner PATH - winget install Gyan.FFmpeg'
           }
           ffmpeg -version | Select-Object -First 1
 
+      # Пустое поле url — берём горячие ролики из свежего RADAR.md.
       - name: Снять ролики
         run: |
           $url = '${{ inputs.url }}'
@@ -71,6 +73,7 @@ jobs:
           if (-not $top) { $top = '5' }
           if ($url) { & $env:PY snimok.py --url $url }
           else      { & $env:PY snimok.py --top $top }
+          if ($LASTEXITCODE -ne 0) { throw 'snimok.py failed' }
 
       - name: Сводка
         run: |
@@ -80,17 +83,19 @@ jobs:
         if: always()
         run: |
           if (Test-Path Primeri/SVODKA.md) {
-            Get-Content Primeri/SVODKA.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            Get-Content Primeri/SVODKA.md -Encoding utf8 |
+              Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           }
 
+      # Коммитим только кадры, субтитры и замеры: видео snimok.py удаляет сам.
       - name: Коммит
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add Primeri
           git diff --cached --quiet
-          if ($LASTEXITCODE -eq 0) { Write-Host 'нового нет'; exit 0 }
+          if ($LASTEXITCODE -eq 0) { Write-Host 'nothing new'; exit 0 }
           $stamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm')
-          git commit -m "Разбор чужих роликов: снимок $stamp UTC" -m "Кадры, субтитры и замеры. Видео не коммитим — оно удалено сразу после измерения." -m "[skip ci]"
+          git commit -m "Razbor chuzhih rolikov: snimok $stamp UTC" -m "Kadry, subtitry i zamery. Video ne kommitim." -m "[skip ci]"
           git pull --rebase origin $env:GITHUB_REF_NAME
           git push origin "HEAD:$env:GITHUB_REF_NAME"
