@@ -310,25 +310,31 @@ const spSub=E_('med',{position:'relative',font:'30px "Golos Text Medium"',color:
 const rs=E_('',{left:px(X0),top:'640px',width:px(CW)});
 const rsHead=E_('med',{position:'relative',font:'30px "Golos Text Medium"',letterSpacing:'.13em',
   textTransform:'uppercase',color:C.dim},'прибавка десять тысяч');
-const rsWrap=E_('',{position:'relative',width:px(CW),height:'210px',marginTop:'30px'});
-const rsCard=(x,lab,val,col,bg)=>{
-  const w=E_('',{left:px(x),top:0,width:'330px',height:'186px',background:bg,
-    border:'1px solid '+LINE2,borderRadius:px(RAD.lg),padding:'32px 34px'});
-  const t=E_('med',{position:'relative',font:'26px "Golos Text Medium"',color:C.dim},lab);
-  /* 76 px переносило «+10 000 ₽» на вторую строку: в карточке 330 px
-     с полями остаётся 262. Кегль 58 и запрет переноса — число должно
-     читаться одной строкой, иначе сравнение рассыпается. */
-  const v=E_('blk tnum',{position:'relative',font:'58px "Golos Text Black"',color:col,
-    marginTop:'18px',lineHeight:'1',whiteSpace:'nowrap'},val);
+/* Было две карточки рядом со стрелкой между ними. Числа упирались в
+   правый край: в карточке 330 px с полями остаётся 262, а «+14 900 ₽»
+   в чёрном начертании шире. Поля выходили разные слева и справа —
+   ровно то, что Егор и увидел.
+
+   Теперь строки одна под другой во всю колонку: подпись слева, число
+   справа. Так же устроена карточка расчёта выше по ролику, и читается
+   это привычнее — как строка в расчётном листке. Заодно числу хватает
+   кегля 64 вместо 58. */
+const rsWrap=E_('',{position:'relative',width:px(CW),height:'260px',marginTop:'30px'});
+const rsRow=(y,lab,val,col)=>{
+  const w=E_('',{left:0,top:px(y),width:px(CW),height:'116px',background:S.c1,
+    border:'1px solid '+LINE2,borderRadius:px(RAD.lg)});
+  const t=E_('med',{left:'34px',top:'42px',font:'30px "Golos Text Medium"',color:C.dim},lab);
+  const v=E_('blk tnum',{right:'34px',top:'26px',font:'64px "Golos Text Black"',color:col,
+    lineHeight:'1',whiteSpace:'nowrap',textAlign:'right'},val);
   w.appendChild(t);w.appendChild(v);rsWrap.appendChild(w);return {w,v};
 };
-const rsA=rsCard(0,'вам на руки','+10 000 ₽',C.green,S.c1);
-const rsB=rsCard(430,'работодателю','+14 900 ₽',C.red,S.c1);
-const rsArrow=E_('blk',{left:'350px',top:'70px',width:'60px',font:'56px "Golos Text Black"',
-  color:C.dim,textAlign:'center'},'→');
+const rsA=rsRow(0,  'вам на руки',  '+10 000 ₽',C.green);
+const rsB=rsRow(144,'работодателю','+14 900 ₽',C.red);
+const rsArrow=E_('blk',{left:'0px',top:'120px',width:px(CW),height:'24px',
+  font:'26px "Golos Text Black"',color:C.dim,textAlign:'center'},'↓');
 rsWrap.appendChild(rsArrow);
 const rsNote=E_('med',{position:'relative',width:px(CW),font:'30px "Golos Text Medium"',
-  color:C.dim,marginTop:'26px'},'работодатель считает во втором числе');
+  color:C.dim,marginTop:'26px'},'для него ваша прибавка — второе число');
 [rsHead,rsWrap,rsNote].forEach(e=>rs.appendChild(e));
 
 /* ═══ CTA · переход в канал ══════════════════════════════════════
