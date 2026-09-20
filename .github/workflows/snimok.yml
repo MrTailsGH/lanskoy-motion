@@ -36,7 +36,13 @@ jobs:
     runs-on: self-hosted
     defaults:
       run:
-        shell: powershell
+        # Не просто powershell, а с обходом политики выполнения.
+        # Windows по умолчанию стоит Restricted и отказывается запускать
+        # любые .ps1 — а раннер именно так и передаёт шаги: пишет временный
+        # скрипт и зовёт его. Первый запуск 20.09.2026 упал ровно на этом.
+        # Bypass действует только на этот процесс; политика машины не
+        # меняется, лезть в настройки безопасности компьютера не нужно.
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
     steps:
       - uses: actions/checkout@v4
 
