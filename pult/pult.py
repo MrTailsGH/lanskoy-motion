@@ -266,6 +266,31 @@ def priemka():
         return dict(готово=False, почему=str(e))
 
 
+OTMETKI = os.path.join(HERE, 'otmetki.json')
+
+
+def otmetki():
+    """Какие дни уже опубликованы. Файл лежит рядом с пультом и в
+    репозиторий не едет: отслеженный на этой машине день, попавший в
+    историю, ломал бы `git pull --ff-only` при следующем обновлении."""
+    try:
+        d = json.load(open(OTMETKI, encoding='utf-8'))
+        return {int(k): bool(v) for k, v in d.items()}
+    except Exception:
+        return {}
+
+
+def otmetit(день, сделано):
+    д = otmetki()
+    if сделано:
+        д[int(день)] = True
+    else:
+        д.pop(int(день), None)
+    json.dump({str(k): True for k in sorted(д)}, open(OTMETKI, 'w', encoding='utf-8'),
+              ensure_ascii=False, indent=1)
+    return д
+
+
 ДЕНЬ = re.compile(r'^## День (\d+)\s*·\s*(.+)$', re.M)
 
 
@@ -497,6 +522,7 @@ class Pult(BaseHTTPRequestHandler):
                     вход=fayly_vhoda(), версия=versiya(),
                     наши=nashi_lenty(), радартоп=radar_top(),
                     приёмка=priemka(), телеграм=telegram(),
+                    отметки=sorted(otmetki()),
                     инструменты=instrumenty_kesh(),
                     список={k: dict(имя=v['имя'], зачем=v['зачем']) for k, v in ZADACHI.items()}))
             if u.path == '/api/log':
@@ -532,6 +558,9 @@ class Pult(BaseHTTPRequestHandler):
                 if zid not in ZADACHI: return self.json_otvet({'ошибка':'нет такой задачи'}, 400)
                 zapustit(zid, тело.get('параметры') or {})
                 return self.json_otvet(dict(ладно=True))
+            if u.path == '/api/otmetka':
+                д = otmetit(тело.get('день'), тело.get('сделано'))
+                return self.json_otvet(dict(отметки=sorted(д)))
             if u.path == '/api/stop':
                 return self.json_otvet(dict(остановлено=ostanovit(тело.get('id'))))
             return self.json_otvet({'ошибка':'нет такой ручки'}, 404)

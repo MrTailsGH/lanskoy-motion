@@ -62,6 +62,16 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)
 .sverka .bed .imya,.sverka .bed .zn{color:var(--ink)}
 .znak{display:inline-block;width:16px;text-align:center;font-size:12px}
 .znak.da{color:var(--green)} .znak.net{color:#EE5A52}
+.zapostil{display:flex;gap:7px;align-items:center;font-size:14px;color:var(--dim);
+  cursor:pointer;user-select:none;padding:6px 11px;border-radius:10px;
+  border:1px solid var(--line2)}
+.zapostil input{width:17px;height:17px;accent-color:var(--green);cursor:pointer}
+.zapostil.est{color:var(--green);border-color:rgba(47,211,142,.4)}
+.dni{display:flex;gap:4px;flex-wrap:wrap;margin:10px 0 2px}
+.dni b{width:26px;height:24px;border-radius:7px;background:var(--c2);color:var(--dim);
+  font:500 12px/24px inherit;text-align:center;cursor:pointer;font-variant-numeric:tabular-nums}
+.dni b.est{background:rgba(47,211,142,.16);color:var(--green)}
+.dni b.tut{outline:2px solid var(--teal);outline-offset:1px;color:var(--ink)}
 .tg-post{white-space:pre-wrap;background:#0F1513;border:1px solid var(--line2);
   border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.55;
   max-height:340px;overflow:auto}
@@ -598,18 +608,25 @@ function рисоватьТелеграм(){
   const о = $('#telegram'); if(!о) return;
   const дни = СОСТ.телеграм || [];
   if(!дни.length){ о.innerHTML=''; о.append(el('div','tihо','нет TG-30-dney.md')); return; }
-  let n = +(localStorage.getItem('tgden') || 1);
+  const готово = new Set(СОСТ.отметки || []);
+  // По умолчанию открываем первый незапощенный день, а не первый вообще:
+  // пульт должен показывать work in progress, а не начало списка.
+  let n = +(localStorage.getItem('tgden') || 0);
+  if(!n){
+    const свободный = дни.find(д => !готово.has(д.день));
+    n = свободный ? свободный.день : 1;
+  }
   n = Math.min(дни.length, Math.max(1, n));
-  if(о.dataset.день === String(n)) return;      // перерисовываем только при смене
-  о.dataset.день = String(n);
+  const слепок = n + '|' + (СОСТ.отметки || []).join(',');
+  if(о.dataset.слепок === слепок) return;       // перерисовываем только при смене
+  о.dataset.слепок = слепок;
   const д = дни.find(x => x.день === n) || дни[0];
   о.innerHTML = '';
 
   const шапка = el('div','ryad');
-  const назад = el('button',null,'‹'); назад.onclick = () => {
-    localStorage.setItem('tgden', Math.max(1, n-1)); о.dataset.день=''; рисоватьТелеграм(); };
-  const вперёд = el('button',null,'›'); вперёд.onclick = () => {
-    localStorage.setItem('tgden', Math.min(дни.length, n+1)); о.dataset.день=''; рисоватьТелеграм(); };
+  const кДню = m => { localStorage.setItem('tgden', m); о.dataset.слепок=''; рисоватьТелеграм(); };
+  const назад = el('button',null,'‹'); назад.onclick = () => кДню(Math.max(1, n-1));
+  const вперёд = el('button',null,'›'); вперёд.onclick = () => кДню(Math.min(дни.length, n+1));
   шапка.append(назад, вперёд, el('span',null, `День ${д.день} · ${д.заголовок}`));
 
   const копия = (текст, кнопка, что) => {
@@ -624,7 +641,40 @@ function рисоватьТелеграм(){
   const кпр = el('button',null,'Скопировать промпт');
   кпр.onclick = () => копия(д.промпт, кпр);
   шапка.append(кп, кпр);
+
+  // Галка живёт на сервере, в pult/otmetki.json: отметил на компьютере —
+  // отметка там и останется, браузер можно чистить.
+  const метка = el('label','zapostil' + (готово.has(д.день) ? ' est' : ''));
+  const г = el('input'); г.type = 'checkbox'; г.checked = готово.has(д.день);
+  г.onchange = async () => {
+    метка.classList.toggle('est', г.checked);
+    const о2 = await (await fetch('/api/otmetka', {method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({день: д.день, сделано: г.checked})})).json();
+    СОСТ.отметки = о2.отметки || [];
+    о.dataset.слепок = '';
+    // Отметили — листаем к следующему незапощенному: одно действие вместо двух.
+    if(г.checked){
+      const с = дни.find(x => !(СОСТ.отметки||[]).includes(x.день));
+      localStorage.setItem('tgden', с ? с.день : д.день);
+    }
+    рисоватьТелеграм();
+  };
+  метка.append(г, document.createTextNode('запостил'));
+  шапка.append(метка);
+  шапка.append(el('span','tihо', `запощено ${готово.size} из ${дни.length}`));
   о.append(шапка);
+
+  // Полоска всех тридцати дней: видно разом, что сделано и что пропущено.
+  const полоска = el('div','dni');
+  for(const x of дни){
+    const б = el('b', (готово.has(x.день) ? 'est' : '') + (x.день === n ? ' tut' : ''),
+                String(x.день));
+    б.title = x.заголовок;
+    б.onclick = () => кДню(x.день);
+    полоска.append(б);
+  }
+  о.append(полоска);
 
   const пост = el('div','tg-post'); пост.textContent = д.пост;
   о.append(пост);
