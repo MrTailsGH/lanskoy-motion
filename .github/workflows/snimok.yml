@@ -1,16 +1,14 @@
 name: Снимок чужих роликов
 
 # Управление здесь, в GitHub: расписание, кнопка запуска, логи, коммиты.
-# Выполняется на своём раннере — компьютере Егора, зарегистрированном в
-# репозитории. Так нужно не из прихоти:
+# Выполняется на своём раннере — компьютере Егора. Так нужно не из прихоти:
+# проба 20.09.2026 показала, что облачный раннер GitHub получает от YouTube
+# «Sign in to confirm you're not a bot». Домашний адрес такой проверки не
+# вызывает.
 #
-#   проба 20.09.2026 (workflow «Проба · пустит ли YouTube раннер»)
-#   показала, что облачный раннер GitHub получает от YouTube
-#   «Sign in to confirm you're not a bot» и на метаданных, и на
-#   скачивании. Домашний адрес такой проверки не вызывает.
-#
-# То есть в облаке живёт всё, кроме самого скачивания, а компьютер
-# нужен только включённым — руками в терминал лезть больше не надо.
+# Всё написано на PowerShell, а не на bash. Причина: Git для Windows кладёт
+# bash.exe в папку, которой нет в PATH, и на первой же проверке шаг падает с
+# «Имя bash не распознано». PowerShell в Windows есть всегда.
 
 on:
   schedule:
@@ -36,54 +34,57 @@ permissions:
 jobs:
   snimok:
     runs-on: self-hosted
+    defaults:
+      run:
+        shell: powershell
     steps:
       - uses: actions/checkout@v4
 
       - name: Инструменты
-        shell: bash
         run: |
-          # На Windows команда может называться python, python3 или py —
-          # зависит от того, как ставили. Находим один раз и кладём в
-          # окружение шага, чтобы дальше не гадать.
-          PY=$(command -v python || command -v python3 || command -v py) || {
-            echo 'Python не найден в PATH раннера'; exit 1; }
-          echo "PY=$PY" >> "$GITHUB_ENV"
+          # Команда Python на Windows называется по-разному — ищем один раз.
+          $py = (Get-Command python -ErrorAction SilentlyContinue).Source
+          if (-not $py) { $py = (Get-Command py -ErrorAction SilentlyContinue).Source }
+          if (-not $py) { throw 'Python не найден в PATH раннера' }
+          "PY=$py" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Python: $py"
+
           # numpy нужен razbor.py для покадровых замеров, yt-dlp — качать.
-          "$PY" -m pip install -q -U yt-dlp numpy
-          ffmpeg -version | head -1 || {
-            echo 'ffmpeg не найден в PATH раннера — winget install Gyan.FFmpeg'; exit 1; }
+          & $py -m pip install --quiet --upgrade yt-dlp numpy
+          if ($LASTEXITCODE -ne 0) { throw 'не поставились yt-dlp и numpy' }
+
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+            throw 'ffmpeg не найден в PATH раннера — winget install Gyan.FFmpeg'
+          }
+          ffmpeg -version | Select-Object -First 1
 
       - name: Снять ролики
-        shell: bash
         run: |
-          if [ -n "${{ inputs.url }}" ]; then
-            "$PY" snimok.py --url "${{ inputs.url }}"
-          else
-            "$PY" snimok.py --top "${{ inputs.top || 5 }}"
-          fi
+          $url = '${{ inputs.url }}'
+          $top = '${{ inputs.top }}'
+          if (-not $top) { $top = '5' }
+          if ($url) { & $env:PY snimok.py --url $url }
+          else      { & $env:PY snimok.py --top $top }
 
       - name: Сводка
-        shell: bash
         run: |
-          "$PY" svodka.py Primeri --out Primeri/SVODKA.md
+          & $env:PY svodka.py Primeri --out Primeri/SVODKA.md
 
       - name: Отчёт на страницу запуска
         if: always()
-        shell: bash
-        run: cat Primeri/SVODKA.md >> "$GITHUB_STEP_SUMMARY" || true
+        run: |
+          if (Test-Path Primeri/SVODKA.md) {
+            Get-Content Primeri/SVODKA.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          }
 
       - name: Коммит
-        shell: bash
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add Primeri
-          git diff --cached --quiet && { echo 'нового нет'; exit 0; }
-          git commit -m "Разбор чужих роликов: снимок $(date -u '+%Y-%m-%d %H:%M UTC')
-
-          Кадры, субтитры и замеры. Видео не коммитим — оно удалено
-          сразу после измерения.
-
-          [skip ci]"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) { Write-Host 'нового нет'; exit 0 }
+          $stamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm')
+          git commit -m "Разбор чужих роликов: снимок $stamp UTC" -m "Кадры, субтитры и замеры. Видео не коммитим — оно удалено сразу после измерения." -m "[skip ci]"
+          git pull --rebase origin $env:GITHUB_REF_NAME
+          git push origin "HEAD:$env:GITHUB_REF_NAME"

@@ -32,16 +32,21 @@ HTML-страницу канала, а её отдают всем. Блокир�
 git --version
 python --version
 ffmpeg -version
-bash --version
 ```
 
 Что делать, если чего-то нет:
 
 | Чего нет | Команда | Примечание |
 |---|---|---|
-| `git` и `bash` | `winget install Git.Git` | `bash` приходит вместе с Git для Windows, отдельно ставить не надо |
+| `git` | `winget install Git.Git` | |
 | `python` | `winget install Python.Python.3.12` | при установке с сайта python.org **обязательно** галочка «Add python.exe to PATH» |
 | `ffmpeg` | `winget install Gyan.FFmpeg` | |
+
+**Почему в списке нет bash.** Сначала воркфлоу был написан на нём, и первая
+же проверка у Егора дала «Имя bash не распознано»: Git для Windows ставит
+`bash.exe` в `C:\Program Files\Git\bin`, а в PATH добавляет только `cmd`.
+Чинить PATH — лишний шаг на каждой новой машине, поэтому воркфлоу переписан
+на PowerShell. Он в Windows есть всегда.
 
 **После любой установки закройте PowerShell и откройте заново** — иначе он не
 увидит изменившийся PATH.
