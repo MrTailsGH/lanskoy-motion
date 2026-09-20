@@ -34,6 +34,31 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)
 .versiya button{padding:5px 11px;font-size:13px}
 .trevoga{margin-top:10px;padding:10px 14px;border-radius:12px;font-size:14px;
   background:rgba(63,183,201,.1);border:1px solid rgba(63,183,201,.35);color:var(--teal)}
+/* Цвета марок проверены scripts/validate_palette.js на тёмной карточке
+   #18201E: полоса светлоты, порог насыщенности, разделимость для дальтонизма
+   (ΔE 16.6), обычное зрение (29.6) и контраст — все пять проходят.
+   Брендовые #2FD38E и #3FB7C9 не прошли по светлоте, поэтому у марок свои
+   шаги тех же тонов. */
+.lenta{width:100%;display:block;overflow:visible}
+.legenda{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:13px;
+  color:var(--dim);margin:-2px 0 14px}
+.legenda i{display:inline-block;margin-right:6px;vertical-align:middle}
+.klyuch-stolb{width:7px;height:12px;border-radius:2px;background:#3A4541}
+.klyuch-sklejka{width:2px;height:14px;background:#EE5A52}
+.klyuch-perehod{width:9px;height:9px;border-radius:50%;background:#17A2BC}
+.klyuch-blok{width:16px;height:9px;border-radius:3px;background:#23A874}
+.podskazka{position:fixed;pointer-events:none;z-index:50;background:#0F1513;
+  border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:12.5px;
+  color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .1s;
+  max-width:260px;line-height:1.45}
+.podskazka b{font-variant-numeric:tabular-nums}
+.podskazka .tihо{color:var(--dim)}
+.ryad-radar{display:grid;grid-template-columns:1fr 84px;gap:4px 12px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--line2)}
+.ryad-radar:last-child{border:0}
+.ryad-radar .imya{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ryad-radar .kanal{font-size:12px;color:var(--dim)}
+.ryad-radar .chislo{text-align:right;font-variant-numeric:tabular-nums;font-size:13.5px}
 .setka{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
 .karta{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r);padding:14px}
 .karta h3{margin:0 0 4px;font-size:16px}
@@ -101,7 +126,17 @@ pre.md{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r)
 
   <h2>Радар</h2>
   <div id="radar" class="tihо"></div>
+  <div class="karta" id="vybrosy" style="margin-bottom:14px"></div>
   <pre class="md" id="radarmd">…</pre>
+
+  <h2>Ритм: чужие и наши на одной шкале</h2>
+  <div class="legenda">
+    <span><i class="klyuch-stolb"></i>движение в кадре</span>
+    <span><i class="klyuch-sklejka"></i>жёсткая склейка</span>
+    <span><i class="klyuch-perehod"></i>переход с расфокусом</span>
+    <span><i class="klyuch-blok"></i>наш блок речи</span>
+  </div>
+  <div class="karta" id="ritm"></div>
 
   <h2>Разборы чужих роликов</h2>
   <div class="setka" id="primeri"></div>
@@ -138,6 +173,9 @@ function рисовать(){
 
   const рд = СОСТ.радар;
   $('#radar').textContent = `каналов ${рд.каналов} · снимков истории ${рд.снимков} · отчёт ${срок(рд.отчёт)}`;
+
+  рисоватьРитм();
+  рисоватьВыбросы();
 
   const п = $('#primeri'); п.innerHTML='';
   if(!СОСТ.primeri.length) п.append(el('div','tihо','пока ничего не разобрано'));
@@ -329,6 +367,207 @@ function рисоватьРолики(){
   }
 }
 
+
+// ── графика ────────────────────────────────────────────────────────────
+// Одна шкала времени на все ленты: чужие ролики и наши рисуются в одном
+// масштабе, иначе сравнивать ритм бессмысленно.
+const МАРКИ = {движение:'#3A4541', склейка:'#EE5A52', переход:'#17A2BC', блок:'#23A874'};
+const ПОЛЕ = {слева:0, справа:0, верх:10, низ:20};
+let ПОДСКАЗКА = null;
+
+function подсказка(){
+  if(!ПОДСКАЗКА){
+    ПОДСКАЗКА = el('div','podskazka');
+    document.body.append(ПОДСКАЗКА);
+  }
+  return ПОДСКАЗКА;
+}
+
+function следить(марка, текст){
+  марка.style.cursor = 'default';
+  марка.addEventListener('mouseenter', e => {
+    const п = подсказка(); п.innerHTML = текст; п.style.opacity = 1;
+  });
+  марка.addEventListener('mousemove', e => {
+    const п = подсказка();
+    const x = Math.min(e.clientX + 14, innerWidth - п.offsetWidth - 8);
+    п.style.left = x + 'px';
+    п.style.top = Math.max(8, e.clientY - п.offsetHeight - 12) + 'px';
+  });
+  марка.addEventListener('mouseleave', () => { подсказка().style.opacity = 0; });
+}
+
+function svg(имя, атр){
+  const э = document.createElementNS('http://www.w3.org/2000/svg', имя);
+  for(const k in (атр||{})) э.setAttribute(k, атр[k]);
+  return э;
+}
+
+function шкалаВремени(полотно, ш, высота, предел){
+  // Ось — волосяная линия и круглые числа под ней, ничего больше.
+  const y = высота - ПОЛЕ.низ;
+  полотно.append(svg('line', {x1:0, y1:y, x2:ш, y2:y,
+    stroke:'rgba(255,255,255,.15)', 'stroke-width':1}));
+  const шаг = предел > 90 ? 20 : 10;
+  for(let t = 0; t <= предел; t += шаг){
+    const x = t / предел * ш;
+    полотно.append(svg('line', {x1:x, y1:y, x2:x, y2:y+4,
+      stroke:'rgba(255,255,255,.15)', 'stroke-width':1}));
+    const п = svg('text', {x: Math.min(x, ш-14), y: y+16, fill:'#6E7A76',
+      'font-size':11, 'text-anchor': t === 0 ? 'start' : 'middle'});
+    п.textContent = t + (t === 0 ? ' с' : '');
+    полотно.append(п);
+  }
+}
+
+function лентаЧужого(в, ш, предел){
+  const H = 96, y0 = H - ПОЛЕ.низ, л = в.лента;
+  const полотно = svg('svg', {class:'lenta', width:ш, height:H,
+    viewBox:`0 0 ${ш} ${H}`});
+  шкалаВремени(полотно, ш, H, предел);
+  const X = t => t / предел * ш;
+
+  // Движение: столбик от оси, высота — величина изменения кадра.
+  // Корень, а не линейная шкала: пики на склейках в двести раз выше
+  // обычного шевеления и задавили бы всё остальное.
+  const ВЫС = п => 6 + 44 * Math.sqrt(Math.min(п, 20) / 20);
+  for(const с of л.движение){
+    const w = Math.max(2.5, Math.min(24, X(с.длит) - X(0)));
+    const h = ВЫС(с.пик);
+    const r = svg('rect', {x: X(с.t), y: y0 - h, width: w, height: h,
+      rx: Math.min(2, w/2), fill: МАРКИ.движение});
+    следить(r, `<b>${с.t} с</b> · движение<br><span class="tihо">длится ${с.длит} с</span>`);
+    полотно.append(r);
+  }
+  // Склейка: линия во всю высоту. Событий мало, они должны быть видны сразу.
+  for(const t of л.склейки){
+    const л2 = svg('line', {x1:X(t), y1:ПОЛЕ.верх, x2:X(t), y2:y0,
+      stroke:МАРКИ.склейка, 'stroke-width':2});
+    следить(л2, `<b>${t} с</b> · жёсткая склейка`);
+    полотно.append(л2);
+  }
+  // Переход: точка с кольцом цвета карточки, чтобы не слипалась со склейкой.
+  for(const п of л.переходы){
+    const к = svg('circle', {cx:X(п.t), cy:ПОЛЕ.верх + 2, r:4.5, fill:МАРКИ.переход,
+      stroke:'#18201E', 'stroke-width':2});
+    следить(к, `<b>${п.t} с</b> · переход<br><span class="tihо">расфокус ×${п.раз}</span>`);
+    полотно.append(к);
+  }
+  // Конец ролика, раз шкала общая.
+  полотно.append(svg('line', {x1:X(л.длина), y1:y0-6, x2:X(л.длина), y2:y0+2,
+    stroke:'rgba(255,255,255,.35)', 'stroke-width':1}));
+  return полотно;
+}
+
+function лентаНашего(н, ш, предел){
+  const H = 44, y0 = H - ПОЛЕ.низ;
+  const полотно = svg('svg', {class:'lenta', width:ш, height:H, viewBox:`0 0 ${ш} ${H}`});
+  шкалаВремени(полотно, ш, H, предел);
+  const X = t => t / предел * ш;
+  н.блоки.forEach((б, i) => {
+    const w = Math.max(3, X(б[1]) - X(б[0]) - 2);   // 2 px — промежуток паузы
+    const r = svg('rect', {x:X(б[0]), y:y0-14, width:w, height:14, rx:3,
+      fill:МАРКИ.блок});
+    const пауза = i+1 < н.блоки.length ? (н.блоки[i+1][0] - б[1]).toFixed(2) : null;
+    следить(r, `<b>блок ${i+1}</b> · ${б[0]}–${б[1]} с<br>` +
+      `<span class="tihо">длится ${(б[1]-б[0]).toFixed(2)} с` +
+      (пауза ? `, пауза после ${пауза} с` : '') + `</span>`);
+    полотно.append(r);
+  });
+  return полотно;
+}
+
+function предел(){
+  const а = (СОСТ.primeri||[]).map(v => (v.лента||{}).длина || 0);
+  const б = (СОСТ.наши||[]).map(n => n.длина || 0);
+  return Math.max(60, Math.ceil(Math.max(...а, ...б, 0) / 10) * 10);
+}
+
+function рисоватьРитм(){
+  const о = $('#ritm'); if(!о) return;
+  const ш = Math.max(320, о.clientWidth - 28), п = предел();
+  о.innerHTML = '';
+
+  // Сначала чужие: высота столбиков — величина изменения кадра.
+  for(const v of (СОСТ.primeri||[])){
+    if(!(v.лента && v.лента.длина)) continue;
+    const л = v.лента;
+    const ряд = el('div'); ряд.style.marginBottom = '4px';
+    ряд.append(el('div','zachem', `${v.имя} · ${л.длина} с · склеек ${л.склейки.length}` +
+      ` · переходов ${л.переходы.length}` +
+      (л.покой != null ? ` · покой ${Math.round(л.покой*100)}%` : '')));
+    ряд.append(лентаЧужого(v, ш, п));
+    о.append(ряд);
+  }
+
+  if(!(СОСТ.наши||[]).length) return;
+  const черта = el('div'); черта.style.cssText =
+    'border-top:1px solid var(--line2);margin:14px 0 12px';
+  о.append(черта);
+  о.append(el('div','zachem','Наши ролики: блоки дорожки. Промежутки — паузы, ' +
+    'на них живут переходы сцены.'));
+  for(const н of СОСТ.наши){
+    const ряд = el('div'); ряд.style.marginBottom = '2px';
+    ряд.append(el('div','zachem', `${н.имя} · ${н.длина} с · ${н.блоки.length} блоков`));
+    ряд.append(лентаНашего(н, ш, п));
+    о.append(ряд);
+  }
+}
+
+function рисоватьВыбросы(){
+  const о = $('#vybrosy'); if(!о) return;
+  const ряды = СОСТ.радартоп || [];
+  о.innerHTML = '';
+  о.append(el('div','zachem',
+    'Выбросы относительно своего канала: просмотры, делённые на медиану канала.'));
+  if(!ряды.length){ о.append(el('div','tihо','отчёта радара ещё нет')); return; }
+  const макс = Math.max(...ряды.map(р => р.индекс));
+  for(const р of ряды){
+    const ряд = el('div','ryad-radar');
+    const слева = el('div');
+    const a = document.createElement('a');
+    a.href = р.url; a.target = '_blank'; a.className = 'imya';
+    a.style.display = 'block'; a.textContent = р.название;
+    слева.append(a, el('div','kanal', `${р.канал} · ${р.всего}`));
+    ряд.append(слева);
+    ряд.append(el('div','chislo', '×' + р.индекс));
+
+    // Полоса индекса: один тон на все ряды — ролики это не шкала величин,
+    // а просто разные ролики. Длина уже кодирует число.
+    const ш = Math.max(200, о.clientWidth - 140);
+    const полотно = svg('svg', {width:ш, height:14, viewBox:`0 0 ${ш} 14`});
+    const w = Math.max(3, р.индекс / макс * ш);
+    const b = svg('rect', {x:0, y:2, width:w, height:10, rx:4, fill:МАРКИ.переход});
+    следить(b, `<b>×${р.индекс}</b> к медиане канала<br>` +
+      `<span class="tihо">${р.канал} · всего ${р.всего}</span>`);
+    полотно.append(b);
+    const ячейка = el('div'); ячейка.style.gridColumn = '1 / -1';
+    ячейка.append(полотно);
+
+    // Рост по снимкам — спарклайн, только если есть чему расти.
+    const р2 = (р.рост||[]).filter(v => typeof v === 'number');
+    if(р2.length >= 2 && Math.max(...р2) > Math.min(...р2)){
+      const шс = 120, hс = 20, мин = Math.min(...р2), макс2 = Math.max(...р2);
+      const сп = svg('svg', {width:шс, height:hс, viewBox:`0 0 ${шс} ${hс}`});
+      const точки = р2.map((v,i) => [i/(р2.length-1)*(шс-6)+3,
+        hс-3 - (v-мин)/(макс2-мин)*(hс-8)]);
+      сп.append(svg('polyline', {points: точки.map(t=>t.join(',')).join(' '),
+        fill:'none', stroke:'#6E7A76', 'stroke-width':2,
+        'stroke-linejoin':'round', 'stroke-linecap':'round'}));
+      const к = точки[точки.length-1];
+      сп.append(svg('circle', {cx:к[0], cy:к[1], r:4, fill:МАРКИ.переход,
+        stroke:'#18201E', 'stroke-width':2}));
+      следить(сп, `рост по снимкам радара<br><span class="tihо">` +
+        р2.map(v=>v.toLocaleString('ru-RU')).join(' → ') + `</span>`);
+      сп.style.marginLeft = '10px';
+      ячейка.style.display = 'flex'; ячейка.style.alignItems = 'center';
+      ячейка.append(сп);
+    }
+    ряд.append(ячейка);
+    о.append(ряд);
+  }
+}
+
 // ── GitHub: публичный репозиторий читается без ключа ──────────────────
 async function свежесть(){
   try{
@@ -370,6 +609,7 @@ async function радармд(){
 
 тянуть(); радармд(); гитхаб(); свежесть();
 setInterval(тянуть, 2000);
+addEventListener('resize', () => { if(СОСТ) рисовать(); });
 setInterval(радармд, 30000);
 setInterval(гитхаб, 60000);
 setInterval(свежесть, 120000);

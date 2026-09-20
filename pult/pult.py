@@ -268,6 +268,91 @@ def korotko(м):
     }
 
 
+def lenta(м):
+    """Разметка ролика во времени: что и когда произошло.
+
+    Отдаём только то, что рисуется: моменты склеек, переходы с глубиной
+    расфокуса и события движения. Сами кадры и полный список замеров
+    остаются в metrics.json — странице они не нужны."""
+    дв = м.get('движение') or {}
+    return {
+        'длина':    м.get('длина') or 0,
+        'склейки':  [round(float(t), 2) for t in (м.get('склейки') or [])],
+        'переходы': [{'t': round(float(п.get('уход_с') or п.get('t') or 0), 2),
+                      'раз': round(float(п.get('расфокус_во_сколько_раз') or 0), 1)}
+                     for п in (м.get('переходы') or []) if isinstance(п, dict)],
+        'движение': [{'t': round(float(с.get('t', 0)), 2),
+                      'длит': round(float(с.get('длит', 0)), 2),
+                      'пик': round(float(с.get('пик', 0)), 1)}
+                     for с in (дв.get('события') or [])],
+        'покой':    дв.get('доля_покоя'),
+    }
+
+
+def nashi_lenty():
+    """Наши ролики на той же шкале: блоки дорожки и паузы между ними.
+
+    Блоки берём из timing-*.json — это и есть ритм, по которому строится
+    сцена. Рядом с чужими лентами видно, реже наши переключения или чаще."""
+    ряд = []
+    for ф in sorted(os.listdir(CEH)):
+        м = re.match(r'^timing-([IV]-\d\d)\.json$', ф)
+        if not м:
+            continue
+        try:
+            d = json.load(open(os.path.join(CEH, ф), encoding='utf-8'))
+        except Exception:
+            continue
+        блоки = [[round(float(a), 2), round(float(b), 2)] for a, b in (d.get('B') or [])]
+        if not блоки:
+            continue
+        ряд.append(dict(имя=м.group(1), длина=round(float(d.get('DUR') or 0), 2),
+                        блоки=блоки, слогов=d.get('rate_syl_per_sec'),
+                        цена=d.get('cost')))
+    return ряд
+
+
+ССЫЛКА = re.compile(r'\[([^\]]+)\]\(https://youtube\.com/shorts/([\w-]+)\)\s*\|\s*'
+                    r'([^|]+)\|\s*×([\d.]+)\s*\|\s*([^|]+)\|')
+
+
+def radar_top(сколько=10):
+    """Верхушка раздела «Выбросы относительно своего канала» плюс рост
+    просмотров этого ролика по снимкам истории.
+
+    Индекс — просмотры, делённые на медиану канала: лучший источник тем,
+    потому что не зависит от размера канала. Рост берём из history.json."""
+    отчёт = os.path.join(CEH, 'radar', 'RADAR.md')
+    if not os.path.isfile(отчёт):
+        return []
+    txt = open(отчёт, encoding='utf-8').read()
+    кусок = txt.split('## 3.')[1].split('\n## ')[0] if '## 3.' in txt else ''
+    ряды = []
+    for m in ССЫЛКА.finditer(кусок):
+        ряды.append(dict(название=m.group(1).strip(), id=m.group(2),
+                         канал=m.group(3).strip(), индекс=float(m.group(4)),
+                         всего=m.group(5).strip(),
+                         url=f'https://youtube.com/shorts/{m.group(2)}'))
+        if len(ряды) >= сколько:
+            break
+
+    история = []
+    try:
+        h = json.load(open(os.path.join(CEH, 'radar', 'history.json'), encoding='utf-8'))
+        история = h.get('snapshots') or []
+    except Exception:
+        pass
+    for р in ряды:
+        ряд = []
+        for снимок in история:
+            for каналы in (снимок.get('data') or {}).values():
+                if р['id'] in каналы:
+                    ряд.append(каналы[р['id']])
+                    break
+        р['рост'] = ряд
+    return ряды
+
+
 def sostoyanie_primeri():
     корень = os.path.join(CEH, 'Primeri')
     папки = []
@@ -279,7 +364,9 @@ def sostoyanie_primeri():
                 except Exception: чис = {}
                 кадры = os.path.join(корень, d, 'kadry')
                 п = sorted(os.listdir(кадры))[:1] if os.path.isdir(кадры) else []
-                папки.append(dict(имя=d, числа=чис,
+                try: полные = json.load(open(m, encoding='utf-8'))
+                except Exception: полные = {}
+                папки.append(dict(имя=d, числа=чис, лента=lenta(полные),
                                   кадр=f'Primeri/{d}/kadry/{п[0]}' if п else None))
     return папки
 
@@ -345,6 +432,7 @@ class Pult(BaseHTTPRequestHandler):
                     цех=CEH, ролики=sostoyanie_rolikov(), радар=sostoyanie_radara(),
                     primeri=sostoyanie_primeri(), задачи=sostoyanie_zadach(),
                     вход=fayly_vhoda(), версия=versiya(),
+                    наши=nashi_lenty(), радартоп=radar_top(),
                     инструменты=instrumenty_kesh(),
                     список={k: dict(имя=v['имя'], зачем=v['зачем']) for k, v in ZADACHI.items()}))
             if u.path == '/api/log':
