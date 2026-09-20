@@ -26,10 +26,27 @@ RADAR = os.path.join(HERE, 'radar', 'RADAR.md')
 OUT = os.path.join(HERE, 'Primeri')
 
 
-def need(cmd):
-    if shutil.which(cmd) is None:
-        sys.exit(f'нет {cmd} в PATH. Поставить: pip install -U yt-dlp' if cmd == 'yt-dlp'
-                 else f'нет {cmd} в PATH')
+def ytdlp_cmd():
+    """Как звать yt-dlp. На Windows pip кладёт yt-dlp.exe в Scripts, а эта
+    папка часто не в PATH — установка прошла, а команды нет. Тогда зовём
+    модулем через тот же интерпретатор: работает всегда, править
+    переменные среды не нужно."""
+    exe = shutil.which('yt-dlp')
+    if exe:
+        return [exe]
+    try:
+        import yt_dlp  # noqa: F401
+        return [sys.executable, '-m', 'yt_dlp']
+    except ImportError:
+        sys.exit('yt-dlp не установлен. Поставить:  pip install -U yt-dlp')
+
+
+def need_ffmpeg():
+    if shutil.which('ffmpeg'):
+        return
+    sys.exit('нет ffmpeg в PATH — без него нечем мерить ролик.\n'
+             'Windows:  winget install Gyan.FFmpeg   (и заново открыть терминал)\n'
+             'macOS:    brew install ffmpeg')
 
 
 def slug(s):
@@ -56,6 +73,9 @@ def from_radar(top):
     return items
 
 
+YTDLP = ['yt-dlp']
+
+
 def grab(item):
     name = f"{slug(item['канал'])}-{item['id']}"
     dest = os.path.join(OUT, name)
@@ -65,7 +85,7 @@ def grab(item):
     os.makedirs(dest, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         mp4 = os.path.join(tmp, 'v.mp4')
-        r = subprocess.run(['yt-dlp', '-q', '--no-warnings',
+        r = subprocess.run(YTDLP + ['-q', '--no-warnings',
                             '-f', 'bv*[height<=1920][ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b',
                             '--merge-output-format', 'mp4',
                             '--write-auto-subs', '--write-subs', '--sub-langs', 'ru,en',
@@ -99,7 +119,8 @@ def grab(item):
 
 def main():
     args = sys.argv[1:]
-    need('yt-dlp'); need('ffmpeg')
+    global YTDLP
+    YTDLP = ytdlp_cmd(); need_ffmpeg()
     os.makedirs(OUT, exist_ok=True)
 
     if '--url' in args:
