@@ -141,13 +141,24 @@ def grab(item):
     with tempfile.TemporaryDirectory() as tmp:
         mp4 = os.path.join(tmp, 'v.mp4')
         ключи = SET + (['--proxy', proxy()] if proxy() else [])
-        r = subprocess.run(YTDLP + ключи + ['-q', '--no-warnings',
-                            '-f', 'bv*[height<=1920][ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b',
-                            '--merge-output-format', 'mp4',
-                            '--write-auto-subs', '--write-subs', '--sub-langs', 'ru,en',
-                            '--convert-subs', 'vtt',
-                            '-o', os.path.join(tmp, 'v.%(ext)s'), item['url']],
-                           capture_output=True)
+        общее = ['-q', '--no-warnings',
+                 '-f', 'bv*[height<=1920][ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b',
+                 '--merge-output-format', 'mp4', '--sleep-requests', '1',
+                 '-o', os.path.join(tmp, 'v.%(ext)s'), item['url']]
+        субтитры = ['--write-auto-subs', '--write-subs', '--sub-langs', 'ru,en',
+                    '--convert-subs', 'vtt']
+        r = subprocess.run(YTDLP + ключи + субтитры + общее, capture_output=True)
+
+        # Субтитры — не ролик. Из них берётся только темп речи, и терять
+        # из-за них всё скачивание нельзя. Поймано 20.09.2026: «HTTP Error
+        # 429: Too Many Requests» на английских субтитрах уронил ролик,
+        # который прекрасно качался. Общий адрес ВПН ловит 429 легко.
+        if not os.path.isfile(mp4):
+            первая = r.stderr.decode('utf-8', 'ignore')
+            if 'subtitle' in первая.lower() or '429' in первая:
+                print(f"  {name}: субтитры не дались, беру ролик без них")
+                r = subprocess.run(YTDLP + ключи + общее, capture_output=True)
+
         if not os.path.isfile(mp4):
             err = r.stderr.decode('utf-8', 'ignore')
             # Две разные беды, и лечатся они по-разному, поэтому и
