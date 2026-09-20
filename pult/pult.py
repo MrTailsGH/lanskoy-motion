@@ -72,6 +72,10 @@ def zadacha_fayl(p):
     return cmd, CEH
 
 
+def zadacha_svyaz(p):
+    return [PY, 'svyaz.py'], CEH
+
+
 def zadacha_priemka(p):
     r = (p.get('rolik') or '').strip()
     cmd = [PY, 'priemka.py']
@@ -113,6 +117,8 @@ def zadacha_zvuk(p):
     return [PY, 'mixsfx.py', f'out/{r}.mp4', f'out/{r}_sfx.mp4'], CEH
 
 ZADACHI = {
+    'svyaz':        dict(имя='Проверить сеть',       делает=zadacha_svyaz,
+                         зачем='Идёт ли Python через ВПН и пустит ли его YouTube.'),
     'radar':        dict(имя='Радар трендов',        делает=zadacha_radar,
                          зачем='Обойти каналы ниши и пересчитать прирост, скорость, индекс.'),
     'snimok':       dict(имя='Снимок чужих роликов', делает=zadacha_snimok,
