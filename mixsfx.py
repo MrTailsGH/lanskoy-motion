@@ -26,7 +26,7 @@ mixsfx.py — подмешать звуковые эффекты в готовы
    согласные.
 """
 
-import json, math, os, subprocess, sys, asyncio
+import json, math, os, re, subprocess, sys, tempfile, asyncio
 from playwright.async_api import async_playwright
 import browser
 
@@ -84,6 +84,19 @@ def role_db(t, blocks, cue):
         if s - 0.05 <= t <= e + 0.05:
             return DB_SPEECH, 'под речью'
     return DB_PAUSE, 'в паузе'
+
+
+TSEL = -14.0       # норма площадки: у всех трёх разобранных чужих −14,3
+
+
+def gromkost(путь):
+    """Интегральная громкость файла в LUFS. None, если ffmpeg не ответил."""
+    r = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', путь,
+                        '-af', 'ebur128=framelog=quiet', '-f', 'null', '-'],
+                       capture_output=True)
+    м = re.findall(r'I:\s*(-?\d+\.?\d*)\s*LUFS',
+                   r.stderr.decode('utf-8', 'replace'))
+    return float(м[-1]) if м else None
 
 
 def main():
@@ -169,9 +182,43 @@ def main():
     graph = ';'.join(parts) + ';' + ''.join(mix) + \
             f"amix=inputs={len(cues)+1}:normalize=0:dropout_transition=0[m];" + \
             "[m]alimiter=limit=0.891:attack=5:release=50:level=false[a]"
-    ff += ['-filter_complex', graph, '-map', '0:v', '-map', '[a]',
-           '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', out]
-    subprocess.run(ff, check=True)
+
+    # Громкость приводим к норме площадки в два прохода: сначала сводим
+    # звук в WAV и меряем, потом ставим точную добавку. Один проход
+    # loudnorm подгоняет динамику на ходу и промахивается на доли децибела,
+    # а здесь промах виден в ленте: замеренные 20.09.2026 наши −22,2 LUFS
+    # против −14,3 у всех трёх чужих роликов — это восемь децибел тишины,
+    # которые YouTube не поднимет.
+    цель = TSEL
+    if '--lufs' in sys.argv:
+        цель = float(sys.argv[sys.argv.index('--lufs') + 1].replace(',', '.'))
+    if '--bez-lufs' in sys.argv:
+        цель = None
+
+    with tempfile.TemporaryDirectory() as tmpd:
+        свод = os.path.join(tmpd, 'zvuk.wav')
+        subprocess.run(ff + ['-filter_complex', graph, '-map', '[a]',
+                             '-c:a', 'pcm_s16le', свод], check=True)
+        добавка = 0.0
+        if цель is not None:
+            было = gromkost(свод)
+            if было is None:
+                print('  громкость измерить не вышло — оставляю как есть')
+            else:
+                добавка = round(цель - было, 1)
+                print(f"\nгромкость {было:+.1f} LUFS → цель {цель:+.1f}, "
+                      f"добавка {добавка:+.1f} дБ")
+        цепь = (f"volume={добавка}dB,alimiter=limit=0.891:attack=5:release=50:level=false"
+                if abs(добавка) > 0.05 else
+                "alimiter=limit=0.891:attack=5:release=50:level=false")
+        subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', video, '-i', свод,
+                        '-filter_complex', f"[1:a]{цепь}[a]",
+                        '-map', '0:v', '-map', '[a]', '-c:v', 'copy',
+                        '-c:a', 'aac', '-b:a', '192k', out], check=True)
+        стало = gromkost(out)
+        if стало is not None:
+            знак = '✓' if цель is None or abs(стало - цель) <= 0.7 else '✕'
+            print(f"  на выходе {стало:+.1f} LUFS {знак}")
     print(f"\n→ {out}")
 
 

@@ -53,6 +53,21 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)
   max-width:260px;line-height:1.45}
 .podskazka b{font-variant-numeric:tabular-nums}
 .podskazka .tihо{color:var(--dim)}
+.sverka{display:grid;grid-template-columns:1fr auto auto;gap:3px 14px;
+  font-size:13.5px;align-items:center;margin-top:8px}
+.sverka .zn{font-variant-numeric:tabular-nums;text-align:right}
+.sverka .nm{font-variant-numeric:tabular-nums;color:var(--dim);font-size:12.5px;
+  text-align:right;min-width:78px}
+.sverka .imya{color:var(--dim)}
+.sverka .bed .imya,.sverka .bed .zn{color:var(--ink)}
+.znak{display:inline-block;width:16px;text-align:center;font-size:12px}
+.znak.da{color:var(--green)} .znak.net{color:#EE5A52}
+.tg-post{white-space:pre-wrap;background:#0F1513;border:1px solid var(--line2);
+  border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.55;
+  max-height:340px;overflow:auto}
+.tg-prompt{white-space:pre-wrap;background:#0F1513;border:1px solid var(--line2);
+  border-radius:12px;padding:10px 12px;font:12px/1.5 ui-monospace,Consolas,monospace;
+  color:#c8d3cf;max-height:200px;overflow:auto;margin-top:10px}
 .ryad-radar{display:grid;grid-template-columns:1fr 84px;gap:4px 12px;align-items:center;
   padding:9px 0;border-bottom:1px solid var(--line2)}
 .ryad-radar:last-child{border:0}
@@ -129,6 +144,12 @@ pre.md{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r)
   <div class="karta" id="vybrosy" style="margin-bottom:14px"></div>
   <pre class="md" id="radarmd">…</pre>
 
+  <h2>Приёмка: наши ролики против нормы</h2>
+  <div class="karta" id="priemka"></div>
+
+  <h2>Телеграм: пост дня</h2>
+  <div class="karta" id="telegram"></div>
+
   <h2>Ритм: чужие и наши на одной шкале</h2>
   <div class="legenda">
     <span><i class="klyuch-stolb"></i>движение в кадре</span>
@@ -174,6 +195,8 @@ function рисовать(){
   const рд = СОСТ.радар;
   $('#radar').textContent = `каналов ${рд.каналов} · снимков истории ${рд.снимков} · отчёт ${срок(рд.отчёт)}`;
 
+  рисоватьПриёмку();
+  рисоватьТелеграм();
   рисоватьРитм();
   рисоватьВыбросы();
 
@@ -480,7 +503,8 @@ function лентаНашего(н, ш, предел){
 function предел(){
   const а = (СОСТ.primeri||[]).map(v => (v.лента||{}).длина || 0);
   const б = (СОСТ.наши||[]).map(n => n.длина || 0);
-  return Math.max(60, Math.ceil(Math.max(...а, ...б, 0) / 10) * 10);
+  const в = ((СОСТ.приёмка||{}).ролики||[]).map(р => (р.лента||{}).длина || 0);
+  return Math.max(60, Math.ceil(Math.max(...а, ...б, ...в, 0) / 10) * 10);
 }
 
 function рисоватьРитм(){
@@ -500,6 +524,25 @@ function рисоватьРитм(){
     о.append(ряд);
   }
 
+  // Наши ролики, измеренные тем же razbor.py: прямое сравнение, а не
+  // приблизительное — те же склейки и переходы, снятые с картинки.
+  const свои = ((СОСТ.приёмка||{}).ролики || []).filter(р => р.лента && р.лента.длина);
+  if(свои.length){
+    const ч = el('div'); ч.style.cssText =
+      'border-top:1px solid var(--line2);margin:14px 0 12px';
+    о.append(ч);
+    о.append(el('div','zachem','Наши ролики, снятые той же линейкой с готового MP4.'));
+    for(const р of свои){
+      const л = р.лента;
+      const ряд = el('div'); ряд.style.marginBottom = '4px';
+      ряд.append(el('div','zachem', `${р.имя} · ${л.длина} с · склеек ${л.склейки.length}` +
+        ` · переходов ${л.переходы.length}` +
+        (л.покой != null ? ` · покой ${Math.round(л.покой*100)}%` : '')));
+      ряд.append(лентаЧужого({лента:л}, ш, п));
+      о.append(ряд);
+    }
+  }
+
   if(!(СОСТ.наши||[]).length) return;
   const черта = el('div'); черта.style.cssText =
     'border-top:1px solid var(--line2);margin:14px 0 12px';
@@ -511,6 +554,83 @@ function рисоватьРитм(){
     ряд.append(el('div','zachem', `${н.имя} · ${н.длина} с · ${н.блоки.length} блоков`));
     ряд.append(лентаНашего(н, ш, п));
     о.append(ряд);
+  }
+}
+
+function рисоватьПриёмку(){
+  const о = $('#priemka'); if(!о) return;
+  const п = СОСТ.приёмка || {};
+  о.innerHTML = '';
+  if(!п.готово){
+    о.append(el('div','tihо', 'приёмка пока не считается: ' + (п.почему||'')));
+    return;
+  }
+  if(!(п.ролики||[]).length){
+    о.append(el('div','tihо',
+      'замеров ещё нет — нажмите «Приёмка своих роликов» в процессах'));
+    return;
+  }
+  о.append(el('div','zachem',
+    'Норма посчитана из разобранных чужих роликов. Громкость задаёт площадка: −14 LUFS.'));
+  const сетка = el('div','setka'); сетка.style.marginTop = '12px';
+  for(const р of п.ролики){
+    const к = el('div'); к.style.cssText =
+      'background:var(--c2);border-radius:12px;padding:12px 14px';
+    const беды = р.строки.filter(с => !с.ладно).length;
+    к.append(el('div',null, р.имя + (беды ? ` · расхождений ${беды}` : ' · всё в норме')));
+    const т = el('div','sverka');
+    for(const с of р.строки){
+      const и = el('span','imya', с.имя);
+      const з = el('span','zn', String(с.значение));
+      const н = el('span','nm', 'норма ' + с.норма);
+      if(!с.ладно){ и.style.color='var(--ink)'; з.style.color='var(--ink)'; }
+      const зн = el('span','znak ' + (с.ладно ? 'da' : 'net'), с.ладно ? '✓' : '✕');
+      н.append(зн);
+      т.append(и, з, н);
+    }
+    к.append(т);
+    сетка.append(к);
+  }
+  о.append(сетка);
+}
+
+function рисоватьТелеграм(){
+  const о = $('#telegram'); if(!о) return;
+  const дни = СОСТ.телеграм || [];
+  if(!дни.length){ о.innerHTML=''; о.append(el('div','tihо','нет TG-30-dney.md')); return; }
+  let n = +(localStorage.getItem('tgden') || 1);
+  n = Math.min(дни.length, Math.max(1, n));
+  if(о.dataset.день === String(n)) return;      // перерисовываем только при смене
+  о.dataset.день = String(n);
+  const д = дни.find(x => x.день === n) || дни[0];
+  о.innerHTML = '';
+
+  const шапка = el('div','ryad');
+  const назад = el('button',null,'‹'); назад.onclick = () => {
+    localStorage.setItem('tgden', Math.max(1, n-1)); о.dataset.день=''; рисоватьТелеграм(); };
+  const вперёд = el('button',null,'›'); вперёд.onclick = () => {
+    localStorage.setItem('tgden', Math.min(дни.length, n+1)); о.dataset.день=''; рисоватьТелеграм(); };
+  шапка.append(назад, вперёд, el('span',null, `День ${д.день} · ${д.заголовок}`));
+
+  const копия = (текст, кнопка, что) => {
+    navigator.clipboard.writeText(текст).then(() => {
+      const было = кнопка.textContent;
+      кнопка.textContent = 'скопировано';
+      setTimeout(() => кнопка.textContent = было, 1400);
+    }).catch(() => кнопка.textContent = 'не вышло — выделите руками');
+  };
+  const кп = el('button','glav','Скопировать пост');
+  кп.onclick = () => копия(д.пост, кп);
+  const кпр = el('button',null,'Скопировать промпт');
+  кпр.onclick = () => копия(д.промпт, кпр);
+  шапка.append(кп, кпр);
+  о.append(шапка);
+
+  const пост = el('div','tg-post'); пост.textContent = д.пост;
+  о.append(пост);
+  if(д.промпт){
+    const пр = el('div','tg-prompt'); пр.textContent = д.промпт;
+    о.append(пр);
   }
 }
 

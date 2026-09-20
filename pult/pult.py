@@ -72,6 +72,14 @@ def zadacha_fayl(p):
     return cmd, CEH
 
 
+def zadacha_priemka(p):
+    r = (p.get('rolik') or '').strip()
+    cmd = [PY, 'priemka.py']
+    if r and r in ROLIKI:
+        cmd.append(r)
+    return cmd, CEH
+
+
 def zadacha_obnovit(p):
     # --ff-only: если на машине кто-то правил файлы руками, обновление
     # честно откажется, а не устроит слияние с конфликтами за спиной.
@@ -87,8 +95,14 @@ def _rolik(p):
     return r
 
 def zadacha_vyravnivanie(p):
+    # Один шаг вместо четырёх: выравнивание, раскладка в сцену и обе
+    # проверки. Таблицу границ печатает align.py — её читают глазами.
     r = _rolik(p)
-    return [PY, 'align.py', f'voice/{r}.mp3', f'text-{r}.txt', f'timing-{r}.json'], CEH
+    cmd = [PY, 'dorozhka.py', r]
+    хвост = (p.get('tail') or '').strip()
+    if re.match(r'^\d+(\.\d+)?$', хвост):
+        cmd += ['--tail', хвост]
+    return cmd, CEH
 
 def zadacha_sborka(p):
     r = _rolik(p)
@@ -107,12 +121,14 @@ ZADACHI = {
                          зачем='Один конкретный ролик: склейки, переходы, звук, темп.'),
     'fayl':         dict(имя='Разобрать свой файл',   делает=zadacha_fayl,
                          зачем='Ролик уже скачан и лежит в папке vhod — измерить его.'),
+    'priemka':      dict(имя='Приёмка своих роликов', делает=zadacha_priemka,
+                         зачем='Померить наши ролики теми же линейками, что и чужие.'),
     'obnovit':      dict(имя='Обновить из GitHub',   делает=zadacha_obnovit,
                          зачем='Забрать свежие сцены, скрипты и сам пульт.'),
     'svodka':       dict(имя='Пересобрать сводку',   делает=zadacha_svodka,
                          зачем='Собрать все замеры Primeri в одну таблицу.'),
-    'vyravnivanie': dict(имя='Выравнивание дорожки', делает=zadacha_vyravnivanie,
-                         зачем='Пословные тайминги из mp3 и текста озвучки.'),
+    'vyravnivanie': dict(имя='Принять дорожку', делает=zadacha_vyravnivanie,
+                         зачем='Из mp3: тайминги, таблица границ, раскладка в сцену, проверки.'),
     'sborka':       dict(имя='Собрать ролик',        делает=zadacha_sborka,
                          зачем='Сцена плюс дорожка на выходе MP4. Долго.'),
     'zvuk':         dict(имя='Свести звук',          делает=zadacha_zvuk,
@@ -224,6 +240,53 @@ def versiya():
                 заголовок=git('log', '-1', '--format=%s'),
                 правлено=bool(git('status', '--porcelain')),
                 устарел=устарел)
+
+
+def priemka():
+    """Готовые замеры наших роликов против нормы из чужих.
+
+    Считает не пульт: и границы, и сверку даёт priemka.py, тот же код, что
+    работает из командной строки. Две реализации одной проверки рано или
+    поздно разойдутся, и разойдутся молча."""
+    try:
+        sys.path.insert(0, CEH)
+        import priemka as П
+        чужие = П.zamery(П.CHUZHIE)
+        if len(чужие) < 2:
+            return dict(готово=False, почему='в Primeri меньше двух разборов')
+        н = П.norma(чужие)
+        ряд = []
+        for м in П.zamery(П.OUT):
+            ряд.append(dict(имя=м.get('папка'), строки=П.sverit(м, н),
+                            лента=lenta(м)))
+        return dict(готово=True, норма={k: dict(мин=v['мин'], макс=v['макс'],
+                                                сред=v['сред']) for k, v in н.items()},
+                    ролики=ряд)
+    except Exception as e:
+        return dict(готово=False, почему=str(e))
+
+
+ДЕНЬ = re.compile(r'^## День (\d+)\s*·\s*(.+)$', re.M)
+
+
+def telegram():
+    """Посты из TG-30-dney.md: текст и промпт картинки, по дням."""
+    ф = os.path.join(CEH, 'TG-30-dney.md')
+    if not os.path.isfile(ф):
+        return []
+    txt = open(ф, encoding='utf-8').read()
+    метки = list(ДЕНЬ.finditer(txt))
+    дни = []
+    for i, m in enumerate(метки):
+        кусок = txt[m.end(): метки[i+1].start() if i+1 < len(метки) else len(txt)]
+        пост = кусок.split('**Картинка')[0]
+        пост = пост.replace('**Пост**', '', 1).strip()
+        промпт = ''
+        if '```' in кусок.split('**Картинка')[-1]:
+            промпт = кусок.split('**Картинка')[-1].split('```')[1].strip()
+        дни.append(dict(день=int(m.group(1)), заголовок=m.group(2).strip(),
+                        пост=пост, промпт=промпт))
+    return дни
 
 
 def sostoyanie_radara():
@@ -433,6 +496,7 @@ class Pult(BaseHTTPRequestHandler):
                     primeri=sostoyanie_primeri(), задачи=sostoyanie_zadach(),
                     вход=fayly_vhoda(), версия=versiya(),
                     наши=nashi_lenty(), радартоп=radar_top(),
+                    приёмка=priemka(), телеграм=telegram(),
                     инструменты=instrumenty_kesh(),
                     список={k: dict(имя=v['имя'], зачем=v['зачем']) for k, v in ZADACHI.items()}))
             if u.path == '/api/log':
