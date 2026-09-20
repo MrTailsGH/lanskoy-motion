@@ -1,0 +1,44 @@
+name: Проба · пустит ли YouTube раннер
+
+# Одноразовая проба. Вопрос простой: можно ли качать ролики прямо в
+# GitHub Actions, без домашней машины. Раннеры сидят на датацентровых
+# адресах Azure, и YouTube их обычно заворачивает проверкой на бота —
+# но это надо проверить на нашем репозитории, а не поверить на слово.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  proba:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+
+      - name: Поставить yt-dlp
+        run: pip install -q -U yt-dlp && yt-dlp --version
+
+      - name: Только метаданные
+        continue-on-error: true
+        run: |
+          yt-dlp --no-warnings --skip-download \
+            --print "НАЗВАНИЕ: %(title)s" --print "ДЛИНА: %(duration)s" \
+            "https://youtube.com/shorts/IxnOVrPdNMU" 2>&1 | tail -20
+
+      - name: Скачать целиком
+        continue-on-error: true
+        run: |
+          yt-dlp --no-warnings -f "b[ext=mp4]/b" \
+            --write-auto-subs --sub-langs ru --convert-subs vtt \
+            -o "proba.%(ext)s" "https://youtube.com/shorts/IxnOVrPdNMU" 2>&1 | tail -20
+          ls -la proba.* 2>/dev/null || echo "файла нет"
+
+      - name: Итог
+        if: always()
+        run: |
+          if [ -f proba.mp4 ]; then
+            echo "ПУСТИЛ: ролик скачан, $(stat -c%s proba.mp4) байт" >> "$GITHUB_STEP_SUMMARY"
+            ls -la proba.* >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "НЕ ПУСТИЛ: файла нет — раннер заблокирован YouTube" >> "$GITHUB_STEP_SUMMARY"
+          fi
