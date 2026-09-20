@@ -117,6 +117,15 @@ td{padding:8px;border-bottom:1px solid var(--line2);vertical-align:middle}
 video{width:100%;border-radius:10px;background:#000;display:block}
 .primer{background:var(--c1);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden}
 .primer img{width:100%;display:block;aspect-ratio:9/16;object-fit:cover;background:#000}
+.kadry{display:flex;gap:4px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:thin}
+.kadry img{width:52px;height:92px;flex:none;object-fit:cover;border-radius:5px;
+  background:#000;cursor:zoom-in;opacity:.72;transition:opacity .12s}
+.kadry img:hover{opacity:1}
+.krupno{position:fixed;inset:0;z-index:60;background:rgba(4,7,6,.92);display:flex;
+  align-items:center;justify-content:center;cursor:zoom-out}
+.krupno img{max-height:92vh;max-width:92vw;border-radius:12px}
+.vnenorme{font-size:11px;padding:2px 8px;border-radius:999px;color:var(--dim);
+  border:1px solid var(--line2);margin-left:6px}
 .primer .telo{padding:10px 12px}
 .chisla{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13px;color:var(--dim);margin-top:6px}
 .chisla b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
@@ -215,7 +224,30 @@ function рисовать(){
   for(const v of СОСТ.primeri){
     const к = el('div','primer');
     if(v.кадр){ const im = el('img'); im.src = '/fayl/'+v.кадр; im.loading='lazy'; к.append(im); }
-    const т = el('div','telo'); т.append(el('div',null,v.имя));
+    const т = el('div','telo');
+    const шапка = el('div');
+    шапка.append(document.createTextNode(v.название || v.имя));
+    if(!v.внорме) шапка.append(el('span','vnenorme','вне нормы'));
+    т.append(шапка);
+    if(v.канал || v.url){
+      const строка = el('div','zachem'); строка.style.margin='2px 0 0';
+      if(v.канал) строка.append(document.createTextNode(v.канал + ' · '));
+      if(v.url){
+        const a = document.createElement('a'); a.href = v.url; a.target='_blank';
+        a.textContent = 'смотреть оригинал';
+        строка.append(a);
+      }
+      т.append(строка);
+    }
+    if((v.кадры||[]).length > 1){
+      const лк = el('div','kadry');
+      for(const к of v.кадры){
+        const im = el('img'); im.src = '/fayl/' + к; im.loading = 'lazy';
+        im.onclick = () => крупно('/fayl/' + к);
+        лк.append(im);
+      }
+      т.append(лк);
+    }
     const ч = el('div','chisla');
     for(const [подпись, зн] of Object.entries(v.числа||{})){
       if(зн === null || зн === undefined) continue;
@@ -274,6 +306,10 @@ function рисоватьЗадачи(){
       if(zid==='snimok'){
         const n = el('input'); n.type='number'; n.value=2; n.min=1; n.max=20; n.id='top';
         ряд.append(el('span','tihо','сверху'), n);
+        const l = el('label','gal'); const c = el('input'); c.type='checkbox';
+        c.id='nisha'; c.checked = true;
+        l.append(c, document.createTextNode('только наша полка'));
+        ряд.append(l);
       }
       if(zid==='razbor'){
         const u = el('input'); u.placeholder='https://youtube.com/watch?v=…';
@@ -352,7 +388,10 @@ function нельзя(zid){
 
 async function пуск(zid){
   const п = {};
-  if(zid==='snimok') п.top = +document.getElementById('top').value;
+  if(zid==='snimok'){
+    п.top = +document.getElementById('top').value;
+    п.nisha = document.getElementById('nisha').checked;
+  }
   if(zid==='razbor') п.url = document.getElementById('url').value;
   if(['snimok','razbor'].includes(zid)){
     п.push = document.getElementById('push-'+zid).checked;
@@ -573,6 +612,17 @@ function рисоватьРитм(){
     ряд.append(лентаНашего(н, ш, п));
     о.append(ряд);
   }
+}
+
+// Кадр во весь экран: разглядеть вёрстку чужого ролика мелким нельзя.
+function крупно(путь){
+  const слой = el('div','krupno');
+  const im = el('img'); im.src = путь; слой.append(im);
+  слой.onclick = () => слой.remove();
+  addEventListener('keydown', function уход(e){
+    if(e.key === 'Escape'){ слой.remove(); removeEventListener('keydown', уход); }
+  });
+  document.body.append(слой);
 }
 
 function рисоватьПриёмку(){

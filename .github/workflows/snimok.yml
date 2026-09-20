@@ -36,6 +36,10 @@ on:
         description: 'Или один конкретный ролик по ссылке (тогда top не важен)'
         required: false
         default: ''
+      nisha:
+        description: 'Только наша полка: русские каналы про деньги, бизнес и налоги'
+        type: boolean
+        default: true
 
 # Весь Python в задании говорит и печатает в UTF-8 — см. грабли 3.
 env:
@@ -76,6 +80,9 @@ jobs:
           ffmpeg -version | Select-Object -First 1
 
       # Пустое поле url — берём горячие ролики из свежего RADAR.md.
+      # По расписанию inputs пустые, и nisha приходит пустой строкой — это
+      # не 'false', поэтому по расписанию снимается наша полка. Так и надо:
+      # норма приёмки считается по ней, а чужой жанр её обнуляет.
       #
       # SNIMOK_PROXY — необязательный секрет репозитория. Он нужен, если
       # YouTube с домашнего адреса не открывается: третий запуск оборвался
@@ -88,9 +95,15 @@ jobs:
         run: |
           $url = '${{ inputs.url }}'
           $top = '${{ inputs.top }}'
+          $nisha = '${{ inputs.nisha }}'
           if (-not $top) { $top = '5' }
-          if ($url) { & $env:PY snimok.py --url $url }
-          else      { & $env:PY snimok.py --top $top }
+          if ($url) {
+            & $env:PY snimok.py --url $url
+          } elseif ($nisha -eq 'false') {
+            & $env:PY snimok.py --top $top
+          } else {
+            & $env:PY snimok.py --top $top --nisha
+          }
           if ($LASTEXITCODE -ne 0) { throw 'snimok.py failed' }
 
       - name: Сводка

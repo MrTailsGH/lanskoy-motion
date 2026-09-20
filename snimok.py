@@ -11,6 +11,7 @@ snimok.py — принести чужие ролики из радара и ос
     python3 snimok.py                 пять самых горячих из RADAR.md
     python3 snimok.py --top 10        десять
     python3 snimok.py --push          сразу закоммитить и отправить
+    python3 snimok.py --nisha         только ролики нашей полки
     python3 snimok.py --url ССЫЛКА    один конкретный ролик
     python3 snimok.py --fayl vhod/x.mp4   уже скачанный файл
     python3 snimok.py --proxy socks5://127.0.0.1:1080   через прокси
@@ -62,22 +63,63 @@ def slug(s):
     return re.sub(r'[\s_]+', '-', s)[:40] or 'rolik'
 
 
-def from_radar(top):
+# Наша полка: русские каналы про деньги, бизнес и налоги. Остальные
+# категории радар держит ради формата и качества картинки — разбирать их
+# полезно, но мерить себя по ним нельзя, см. Primeri/norma.json.
+ПОЛКА = ('РУ ядро', 'налоги/банки')
+
+
+def kanaly():
+    try:
+        return json.load(open(os.path.join(HERE, 'radar', 'channels.json'),
+                              encoding='utf-8'))
+    except Exception:
+        return []
+
+
+def polka_po_id():
+    """Какому каналу принадлежит ролик и на нашей ли он полке.
+
+    В отчёте радара стоитчеловеческое имя канала, а категория — в channels.json
+    по ручке. Связывает их история: в снимках лежит {ручка: {ролик: views}}."""
+    кат = {c['handle']: c.get('cat', '') for c in kanaly() if c.get('handle')}
+    свои = {}
+    try:
+        h = json.load(open(os.path.join(HERE, 'radar', 'history.json'),
+                           encoding='utf-8'))
+        for снимок in (h.get('snapshots') or []):
+            for ручка, ролики in (снимок.get('data') or {}).items():
+                for vid in ролики:
+                    свои[vid] = ручка
+    except Exception:
+        pass
+    return свои, кат
+
+
+def from_radar(top, только_ниша=False):
     """Ссылки из свежего отчёта радара, в порядке появления: сначала
     раздел прироста — то, что греется прямо сейчас."""
     if not os.path.isfile(RADAR):
         sys.exit('нет radar/RADAR.md — сначала прогон радара')
     txt = open(RADAR, encoding='utf-8').read()
-    seen, items = set(), []
+    ручки, кат = polka_po_id() if только_ниша else ({}, {})
+    seen, items, мимо = set(), [], []
     for m in re.finditer(r'\[([^\]]+)\]\(https://youtube\.com/shorts/([\w-]+)\)\s*\|\s*([^|]+)\|', txt):
         title, vid, chan = m.group(1).strip(), m.group(2), m.group(3).strip()
         if vid in seen:
             continue
         seen.add(vid)
+        if только_ниша:
+            категория = кат.get(ручки.get(vid, ''), '')
+            if категория not in ПОЛКА:
+                мимо.append(f'{chan} ({категория or "канал неизвестен"})')
+                continue
         items.append({'id': vid, 'название': title, 'канал': chan,
                       'url': f'https://youtube.com/shorts/{vid}'})
         if len(items) >= top:
             break
+    if мимо:
+        print(f'мимо полки: {len(мимо)} — ' + '; '.join(мимо[:6]))
     return items
 
 
@@ -236,8 +278,13 @@ def main():
         items = [{'id': vid, 'название': 'вручную', 'канал': 'вручную', 'url': url}]
     else:
         top = int(args[args.index('--top') + 1]) if '--top' in args else 5
-        items = from_radar(top)
-        print(f'из радара взято роликов: {len(items)}')
+        ниша = '--nisha' in args
+        items = from_radar(top, ниша)
+        print(f'из радара взято роликов: {len(items)}' +
+              (' (только наша полка)' if ниша else ''))
+        if ниша and not items:
+            sys.exit('на нашей полке свежих роликов не нашлось.\n'
+                     'Прогоните радар — или снимайте без ключа --nisha.')
 
     было = [i for i in items
             if os.path.isfile(os.path.join(OUT, f"{slug(i['канал'])}-{i['id']}",

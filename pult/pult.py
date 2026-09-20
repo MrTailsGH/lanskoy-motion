@@ -43,6 +43,7 @@ def proxy(p):
 def zadacha_snimok(p):
     top = max(1, min(20, int(p.get('top') or 5)))
     cmd = [PY, 'snimok.py', '--top', str(top)] + proxy(p)
+    if p.get('nisha'): cmd.append('--nisha')
     if p.get('push'): cmd.append('--push')
     return cmd, CEH
 
@@ -342,6 +343,15 @@ def sostoyanie_radara():
     except Exception: pass
     return dict(отчёт=kogda('radar/RADAR.md'), снимков=снимков, каналов=каналов)
 
+def isklyuchennye_papki():
+    try:
+        d = json.load(open(os.path.join(CEH, 'Primeri', 'norma.json'),
+                           encoding='utf-8'))
+        return d.get('исключить') or {}
+    except Exception:
+        return {}
+
+
 def korotko(м):
     """Из metrics.json — только то, что влезает в карточку."""
     дв = м.get('движение') or {}; зв = м.get('звук') or {}
@@ -466,11 +476,18 @@ def sostoyanie_primeri():
                 try: чис = korotko(json.load(open(m, encoding='utf-8')))
                 except Exception: чис = {}
                 кадры = os.path.join(корень, d, 'kadry')
-                п = sorted(os.listdir(кадры))[:1] if os.path.isdir(кадры) else []
+                п = sorted(os.listdir(кадры)) if os.path.isdir(кадры) else []
                 try: полные = json.load(open(m, encoding='utf-8'))
                 except Exception: полные = {}
+                try: мета = json.load(open(os.path.join(корень, d, 'meta.json'),
+                                          encoding='utf-8'))
+                except Exception: мета = {}
                 папки.append(dict(имя=d, числа=чис, лента=lenta(полные),
-                                  кадр=f'Primeri/{d}/kadry/{п[0]}' if п else None))
+                                  кадр=f'Primeri/{d}/kadry/{п[0]}' if п else None,
+                                  кадры=[f'Primeri/{d}/kadry/{к}' for к in п],
+                                  название=мета.get('название'),
+                                  канал=мета.get('канал'), url=мета.get('url'),
+                                  внорме=d not in isklyuchennye_papki()))
     return папки
 
 def instrumenty():
