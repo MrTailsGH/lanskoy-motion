@@ -84,6 +84,10 @@ def zadacha_priemka(p):
     return cmd, CEH
 
 
+def zadacha_otpravit(p):
+    return [PY, 'otpravit.py'], CEH
+
+
 def zadacha_obnovit(p):
     # --ff-only: если на машине кто-то правил файлы руками, обновление
     # честно откажется, а не устроит слияние с конфликтами за спиной.
@@ -131,6 +135,8 @@ ZADACHI = {
                          зачем='Померить наши ролики теми же линейками, что и чужие.'),
     'obnovit':      dict(имя='Обновить из GitHub',   делает=zadacha_obnovit,
                          зачем='Забрать свежие сцены, скрипты и сам пульт.'),
+    'otpravit':     dict(имя='Отправить в репозиторий', делает=zadacha_otpravit,
+                         зачем='Радар, приёмка, тайминги и сцены с этой машины — на GitHub.'),
     'svodka':       dict(имя='Пересобрать сводку',   делает=zadacha_svodka,
                          зачем='Собрать все замеры Primeri в одну таблицу.'),
     'vyravnivanie': dict(имя='Принять дорожку', делает=zadacha_vyravnivanie,
@@ -239,7 +245,10 @@ def versiya():
         for ф in ('pult/pult.py', 'pult/index.html'):
             СВОЙ_ВОЗРАСТ[ф] = kogda(ф)
     устарел = any(kogda(ф) != т for ф, т in СВОЙ_ВОЗРАСТ.items())
-    return dict(коммит=git('rev-parse', '--short', 'HEAD'),
+    порядок = git('status', '--porcelain')
+    правок = len([с for с in порядок.splitlines() if с.strip()])
+    return dict(правок=правок,
+                коммит=git('rev-parse', '--short', 'HEAD'),
                 полный=git('rev-parse', 'HEAD'),
                 ветка=git('rev-parse', '--abbrev-ref', 'HEAD'),
                 когда=git('log', '-1', '--format=%cI'),
