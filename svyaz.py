@@ -47,14 +47,49 @@ def rukopozhatie(хост='www.youtube.com', порт=443, таймаут=8):
 
 
 def stranitsa(url='https://www.youtube.com/@kokorevinvest/shorts'):
-    """Отдаёт ли YouTube обычный HTML — этим живёт радар."""
+    """Отдаёт ли YouTube обычный HTML — этим живёт радар.
+
+    Читать надо целиком: разметка `ytInitialData` лежит в конце, и обрезка
+    на первых двухстах килобайтах давала «страница не отдалась» там, где
+    страница прекрасно отдавалась. Поймано на машине Егора 20.09.2026."""
     try:
         зап = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(зап, timeout=12) as r:
-            тело = r.read(200000).decode('utf-8', 'replace')
-        return ('ytInitialData' in тело), len(тело)
+        with urllib.request.urlopen(зап, timeout=15) as r:
+            тело = r.read(4_000_000).decode('utf-8', 'replace')
     except Exception as e:
-        return False, f'{type(e).__name__}: {e}'
+        return 'нет', f'{type(e).__name__}: {e}'
+    есть = any(м in тело for м in ('ytInitialData', 'shortsLockupViewModel',
+                                   '"videoRenderer"'))
+    return ('да' if есть else 'без разметки'), len(тело)
+
+
+def proba_ytdlp():
+    """Решающая проверка: видит ли yt-dlp сам ролик. Ничего не качает —
+    спрашивает только название."""
+    # На Windows yt-dlp.exe часто не в PATH — тогда это не ненулевой код,
+    # а FileNotFoundError, и проверка падала бы вместо ответа.
+    зов = None
+    try:
+        if subprocess.run(['yt-dlp', '--version'],
+                          capture_output=True).returncode == 0:
+            зов = ['yt-dlp']
+    except Exception:
+        pass
+    if зов is None:
+        try:
+            import yt_dlp  # noqa: F401
+            зов = [sys.executable, '-m', 'yt_dlp']
+        except ImportError:
+            return None, 'yt-dlp не установлен'
+    r = subprocess.run(зов + ['--no-warnings', '--skip-download',
+                              '--print', '%(title)s', '--socket-timeout', '15',
+                              'https://www.youtube.com/watch?v=aqz-KE-bpKQ'],
+                       capture_output=True)
+    имя = r.stdout.decode('utf-8', 'replace').strip()
+    if r.returncode == 0 and имя:
+        return True, имя
+    беда = r.stderr.decode('utf-8', 'replace').strip().splitlines()
+    return False, (беда[-1] if беда else 'без объяснения')
 
 
 def main():
@@ -75,15 +110,31 @@ def main():
     if not ладно:
         print(f'         {чем}')
 
-    есть, сколько = stranitsa()
-    print('Страница: ' + (f'отдалась, {сколько} знаков — радару хватит' if есть
-                          else f'не отдалась — {сколько}'))
+    стр, сколько = stranitsa()
+    if стр == 'да':
+        print(f'Страница: отдалась, {сколько} знаков — радару хватит')
+    elif стр == 'без разметки':
+        print(f'Страница: пришла ({сколько} знаков), но разметки радара в ней нет')
+    else:
+        print(f'Страница: не пришла — {сколько}')
+
+    вышло, чем = proba_ytdlp()
+    if вышло is None:
+        print(f'Проба:   {чем}')
+    elif вышло:
+        print(f'Проба:   yt-dlp видит ролик — «{чем}»')
+    else:
+        print(f'Проба:   yt-dlp не смог\n         {чем[:200]}')
 
     print()
-    if ладно and есть:
+    if вышло:
         print('Вывод: скачивание роликов отсюда пройдёт.')
-    elif есть and not ладно:
-        print('Вывод: радар работать будет, скачивание — нет.')
+    elif вышло is None and ладно and стр == 'да':
+        print('Вывод: сеть в порядке, но проверить скачивание нечем — '
+              'поставьте yt-dlp:  pip install -U yt-dlp')
+    elif стр == 'да' and not вышло:
+        print('Вывод: радар работать будет, скачивание — нет. '
+              'Причина выше, в строке «Проба».')
     else:
         print('Вывод: скачивание отсюда не пройдёт.\n'
               'Лечится так: в ВПН-приложении включить режим на всю систему\n'
