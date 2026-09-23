@@ -23,16 +23,30 @@ async def main():
         await pg.goto(browser.scene_url(SCENE))
         await pg.wait_for_timeout(700)
         bad = await pg.evaluate("""(LIMIT) => {
+          /* Акты объявлены в сцене через const, а такие переменные в
+             window не попадают: window['hook'] всегда undefined. Проверка
+             из-за этого годами видела ноль актов и всегда отвечала «наложений
+             нет» — поймано 23.09.2026. Теперь сцена может сама перечислить
+             акты в window.ACTS; если не перечислила, имена разрешаются через
+             Function — она выполняется в глобальной области и видит const. */
           const names = ['in0','in1','hook','card','cyc','tot','bars','scale',
-                         'msp','form','grow','mrg','cls','pills','cta'];
-          const acts = names.filter(n => typeof window[n]!=='undefined' && window[n]);
+                         'msp','form','grow','mrg','cls','pills','cta',
+                         'split','white','raise'];
+          const достать = n => { try { return new Function(
+              'return typeof '+n+'!=="undefined" ? '+n+' : null')(); }
+            catch(e){ return null; } };
+          const реестр = window.ACTS || {};
+          const acts = Object.keys(реестр).length ? Object.keys(реестр)
+                     : names.filter(n => достать(n));
+          const взять = n => реестр[n] || достать(n);
+          if(!acts.length) return [{t:-1, акты:['НЕ НАЙДЕНО НИ ОДНОГО АКТА']}];
           const out=[];
           const N=Math.round(META.DUR*META.FPS);
           for(let f=0; f<N; f++){
             const t=f/META.FPS;
             seek(t);
             const lit=acts.filter(n=>{
-              const e=window[n];
+              const e=взять(n);
               if(e.style.display==='none') return false;
               return parseFloat(e.style.opacity||1) > LIMIT;
             });
