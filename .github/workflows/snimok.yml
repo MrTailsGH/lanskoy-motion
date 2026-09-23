@@ -110,6 +110,12 @@ jobs:
         run: |
           & $env:PY svodka.py Primeri --out Primeri/SVODKA.md
 
+      # Хуки считаются из субтитров, которые снимок уже принёс: новых
+      # запросов в сеть нет, поэтому шаг стоит здесь, а не отдельно.
+      - name: Хуки
+        run: |
+          & $env:PY hooki.py
+
       - name: Отчёт на страницу запуска
         if: always()
         run: |
@@ -131,6 +137,7 @@ jobs:
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git checkout -- Primeri/SVODKA.md 2>$null
+          git checkout -- Primeri/HOOKI.md 2>$null
           git add Primeri
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 0) { Write-Host 'nothing new'; exit 0 }
@@ -143,7 +150,8 @@ jobs:
             throw 'rebase failed - nothing pushed'
           }
           & $env:PY svodka.py Primeri --out Primeri/SVODKA.md
-          git add Primeri/SVODKA.md
+          & $env:PY hooki.py
+          git add Primeri/SVODKA.md Primeri/HOOKI.md
           git diff --cached --quiet
           if ($LASTEXITCODE -ne 0) { git commit -m "Svodka: peresborka posle snimka" -m "[skip ci]" }
           git push origin "HEAD:$env:GITHUB_REF_NAME"

@@ -95,6 +95,10 @@ def zadacha_obnovit(p):
     return ['git', 'pull', '--ff-only'], CEH
 
 
+def zadacha_hooki(p):
+    return [PY, 'hooki.py'], CEH
+
+
 def zadacha_svodka(p):
     return [PY, 'svodka.py', 'Primeri', '--out', 'Primeri/SVODKA.md'], CEH
 
@@ -138,6 +142,8 @@ ZADACHI = {
                          зачем='Забрать свежие сцены, скрипты и сам пульт.'),
     'otpravit':     dict(имя='Отправить в репозиторий', делает=zadacha_otpravit,
                          зачем='Радар, приёмка, тайминги и сцены с этой машины — на GitHub.'),
+    'hooki':        dict(имя='Разобрать хуки',       делает=zadacha_hooki,
+                         зачем='Первые секунды чужих роликов и наших: темп, до числа, вопрос.'),
     'svodka':       dict(имя='Пересобрать сводку',   делает=zadacha_svodka,
                          зачем='Собрать все замеры Primeri в одну таблицу.'),
     'vyravnivanie': dict(имя='Принять дорожку', делает=zadacha_vyravnivanie,
