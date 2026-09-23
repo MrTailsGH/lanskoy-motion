@@ -159,8 +159,17 @@ def scan_channel(ch):
     if m:
         name = m.group(1)
     dates = rss_dates(cid) if cid else {}
+    совпало = 0
     for vid, rec in shorts.items():
         rec["published"] = dates.get(vid)
+        if rec["published"]:
+            совпало += 1
+    # Две метрики из трёх пустуют с первого дня: «скорость» и «свежие».
+    # Считаем на живом прогоне, где рвётся цепочка: не нашлась ручка
+    # канала, не пришла лента, или ленты приходят, но номера в них
+    # другие — RSS отдаёт обычные видео, а не шортсы.
+    print(f"        id:{'да' if cid else 'НЕТ'}  в ленте:{len(dates)}  "
+          f"совпало с шортсами:{совпало}", file=sys.stderr)
     return {"handle": handle, "name": name, "channel_id": cid,
             "note": ch.get("note", ""), "shorts": shorts}
 
