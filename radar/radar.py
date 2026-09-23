@@ -35,6 +35,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CHANNELS = os.path.join(HERE, "channels.json")
 HISTORY = os.path.join(HERE, "history.json")
 
+# Счёт отказов лент за прогон: попадает в отчёт, чтобы пустая метрика
+# отличалась от метрики без данных.
+ЛЕНТЫ = {'не ответили': [], 'пустые': []}
+
 UA = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
@@ -129,10 +133,16 @@ def channel_id_of(html):
 
 
 def rss_dates(channel_id):
-    """videoId -> дата публикации ISO. RSS отдаёт последние 15 загрузок, ключ не нужен."""
+    """videoId -> дата публикации ISO. RSS отдаёт последние 15 загрузок, ключ не нужен.
+
+    Отказ здесь молча съедался, и две метрики из трёх пустели без
+    объяснения: отчёт писал «Данных пока нет», как будто не хватает
+    истории. На деле 23.09.2026 ночной прогон не получил ни одной ленты,
+    а ручной через три часа получил все двадцать четыре."""
     try:
         xml = fetch(f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}")
-    except Exception:
+    except Exception as e:
+        ЛЕНТЫ['не ответили'].append((channel_id, str(e)[:60]))
         return {}
     dates = {}
     for entry in xml.split("<entry>")[1:]:
@@ -140,6 +150,8 @@ def rss_dates(channel_id):
         pub = re.search(r"<published>([^<]+)</published>", entry)
         if vid and pub:
             dates[vid.group(1)] = pub.group(1)
+    if not dates:
+        ЛЕНТЫ['пустые'].append(channel_id)
     return dates
 
 
@@ -219,8 +231,18 @@ def fmt(n):
 
 # ---------------------------------------------------------------- отчёт
 
-def build_report(scan, prev_snapshot):
+def build_report(scan, prev_snapshot, прошлый_раз=None):
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    # Прирост считается «с прошлого прогона», а прогон бывает и через сутки,
+    # и через три часа. Без срока число сравнивать не с чем.
+    прошло = ''
+    if прошлый_раз:
+        try:
+            ч = (datetime.now(timezone.utc)
+                 - datetime.fromisoformat(прошлый_раз)).total_seconds() / 3600
+            прошло = (f" за {ч:.0f} ч" if ч < 48 else f" за {ч/24:.0f} сут")
+        except Exception:
+            pass
     rows = []
     for ch in scan:
         med = median([s["views"] for s in ch["shorts"].values()])
@@ -243,13 +265,21 @@ def build_report(scan, prev_snapshot):
 
     L = []
     L.append(f"# SHORTS RADAR — {now}\n")
-    L.append(f"Каналов в слежке: {len(scan)}. Роликов снято: {len(rows)}.\n")
+    L.append(f"Каналов в слежке: {len(scan)}. Роликов снято: {len(rows)}."
+             + (f" Прошлый прогон{прошло} назад." if прошло else "") + "\n")
 
     def table(title, key, note, top=12, extra=None):
         sel = [r for r in rows if r.get(key)]
         sel.sort(key=lambda r: r[key], reverse=True)
         if not sel:
-            L.append(f"## {title}\n\n{note}\n\n_Данных пока нет._\n")
+            почему = '_Данных пока нет._'
+            if key == 'speed' and (ЛЕНТЫ['не ответили'] or ЛЕНТЫ['пустые']):
+                почему = (f"_Ленты публикаций не ответили: "
+                          f"{len(ЛЕНТЫ['не ответили'])} с ошибкой, "
+                          f"{len(ЛЕНТЫ['пустые'])} пустых. Без дат скорость и "
+                          f"свежесть не считаются — это сбой сети, а не нехватка "
+                          f"истории._")
+            L.append(f"## {title}\n\n{note}\n\n{почему}\n")
             return
         L.append(f"## {title}\n\n{note}\n")
         L.append("| | Ролик | Канал | " + (extra or "Значение") + " | Всего |")
@@ -283,7 +313,11 @@ def build_report(scan, prev_snapshot):
     L.append("## 4. Свежие ролики (до 7 дней)\n")
     fresh = [r for r in rows if r["age"] and r["age"] <= 7]
     fresh.sort(key=lambda r: r["age"])
-    if fresh:
+    if not fresh and (ЛЕНТЫ['не ответили'] or ЛЕНТЫ['пустые']):
+        L.append(f"_Дат публикации в этом прогоне нет: ленты не ответили "
+                 f"({len(ЛЕНТЫ['не ответили'])} с ошибкой, "
+                 f"{len(ЛЕНТЫ['пустые'])} пустых). Свежесть не посчитать._\n")
+    elif fresh:
         L.append("| Ролик | Канал | Возраст | Просмотры | Скорость |")
         L.append("|---|---|---|---|---|")
         for r in fresh[:20]:
@@ -370,7 +404,8 @@ def main():
     hist["snapshots"] = hist["snapshots"][-60:]
     save(HISTORY, hist)
 
-    report = build_report(scan, prev)
+    прошлый_раз = hist["snapshots"][-2]["at"] if len(hist["snapshots"]) > 1 else None
+    report = build_report(scan, prev, прошлый_раз)
     if failed:
         report += "\n\n**Не открылись:** " + ", ".join(f"{h} ({e})" for h, e in failed) + "\n"
 
