@@ -383,8 +383,12 @@ function layRail(){
 }
 
 /* ═══ ТИТР: две строки, въезжают по очереди ════════════════════ */
-const cap=E_('blk',{left:px(X0),top:'258px',width:px(CW),height:'200px',font:'76px "Golos Text Black"',
-  lineHeight:'1.08',letterSpacing:'-.015em',color:C.ink,textTransform:'uppercase'});
+const CAPCSS={left:px(X0),top:'258px',width:px(CW),height:'200px',font:'76px "Golos Text Black"',
+  lineHeight:'1.08',letterSpacing:'-.015em',color:C.ink,textTransform:'uppercase'};
+/* уходящий титр: смена титра — 18 раз за ролик, и мгновенная замена
+   давала 18 однокадровых скачков. Теперь старый уходит вверх 0,2 с. */
+const capOld=E_('blk',Object.assign({},CAPCSS));
+const cap=E_('blk',Object.assign({},CAPCSS));
 
 /* ═══ ФУТЕР ══════════════════════════════════════════════════════ */
 const fCalc=E_('med',{left:px(X0),top:'1318px',width:'900px',font:'25px "Golos Text Medium"',
@@ -533,8 +537,12 @@ window.seek=function(tt){
 
   /* мир дрейфует: 2–3 px за 3 с, как у образца, — кадр никогда не
      замирает, но глазом это не читается как движение */
-  world.style.transform='translate('+(2.8*Math.sin(tt*2*Math.PI/19)).toFixed(2)+'px,'+
-    (2.0*Math.sin(tt*2*Math.PI/27+1)).toFixed(2)+'px)';
+  /* Ровный ход 2 px/с туда и обратно. Замер смотрит кадр шириной 192 px,
+     один его пиксель — 5,6 настоящих: синус в 2,8 px он не видел вовсе.
+     У образца 5,6 px за 3 с — ровно этот порог. */
+  const tri=(t,P)=>(2/Math.PI)*Math.asin(Math.sin(2*Math.PI*t/P));
+  world.style.transform='translate('+(14*tri(tt,28)).toFixed(2)+'px,'+
+    (4*tri(tt+5,37)).toFixed(2)+'px)';
   const m=mood(tt);
   glowR.style.opacity=m.toFixed(3); glowG.style.opacity=(1-m*.85).toFixed(3);
   const gx=Math.sin(tt*2*Math.PI/23)*40, gy=Math.cos(tt*2*Math.PI/31)*30;
@@ -730,6 +738,9 @@ function drawRail(tt){
 const capFit={};
 function fitCaption(html){
   if(capFit[html]!==undefined) return capFit[html];
+  /* замер портит содержимое титра — вернуть как было */
+  const keep={h:cap.innerHTML,d:cap.dataset.h||'',f:cap.style.fontSize,
+              o:cap.style.opacity,v:cap.style.display};
   let size=76;
   cap.style.display='block'; cap.style.opacity='0'; cap.innerHTML=html;
   cap.style.height='auto';
@@ -740,26 +751,44 @@ function fitCaption(html){
     size-=2;
   }
   cap.style.height='200px';
+  cap.innerHTML=keep.h; cap.dataset.h=keep.d; cap.style.fontSize=keep.f;
+  cap.style.opacity=keep.o; cap.style.display=keep.v;
   capFit[html]=size; return size;
 }
 
-/* титр: строки въезжают по очереди, снизу вверх из расфокуса */
+/* титр: строки въезжают по очереди, снизу вверх из расфокуса;
+   предыдущий в это время уходит вверх */
 function drawCaption(tt){
   let idx=-1;
   for(let i=0;i<CUES.length;i++) if(tt>=CUES[i][0]) idx=i;
+  const w=onWhite();
+
+  /* уходящий */
+  const prev = idx>0 ? CUES[idx-1] : null;
+  const st = idx>=0 ? CUES[idx][0] : 0;
+  const po = prev && prev[1] ? 1-seg(tt,st,0.20,E.io) : 0;
+  if(po>0.001){
+    const ph=capHTML(prev[1]);
+    if(capOld.dataset.h!==ph){capOld.innerHTML=ph; capOld.dataset.h=ph;}
+    capOld.style.fontSize=fitCaption(ph)+'px';
+    capOld.style.display='block'; capOld.style.opacity=po.toFixed(3);
+    capOld.style.transform='translateY('+lerp(0,-18,1-po).toFixed(1)+'px)';
+    capOld.style.filter='blur('+((1-po)*7).toFixed(1)+'px)';
+    capOld.style.color = w ? '#0A0D0C' : C.ink;
+  } else {capOld.style.display='none'; capOld.dataset.h='';}
+
   if(idx>=0 && CUES[idx][1]){
-    const st=CUES[idx][0];
     const html=capHTML(CUES[idx][1]);
     const sz=fitCaption(html);
     if(cap.dataset.h!==html){cap.innerHTML=html; cap.dataset.h=html;}
     cap.style.fontSize=sz+'px';
     cap.style.opacity=1; cap.style.display='block';
-    cap.style.color = onWhite() ? '#0A0D0C' : C.ink;
+    cap.style.color = w ? '#0A0D0C' : C.ink;
     [...cap.children].forEach((ln,i)=>{
-      const s0=st+i*0.09;
-      const p=seg(tt,s0,0.36,E.s);
-      ln.style.opacity=seg(tt,s0,0.20,E.io);
-      ln.style.transform='translateY('+lerp(22,0,p).toFixed(1)+'px)';
+      const s0=st+0.06+i*0.09;
+      const p=seg(tt,s0,0.40,E.s);
+      ln.style.opacity=seg(tt,s0,0.24,E.io);
+      ln.style.transform='translateY('+lerp(24,0,p).toFixed(1)+'px)';
       ln.style.filter=p>0.99?'none':'blur('+((1-p)*6).toFixed(1)+'px)';
     });
   } else {cap.style.opacity=0;cap.style.display='none';cap.dataset.h='';}
