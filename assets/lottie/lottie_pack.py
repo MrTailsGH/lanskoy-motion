@@ -9,8 +9,9 @@
     <!-- LOTTIE coin-rub,check,chart-grow -->
 
 Сразу за ней скрипт вписывает (или перевписывает при повторном запуске)
-блок <script id="lottie-pack"> с плеером lottie_light, помощником
-lottie-seek.js и данными window.LOTTIE[name] из assets/lottie/<name>.json.
+блок <script id="lottie-pack"> с плеером lottie-web (полная сборка — облегчённая
+lottie_light не рисует эффекты Fill, на них держатся цвета переходов), помощником
+lottie-seek.js, переходами perehody.js и данными window.LOTTIE[name] из assets/lottie/<name>.json.
 Руками блок не править — следующий запуск перезапишет, как tokens.py.
 
 Имена — файлы этой папки без .json. Каталог с превью — README.md рядом.
@@ -23,8 +24,9 @@ BLOCK = re.compile(r'\s*<script id="lottie-pack">.*?</script>', re.S)
 
 
 def pack(names):
-    lib = open(os.path.join(HERE, "lottie_light.min.js"), encoding="utf-8").read()
+    lib = open(os.path.join(HERE, "lottie.min.js"), encoding="utf-8").read()
     helper = open(os.path.join(HERE, "lottie-seek.js"), encoding="utf-8").read()
+    helper += "\n" + open(os.path.join(HERE, "perehody.js"), encoding="utf-8").read()
     data = {}
     for n in names:
         p = os.path.join(HERE, n + ".json")

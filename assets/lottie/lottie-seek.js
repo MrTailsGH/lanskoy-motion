@@ -15,8 +15,19 @@
  * Прозрачность, положение и масштаб контейнера — забота сцены, как у любого
  * другого элемента.
  *
+ * ПЕРЕХОДЫ (файлы tr-*): пик закрытия экрана ставится ровно на смену акта.
+ *
+ *   const tr = LOT.cut(E_('',{left:0,top:0,width:'1080px',height:'1920px',zIndex:50}), 'tr-circle');
+ *   // в seek(t):  LOT.cutAt(tr, t, swap(4));             // swap(i) — середина паузы после блока i
+ *   //             LOT.cutAt(tr, t, swap(4), {speed:1.6}); // быстрее: пауза короткая
+ *   LOT.span(tr, 1.6)  // -> [когда начнёт закрывать, когда откроет] относительно смены, в секундах
+ *
+ * Сцена меняет акт в ту же секунду swap(i) — под закрытым экраном склейки не
+ * видно. Окно закрытия и режим (through / mirror) замерены lottie_cover.py и
+ * лежат в самом файле: meta.lanskoy. Вне своего отрезка переход не рисуется.
+ *
  * Данные лежат в window.LOTTIE[name]: их вписывает lottie_pack.py вместе с
- * самим плеером (lottie_light — только SVG, без выражений), так что сцена
+ * самим плеером (полный lottie-web: эффекты Fill и Tint у переходов в облегчённой сборке не рисуются), так что сцена
  * остаётся одним самодостаточным файлом.
  */
 window.LOT = (function () {
@@ -30,7 +41,38 @@ window.LOT = (function () {
       animationData: JSON.parse(JSON.stringify(data)),
       rendererSettings: Object.assign({preserveAspectRatio: 'xMidYMid meet', progressiveLoad: false}, opts || {})
     });
-    return {anim, name, fr: data.fr, ip: data.ip, op: data.op, dur: (data.op - data.ip) / data.fr, last: null};
+    return {anim, el, name, fr: data.fr, ip: data.ip, op: data.op, dur: (data.op - data.ip) / data.fr, last: null,
+            meta: (data.meta && data.meta.lanskoy) || null};
+  }
+
+  /* ── переходы ─────────────────────────────────────────────────── */
+  function cut(el, name) {
+    const h = make(el, name, {preserveAspectRatio: 'xMidYMid slice'});
+    if (!h.meta) throw new Error('LOT.cut: у ' + name + ' нет замера — python3 scout/lottie_cover.py ' + name + '.json --write');
+    el.style.transform = 'scale(1.03)';        // запас за край: по краю у файлов бывает полоска в пиксель
+    el.style.pointerEvents = 'none';
+    return h;
+  }
+
+  function side(h) { return h.meta.peak > h.dur / 2 ? 1 : -1; }
+
+  function span(h, speed) {
+    const sp = speed || 1, m = h.meta, end = h.dur - 1 / h.fr;
+    if (m.mode === 'through') return [-m.peak / sp, (end - m.peak) / sp];
+    const r = (side(h) > 0 ? m.peak : end - m.peak) / sp;
+    return [-r, r];
+  }
+
+  function cutAt(h, t, tSwap, o) {
+    const sp = (o && o.speed) || 1, m = h.meta, dt = (t - tSwap) * sp, end = h.dur - 1 / h.fr;
+    const sec = m.mode === 'through' ? m.peak + dt : m.peak - side(h) * Math.abs(dt);
+    const on = sec >= 0 && sec <= end;
+    h.el.style.visibility = on ? 'visible' : 'hidden';
+    if (on) {
+      const f = h.ip + sec * h.fr;
+      if (h.last !== f) { h.anim.goToAndStop(f, true); h.last = f; }
+    }
+    return on;
   }
 
   function frameAt(h, lt, o) {
@@ -55,5 +97,5 @@ window.LOT = (function () {
     return f;
   }
 
-  return {make, at, frameAt};
+  return {make, at, frameAt, cut, cutAt, span};
 })();
