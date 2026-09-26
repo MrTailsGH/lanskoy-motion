@@ -107,6 +107,10 @@ def cells(anim):
                 color_prop(node["c"])
             if ty in ("gf", "gs") and "g" in node:
                 grad_prop(node["g"])
+            if ty == 2 and isinstance(node.get("v"), dict):
+                color_prop(node["v"])            # цвет в эффекте (Fill, Tint): параметр ty=2
+            if ty == 1 and isinstance(node.get("sc"), str) and node["sc"].startswith("#"):
+                out.append((node, "sc"))         # слой-заливка (solid): цвет строкой #rrggbb
             if ty == 5 and "t" in node:          # текстовый слой: цвет в документе
                 for kf in node["t"].get("d", {}).get("k", []):
                     s = kf.get("s", {})
@@ -126,6 +130,8 @@ def cells(anim):
 
 def get(c):
     arr, o = c
+    if isinstance(o, str):
+        return hex2rgb(arr[o])
     v = arr[o:o + 3]
     if max(v) > 1.0:                         # старые файлы хранят 0..255
         v = [x / 255 for x in v]
@@ -134,6 +140,9 @@ def get(c):
 
 def put(c, rgb):
     arr, o = c
+    if isinstance(o, str):
+        arr[o] = rgb2hex(rgb).lower()
+        return
     scale = 255 if max(arr[o:o + 3]) > 1.0 else 1
     for i in range(3):
         arr[o + i] = round(rgb[i] * scale, 4)

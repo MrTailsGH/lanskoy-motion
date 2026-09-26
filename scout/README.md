@@ -36,6 +36,8 @@ python3 lottie_scan.py <url .lottie|.json> <out-префикс> "названи�
 python3 lottie_recolor.py <файл.lottie|.json> --dump                  # какие цвета внутри
 python3 lottie_recolor.py <файл> ../assets/lottie/<имя>.json [--as warm=ink] [--map "#hex=токен"]
 #   --text "₹=₽" --font "Golos Text Black" --unhide "₹" --drop "слой,слой"
+# переход Lottie: когда он закрывает кадр 9:16 целиком (пишет окно в сам файл)
+python3 lottie_cover.py ../assets/lottie/tr-<имя>.json --write
 # встроить в сцену: ../assets/lottie/README.md
 
 # свежие статьи Codrops и Vimeo
