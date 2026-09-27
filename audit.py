@@ -20,13 +20,22 @@ async def main():
         await pg.wait_for_timeout(800)
         res = await pg.evaluate("""() => {
           const out=[];
-          const lh=parseFloat(getComputedStyle(cap).lineHeight);
           for(const c of CUES){
             if(!c[1]) continue;
             seek(c[0]+0.5);
+            /* Мерить содержимое, а не коробку: у титра фиксированная высота
+               200 px, и scrollHeight всегда давал 200, а межстрочие бралось
+               один раз от кегля первого титра. Поэтому число строк зависело
+               от того, каким кеглем встал первый титр (27.09.2026: И-02 —
+               18 ложных тревог, И-01 — ноль по счастливой случайности). */
+            const keep=cap.style.height;
+            cap.style.height='auto';
+            const lh=parseFloat(getComputedStyle(cap).lineHeight);
             const r=cap.getBoundingClientRect();
-            const h=cap.scrollHeight;
+            const h=cap.offsetHeight;
+            cap.style.height=keep;
             out.push({t:c[0], lines:Math.round(h/lh), bottom:Math.round(r.top+h),
+                      size:parseFloat(getComputedStyle(cap).fontSize),
                       text:cap.textContent.slice(0,34)});
           }
           /* Верх основного блока под титром. У сцен он называется по-разному:
@@ -49,7 +58,7 @@ async def main():
             over = c["lines"] > 2 or c["bottom"] > res["cardTop"]
             if over: bad += 1
             print(("!! " if over else "OK "),
-                  f'{c["t"]:>6.2f}  строк {c["lines"]}  низ {c["bottom"]:>4}  {c["text"]}')
+                  f'{c["t"]:>6.2f}  строк {c["lines"]}  кегль {c["size"]:>3.0f}  низ {c["bottom"]:>4}  {c["text"]}')
         print("проблемных титров:", bad)
         await b.close()
 
