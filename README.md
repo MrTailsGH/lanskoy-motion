@@ -26,6 +26,7 @@ git clone --branch renders --depth 1 https://github.com/MrTailsGH/lanskoy-motion
 | `videos/I-03_plus_desyat_9x16.mp4` | Плюс десять, которые не равны | 58,25 с | 5 из 6 |
 | `videos/I-04_vash_nol_9x16.mp4` | Ваш ноль | 45,30 с | 6 из 6 |
 | `videos/I-05_pribyl_est_9x16.mp4` | Прибыль есть, денег нет | 55,22 с | 6 из 6 |
+| `videos/POKAZ_test_motion_9x16.mp4` | **Показ** — тест возможностей: 18 сцен, 16 переходов, без голоса | 2:34 | — |
 
 У И-02 и И-03 не добрана одна норма — плотность звука (92,0 и 90,6 при
 93,2): у этих дорожек речь тише и медленнее. Разбор — `OPERATIONS.md`.
