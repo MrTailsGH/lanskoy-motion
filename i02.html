@@ -765,6 +765,7 @@ const GP_HERO= at(3,0.76);          // «шестьдесят семь»
 const GP_OUT = gone(3);
 
 const RC     = enter(4,0.30);       // заказ
+const T_TRACK= at(4,0.12);          // пауза после «смотрите»: пустая полоса заказа (приём 35)
 const T_CENA = at(4,0.23);          // «цена — тысяча»
 const T_SEB  = at(4,0.35);          // «себестоимость»
 const T_SEBV = at(4,0.66);          // «семьсот»
@@ -815,7 +816,8 @@ window.SFX=[
   {t:GP_STR,           s:'click'},              // вычеркнули двадцать
   {t:GP_HERO, d:0.55,  s:'count', m:'onset'},   // 20 → 67
   {t:GP_HERO+0.55,     s:'hero', a:true},       // шестьдесят семь
-  {t:PERE_T,           s:'flash'},              // столбики: разрыв → заказ
+  {t:PERE_T,           s:'flash', a:true},      // столбики: разрыв → заказ — главная смена, акцент
+  {t:T_TRACK,          s:'row'},                // пустая полоса заказа
   {t:T_CENA,           s:'row'},                // цена
   {t:T_SEBV,           s:'row'},                // себестоимость
   {t:T_PRIB,           s:'row'},                // прибыль
@@ -824,13 +826,13 @@ window.SFX=[
   {t:T_PRIB2, d:0.40,  s:'count', m:'onset'},   // 300 → 100
   {t:RS_V2,   d:0.45,  s:'count', m:'onset'},   // было → стало
   {t:RS_HERO,          s:'hero', a:true},       // −67%
-  {t:FL,               s:'flash'},              // белый акт
+  {t:FL,               s:'flash', a:true},      // белый акт — акцент
   {t:FL_STR,           s:'click'},              // вычеркнули выручку
   {t:VL_B3+0.30,       s:'bounce'},             // ×3 встал с перелётом
   {t:VL_3,             s:'row'},                // три клиента
   {t:VL_EQ,            s:'land'},               // «за ту же прибыль»
-  {t:CT,               s:'click'},              // CTA
-  {t:CT+1.84,          s:'land'}                // адрес канала встал
+  {t:CT,               s:'click', a:true},      // CTA — акцент: хвост без речи
+  {t:CT+1.84,          s:'land', a:true}        // адрес канала встал
 ];
 
 /* ═══ ТИТРЫ ══════════════════════════════════════════════════════ */
@@ -988,6 +990,11 @@ window.seek=function(tt){
     barCut.style.left=px(Math.round(BW*pEnd));
     barCut.style.width=px(Math.round(BW*0.2*cut));
     barCut.style.opacity=(1-seg(tt,T_CENA2+0.9,0.6,E.io)*0.55).toFixed(3);
+    /* заготовка полосы — в паузе после «смотрите», до первой строки */
+    const pt=seg(tt,T_TRACK,IN,E.s);
+    barTrack.style.opacity=pt;
+    barTrack.style.transform='scaleX('+lerp(.2,1,pt).toFixed(3)+')';
+    barTrack.style.transformOrigin='0 50%';
     rise(barLeg,tt,T_SEBV+0.1,10);
     barLegCut.style.opacity=seg(tt,T_CENA2+0.2,0.3,E.io);
   } else show(card,0);
