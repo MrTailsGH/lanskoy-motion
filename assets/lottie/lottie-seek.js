@@ -45,6 +45,17 @@ window.LOT = (function () {
             meta: (data.meta && data.meta.lanskoy) || null};
   }
 
+  /* Кадр ставится всегда от первого: сначала ip, потом нужный. Иначе
+     lottie-web пересчитывает только то, что изменилось с прошлого кадра,
+     и один t даёт чуть разный кадр в зависимости от того, откуда пришли —
+     замер 27.09.2026: chart-grow, bars-rise, coin-rub, percent, piggy,
+     до 50 уровней на сотнях пикселей. Докатка после обрыва давала бы
+     скачок на стыке. С якорем расхождений с разных путей — ноль. */
+  function go(h, f) {
+    if (f !== h.ip) h.anim.goToAndStop(h.ip, true);
+    h.anim.goToAndStop(f, true);
+  }
+
   /* ── переходы ─────────────────────────────────────────────────── */
   function cut(el, name) {
     const h = make(el, name, {preserveAspectRatio: 'xMidYMid slice'});
@@ -70,7 +81,7 @@ window.LOT = (function () {
     h.el.style.visibility = on ? 'visible' : 'hidden';
     if (on) {
       const f = h.ip + sec * h.fr;
-      if (h.last !== f) { h.anim.goToAndStop(f, true); h.last = f; }
+      if (h.last !== f) { go(h, f); h.last = f; }
     }
     return on;
   }
@@ -91,7 +102,7 @@ window.LOT = (function () {
   function at(h, lt, o) {
     const f = frameAt(h, lt, o);
     if (h.last !== f) {          // тот же кадр не перерисовываем
-      h.anim.goToAndStop(f, true);
+      go(h, f);
       h.last = f;
     }
     return f;
