@@ -50,7 +50,14 @@ async def main():
             const r = main.getBoundingClientRect();
             if(r.height>0) top = r.top;
           }
-          return {cues:out, cardTop:Math.round(top)};
+          /* строка расчёта в подвале: одна строка, иначе хвост ложится на
+             подпись «ЛАНСКОЙ» (И-05, 27.09.2026 — поймал пользователь) */
+          let foot=null;
+          if(typeof fCalc!=='undefined'){
+            const lh=parseFloat(getComputedStyle(fCalc).fontSize)*1.3;
+            foot={lines:Math.round(fCalc.getBoundingClientRect().height/lh), text:fCalc.textContent.slice(0,40)};
+          }
+          return {cues:out, cardTop:Math.round(top), foot};
         }""")
         print("верх карточки:", res["cardTop"])
         bad = 0
@@ -59,6 +66,11 @@ async def main():
             if over: bad += 1
             print(("!! " if over else "OK "),
                   f'{c["t"]:>6.2f}  строк {c["lines"]}  кегль {c["size"]:>3.0f}  низ {c["bottom"]:>4}  {c["text"]}')
+        f = res.get("foot")
+        if f:
+            ok = f["lines"] <= 1
+            if not ok: bad += 1
+            print(("OK " if ok else "!! ") + f'подвал  строк {f["lines"]}  {f["text"]}')
         print("проблемных титров:", bad)
         await b.close()
 
