@@ -775,8 +775,8 @@ scene(79.7,90,r=>{
     stampAt(st,lt,86.3);vis(dash,S(lt,84.6,.3));
     cta.textContent=typed('ЧЕКИ — КАЖДУЮ НЕДЕЛЮ',lt,87.0,30);
     /* лента уходит вверх рывками — к началу ролика */
-    const out=EZ.in2(P(STEP(lt),88.5,1.3));all.style.transform='translateY('+(-2300*out).toFixed(1)+'px)';
-    r.style.background=out>0?'rgb('+[243,239,228].map((c,k)=>Math.round(lerp(c,[11,11,12][k],EZ.io(P(lt,88.9,.9))))).join(',')+')':C.paper;
+    const out=EZ.in2(P(STEP(lt),88.5,1.0));all.style.transform='translateY('+(-2300*out).toFixed(1)+'px)';
+    r.style.background=out>0?'rgb('+[243,239,228].map((c,k)=>Math.round(lerp(c,[11,11,12][k],EZ.io(P(lt,89.4,.45))))).join(',')+')':C.paper;
   };
 });
 }
@@ -785,7 +785,7 @@ scene(79.7,90,r=>{
 const HITS=[[3.0,26],[19.4,6],[23.7,8],[25.8,12],[28.6,22],[39.3,26],[63.65,16],[79.3,34],[86.3,22]];
 function shake(t){let x=0,y=0,r=0;HITS.forEach(([a,A],i)=>{const u=t-a;if(u<0||u>.6)return;const e=A*Math.exp(-u*9),f=Math.floor(t*30);
   x+=(rnd(f*3+i)-.5)*2*e;y+=(rnd(f*3+i+11)-.5)*2*e;r+=(rnd(f*3+i+23)-.5)*e*.05;});return [x,y,r];}
-const BGT=[[0,C.night],[7.2,C.desk],[21.0,C.night],[35.6,C.paper],[45.2,C.redBg],[63.9,C.night],[80.0,C.paper],[89.4,C.night]];
+const BGT=[[0,C.night],[7.2,C.desk],[21.0,C.night],[35.6,C.paper],[45.2,C.redBg],[63.9,C.night],[80.0,C.paper],[89.85,C.night]];
 
 /* ═══ SEEK ═══ */
 let built=false;
