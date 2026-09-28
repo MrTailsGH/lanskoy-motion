@@ -304,6 +304,7 @@ for tk_ in (50.3, 53.7, 57.1): put(whoosh(.6, .9, up=False), tk_ - .05); put(sta
 for tk_ in (46.9, 50.3, 53.7, 57.1): put(swipe(.4, .7), tk_ + .35)
 for i in range(3): put(tick(.5, 2400), 47.5 + i)       # часы тикают на рубрике «час»
 put(riser(1.2, 1.0, 250, 2200), 60.5)
+drums(61.75, 63.6, k=.5, cl=False, tk=.6); bass(61.75, 63.6, .24, 4)       # сборка QR: тихий бит держит темп
 for i in range(40): put(tick(.5, 3500 + 2000 * rnd(i)), 61.75 + rnd(i + 70) * .85, pan=rnd(i + 3) - .5)
 put(laser[:int(.7 * SR)], 62.9); put(beep(2900, .16, 1.2), 63.6); put(impact(1.1, 1.8), 63.65); put(whoosh(.6, .8, up=False), 63.65)
 
@@ -314,6 +315,9 @@ put(riser(1.9, .9), 66.1)
 drums(68.0, 76.0, k=1.1, cl=True, tk=1.1); bass(68.0, 76.0, .36, 1); stabs(68, 76, .22, (0, 2, 4, 6))
 for i in range(16): put(impact(.5, .6), 68 + i * .5); put(clap(.5), 68 + i * .5 + .25)
 put(riser(3.3, 1.2, 150, 3000), 76.0); put(whoosh(3.3, .9), 76.0)
+_n = int(3.3 * SR); _x = np.arange(_n) / SR
+put(np.sin(2 * np.pi * np.cumsum(41 + 50 * (_x / 3.3) ** 2) / SR) * (.35 + .65 * _x / 3.3) * .5
+    + bp(rng.standard_normal(_n), 200, 2500) * (_x / 3.3) * .25, 76.0)          # воронка: гул снизу, без провала
 for i in range(24): put(tick(.6, 4000), 76 + (i / 24) ** .6 * 3.2)
 put(impact(1.8, 3.0), 79.3); put(kaching(1.2), 79.35)
 for i, f in enumerate((1046.5, 1318.5, 1568, 2093, 2637)): put(bell(f, .5), 79.45 + i * .08, pan=(i % 3 - 1) * .3)

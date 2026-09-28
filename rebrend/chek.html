@@ -599,7 +599,7 @@ scene(34.5,46.0,r=>{
     const L=[['КОФЕ',UB(172,900),480],['ЗА 10 ЛЕТ —',UB(92,900),680],['ЭТО НЕ',UB(172,900),820],['ТРАТА.',UB(172,900),1020]].map((q,i)=>{
       const e=el(sh,{left:'70px',top:q[2]+'px',font:q[1],color:C.ink,letterSpacing:'-.02em',whiteSpace:'nowrap',lineHeight:1.05},q[0]);return e;});
     const strike=el(sh,{left:'56px',top:'1120px',width:'760px',height:'44px',background:C.red,transformOrigin:'0 50%',transform:'scaleX(0)',borderRadius:'10px 22px 14px 20px',opacity:.93});
-    const st=stamp(sh,'ЭТО ЧЕК',{x:540,y:1335,size:136,color:C.red,rot:-6});
+    const st=stamp(sh,'ЭТО ЧЕК',{x:540,y:1352,size:136,color:C.red,rot:-6});
     const head=el(sh,{left:'40px',top:0,width:(W-80)+'px',height:'6px',background:'rgba(21,21,21,.35)',boxShadow:'0 0 14px rgba(21,21,21,.4)',visibility:'hidden'});
     const ph=dm('КАЖДОЕ РЕШЕНИЕ\nПРОБИВАЕТ ЧЕК',{font:JB(98,800),size:98,pitch:7,dot:6.2,center:true});
     const mk=marker(sh,(W-ph.w)/2-6,820+ph.h*.52,ph.w+12,ph.h*.44);place(ph,sh,(W-ph.w)/2,820);
