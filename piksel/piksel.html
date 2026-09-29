@@ -272,7 +272,7 @@ scene(0,9.0,r=>{
   const l1=ws[0].w+36+ws[1].w,l2=ws[2].w+36+ws[3].w;
   place(ws[0],r,snap((W-l1)/2,6),456);place(ws[1],r,snap((W-l1)/2+ws[0].w+36,6),456);
   place(ws[2],r,snap((W-l2)/2,6),630);place(ws[3],r,snap((W-l2)/2+ws[2].w+36,6),630);
-  const glyph=dm('₽',{font:F(260),size:260,pitch:6});
+  const glyph=dm('₽',{font:F(470),size:470,pitch:6});
   const cells=glyph.pts.map(([x,y])=>[90-Math.round(glyph.w/12)+x/6,152-Math.round(glyph.h/12)+y/6]);
   const NP=cells.length;
   const parts=cells.map((c,i)=>({c,a:rnd(i+11)*6.2832,sp:40+rnd(i+12)*90,col:[C.green,C.mint,C.teal,C.green2][Math.floor(rnd(i+13)*4)]}));
@@ -296,12 +296,12 @@ scene(0,9.0,r=>{
     /* кольца */
     for(let k=0;k<3;k++){const u=P(t,3.2+k*.14,.9);if(u>0&&u<1)pcirc(g,90,FL-1,4+u*110,u<.5?C.teal:C.teal2);}
     /* взрыв → ₽ */
-    if(burst&&t<5.9){const b=t-4.0;parts.forEach((p,i)=>{const k=3,ex=90+Math.cos(p.a)*p.sp*(1-Math.exp(-k*b))/k,ey=FL-1+Math.sin(p.a)*p.sp*(1-Math.exp(-k*b))/k;
-        const s_=spring(b-.3-i*.0015,8,5);let x=lerp(ex,p.c[0],cl(s_,0,1.15)),y=lerp(ey,p.c[1],cl(s_,0,1.15));
-        const sh=EZ.in2(P(t,5.45,.4));x=lerp(x,90,sh);y=lerp(y,152,sh);g.fillStyle=p.col;g.fillRect(Math.round(x),Math.round(y),1,1);});}
+    if(burst&&t<5.95){const b=t-4.0;parts.forEach((p,i)=>{const k=3,ex=90+Math.cos(p.a)*p.sp*(1-Math.exp(-k*b))/k,ey=FL-1+Math.sin(p.a)*p.sp*(1-Math.exp(-k*b))/k;
+        const s_=spring(b-.3-(i/NP)*.5,8,5);let x=lerp(ex,p.c[0],cl(s_,0,1.15)),y=lerp(ey,p.c[1],cl(s_,0,1.15));
+        const sh=EZ.in2(P(t,5.6,.35));x=lerp(x,90,sh);y=lerp(y,152,sh);g.fillStyle=p.col;g.fillRect(Math.round(x),Math.round(y),1,1);});}
     /* монета */
-    const on=t>=5.65;cc.style.visibility=on?'visible':'hidden';
-    if(on){const R=lerp(4,96,EZ.out(P(t,5.65,1.1)))+300*EZ.in3(P(t,8.2,.8)),ry=lerp(-6*Math.PI,0,EZ.out(P(t,5.65,2.4))),rx=.45*(1-EZ.io(P(t,5.65,2.3)));
+    const on=t>=5.9;cc.style.visibility=on?'visible':'hidden';
+    if(on){const R=lerp(4,96,EZ.out(P(t,5.9,1.0)))+300*EZ.in3(P(t,8.2,.8)),ry=lerp(-6*Math.PI,0,EZ.out(P(t,5.9,2.2))),rx=.45*(1-EZ.io(P(t,5.9,2.1)));
       coin(cg,270,480,135,228,R,ry,rx,.15*Math.sin(t*1.4),RG,true);}
     cap.textContent=typed('ТЕСТ №3 · ПИКСЕЛЬ × НАШ СТИЛЬ',t,6.1,24);vis(cap,1-S(t,8.3,.3));
   };
