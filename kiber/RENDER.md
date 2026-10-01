@@ -9,7 +9,7 @@
 ## Один раз
 
 ```
-pip install playwright numpy pillow
+pip install playwright numpy
 playwright install chromium
 ```
 
@@ -34,6 +34,7 @@ python kiber/render_doma.py --check
 
 ```
 python kiber/render_doma.py --cut teaser      # 10 с, звук соберётся сам
+python kiber/render_doma.py --cut teaser2     # второй тизер, наплывы и размытие движения
 python kiber/render_doma.py                   # полный, 120 с
 python kiber/render_doma.py --workers 2       # два окна, если карта тянет
 ```
@@ -49,3 +50,12 @@ python kiber/render_doma.py --workers 2       # два окна, если кар
 - Сцена не стартует (ждёт `READY` больше 10 минут) — открыть
   `kiber/kiber.html` в Chrome, F12 → Console: там будет ошибка.
 - Кадры чёрные — в `--check` SwiftShader или WebGL2 нет совсем, см. выше.
+
+## Плавность
+
+Размытие движения: `window.seekMB(t, 4)` — сцена сама считает четыре
+подкадра в пределах половины кадра (затвор 180°) и усредняет их; снимок
+один. Работает на отрезках `window.BLUR`; во втором тизере — на всём ролике.
+Для полного ролика размытие сейчас включено только на погружении — если
+видеокарта быстрая, его можно распространить на весь ролик
+(`window.BLUR=[[0,120]]` в `kiber.js`), картинка станет заметно мягче.

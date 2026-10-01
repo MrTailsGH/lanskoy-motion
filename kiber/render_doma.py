@@ -4,6 +4,7 @@
 
     python kiber/render_doma.py                    # полный ролик, 120 с
     python kiber/render_doma.py --cut teaser       # тизер, 10 с
+    python kiber/render_doma.py --cut teaser2      # второй тизер, 10 с, плавный
     python kiber/render_doma.py --workers 2        # два окна браузера параллельно
     python kiber/render_doma.py --check            # только показать, какая видеокарта взялась
 
@@ -17,10 +18,10 @@
 рендер можно прервать и продолжить. Потом, если есть ffmpeg и звук,
 собирается MP4 (x264, CRF 16, AAC 192k).
 
-Нужно: Python 3.10+, pip install playwright numpy pillow,
+Нужно: Python 3.10+, pip install playwright numpy,
 playwright install chromium (или --channel chrome для обычного Chrome).
 """
-import argparse, asyncio, io, os, shutil, subprocess, sys
+import argparse, asyncio, os, shutil, subprocess, sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -36,8 +37,6 @@ else:
 
 async def worker(scene_url, out, frames, channel, blur, idx, total_left):
     from playwright.async_api import async_playwright
-    import numpy as np
-    from PIL import Image
     async with async_playwright() as p:
         kw = {"args": GPU_ARGS, "headless": True}
         if channel:
@@ -56,16 +55,12 @@ async def worker(scene_url, out, frames, channel, blur, idx, total_left):
             if fp.exists() and fp.stat().st_size > 0:
                 continue
             t = i / 30
+            # размытие движения: подкадры усредняет сама сцена (window.seekMB)
             if any(s <= t < e for s, e in BL):
-                acc = None
-                for k in (-3, -1, 1, 3):
-                    await pg.evaluate("t=>window.seek(t)", t + k / 8 * (0.5 / 30))
-                    im = np.asarray(Image.open(io.BytesIO(await pg.screenshot(type="png"))).convert("RGB"), dtype=np.float32)
-                    acc = im if acc is None else acc + im
-                Image.fromarray((acc / 4 + .5).astype(np.uint8)).save(fp, quality=95)
+                await pg.evaluate("t=>window.seekMB(t,4)", t)
             else:
                 await pg.evaluate("t=>window.seek(t)", t)
-                await pg.screenshot(path=str(fp), type="jpeg", quality=95)
+            await pg.screenshot(path=str(fp), type="jpeg", quality=95)
             total_left[0] -= 1
             if total_left[0] % 30 == 0:
                 print(f"  осталось кадров: {total_left[0]}", flush=True)
@@ -88,7 +83,7 @@ async def check(scene_url, channel):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--cut", default="full", choices=["full", "teaser"])
+    ap.add_argument("--cut", default="full", choices=["full", "teaser", "teaser2"])
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--channel", default=None, help="chrome — взять установленный Google Chrome")
     ap.add_argument("--no-blur", action="store_true", help="без размытия движения на погружении")
@@ -96,14 +91,14 @@ def main():
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
     scene = HERE / "kiber.html"
-    url = scene.as_uri() + ("?cut=teaser" if a.cut == "teaser" else "")
+    url = scene.as_uri() + ("" if a.cut == "full" else "?cut=" + a.cut)
     gpu = asyncio.run(check(url, a.channel))
     print("видеокарта:", gpu)
     if "SwiftShader" in gpu:
         print("ВНИМАНИЕ: программная отрисовка, GPU не подхватился — см. kiber/RENDER.md")
     if a.check:
         return
-    n = 300 if a.cut == "teaser" else 3600
+    n = 3600 if a.cut == "full" else 300
     out = HERE / "kadry" / a.cut
     out.mkdir(parents=True, exist_ok=True)
     todo = [i for i in range(n) if not (out / f"f{i:05d}.jpg").exists()]
@@ -118,9 +113,9 @@ def main():
         print("ffmpeg не найден — кадры в", out)
         return
     audio = a.audio
-    if not audio and a.cut == "teaser":
-        audio = str(HERE / "TIZER.wav")
-        subprocess.run([sys.executable, str(HERE / "tizer_zvuk.py"), audio], check=True)
+    if not audio and a.cut != "full":
+        audio = str(HERE / f"{a.cut.upper()}.wav")
+        subprocess.run([sys.executable, str(HERE / "tizer_zvuk.py"), audio, a.cut], check=True)
     mp4 = HERE / f"NEON_{a.cut}_9x16.mp4"
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-framerate", "30", "-i", str(out / "f%05d.jpg")]
     if audio and os.path.exists(audio):
