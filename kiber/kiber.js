@@ -667,7 +667,7 @@ function sCity(t,still=false){
   render3();
   const gq=scr(-48,TGOAL,3);tx('ЦЕЛЬ 5 000 000₽',70,gq[1]-30,F('M',28),hit?C.mi:C.cy,'l');
   if(t>74.1&&t<76.9&&panel(70,gq[1]-200,560,96,C.mi,popen(t,74.1)*(1-P_(t,76.6,.3))))neon('ЦЕЛЬ — НА 16-Й ГОД',350,gq[1]-152,F('T',44),C.mi,'c',1,10);
-  const yr=cl((t-67.0)/.45+1,0,20),val=yr<=0?0:Bal(Math.min(20,Math.max(0,yr-1+spr(((t-67.0)%.45),14))));
+  const yr=cl((t-67.0)/.45+1,0,20),val=yr<=0?0:t>=67.0+19*.45+.5?Bal(20):Bal(Math.min(20,Math.max(0,yr-1+spr(((t-67.0)%.45),14))));
   if(panel(60,180,960,280,C.mi,popen(t,66.3))){tx('КОПИЛКА · 20 ЛЕТ',96,226,F('M',30),C.dim,'l',1,3);neon(fmt(val)+'₽',96,320,F('TB',96),C.mi,'l',1,16);
     tx('ГОД '+String(Math.floor(yr)).padStart(2,'0'),984,320,F('M',32),C.ink,'r');tx('10 000₽ В МЕСЯЦ · 12% УСЛОВНО',96,412,F('M',28),C.dim,'l');}
   if(t>76.6&&panel(70,520,560,200,C.vi,popen(t,76.6))){const a=P_(t,77.0,.3),b=P_(t,77.6,.3);
