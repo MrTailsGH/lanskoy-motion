@@ -4,6 +4,7 @@
 mixsfx.py — подмешать звуковые эффекты в готовый ролик.
 
     python3 mixsfx.py i01 out/I-01.mp4 out/I-01_sfx.mp4
+    python3 mixsfx.py i01-3d/i01-3d in.mp4 out.mp4 --voice voice/I-01.mp3
 
 Времена берутся из самой сцены: она объявляет window.SFX из тех же якорей,
 что двигают картинку. Подгонять на слух нечего.
@@ -109,6 +110,9 @@ def main():
         print(f"общая добавка: {extra:+.1f} дБ")
     scene = os.path.join(HERE, name + '.html')
     voice = os.path.join(HERE, 'voice', 'I-' + name[1:] + '.mp3')
+    # сцена вне корня (i01-3d/i01-3d) — дорожку указать явно
+    if '--voice' in sys.argv:
+        voice = os.path.join(HERE, sys.argv[sys.argv.index('--voice') + 1])
 
     m = load(MAP, 'карты звуков')
     idx = load(INDEX, 'индекса замеров (запустите sfxindex.py)')
