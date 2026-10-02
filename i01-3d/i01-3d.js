@@ -268,7 +268,7 @@ for(let i=0;i<8;i++)bar1.push(bundle(HOOK,NOTE_G,EDGE_G,X0+BW/2+i*PITCH,ROW1Y));
 for(let i=0;i<8;i++)bar2.push(bundle(HOOK,NOTE_G,EDGE_G,X0+BW/2+i*PITCH,ROW2Y));
 /* сверх ваших восьмидесяти — шесть пачек: пять целых и 0,4 */
 const extra=[];for(let k=0;k<6;k++){const m=bundle(HOOK,NOTE_R,EDGE_R,X0+BW/2+(8+k)*PITCH,ROW2Y);if(k===5){m.scale.x=.4;m.position.x-=BW*.3;}extra.push(m);}
-let num1,num2;
+let num1,num2,HOOKM=[];
 
 /* монета: переход хук → чек (PRIYOMY №33) */
 const COIN=new THREE.Group();S3.add(COIN);
@@ -277,7 +277,7 @@ let coinFace=null;
 /* ═══ АКТ «ЧЕК» ═══ */
 const REC=new THREE.Group();S3.add(REC);
 const PW=4.4,TW=1100,TH=1150,TU=PW/TW;          // ширина ленты в мире и в пикселях текстуры
-const PTOP=sy(520);
+const PTOP=sy(545);
 const RCV=mk(TW,TH),RCG=RCV.getContext('2d');
 const RTEX=new THREE.CanvasTexture(RCV);RTEX.colorSpace=THREE.SRGBColorSpace;RTEX.anisotropy=8;
 const PSEG=60;
@@ -286,7 +286,7 @@ const PMAT=new THREE.MeshStandardMaterial({map:RTEX,transparent:true,alphaTest:.
   emissive:0xffffff,emissiveMap:RTEX,emissiveIntensity:.62});
 const PAPER=new THREE.Mesh(PGEO,PMAT);
 const PGRP=new THREE.Group();PGRP.position.set(0,PTOP,0);PGRP.add(PAPER);REC.add(PGRP);
-const PBASE=PGEO.attributes.position.array.slice();
+const PBASE=PGEO.attributes.position.array.slice();let PL=0;
 const HEAD=150,RH=118;
 const ROWS=[
   {k:'ruk', lab:'на руки',          col:C.green, kind:'line'},
@@ -329,6 +329,7 @@ function build(){
   /* хук */
   num1=Num3D(HOOK,{digitPx:96,col:C.green});num1.set('80 000 ₽');num1.grp.position.set(X0,sy(690),0);
   num2=Num3D(HOOK,{digitPx:96,col:C.red});num2.set('80 000 ₽');num2.grp.position.set(X0,sy(1020),0);
+  HOOKM=num1.mats.concat(num2.mats);bar1.concat(bar2).forEach(m=>HOOKM.push(...m.material));
 
   /* монета: золото, ребро в насечку, ₽ на обеих сторонах */
   const rimT=ctex(512,32,(c,x)=>{for(let i=0;i<512;i+=8){x.fillStyle='#F6D27A';x.fillRect(i,0,4,32);x.fillStyle='#9C6A1C';x.fillRect(i+4,0,4,32);}},true);
@@ -359,18 +360,18 @@ function build(){
   num3=Num3D(REC,{digitPx:118,depthU:.32,col:C.red});num3.set('134 000 ₽');
 
   /* бублик: сектора кольца с фаской */
-  let a=2.80;const sum=SEGS.reduce((s,d)=>s+d.v,0),R1=1.55,R0=.88,gap=.045;
+  let a=2.80;const sum=SEGS.reduce((s,d)=>s+d.v,0),R1=1.28,R0=.72,gap=.045;
   SEGS.forEach((d,i)=>{const da=2*Math.PI*d.v/sum,a0=a-gap/2,a1=a-da+gap/2;a-=da;
     const sh=new THREE.Shape();sh.absarc(0,0,R1,a0,a1,true);sh.absarc(0,0,R0,a1,a0,false);sh.closePath();
     const ge=new THREE.ExtrudeGeometry(sh,{depth:.42,bevelEnabled:true,bevelThickness:.07,bevelSize:.05,bevelSegments:3,curveSegments:56});
     ge.translate(0,0,-.21);const mats=mNum(d.col,1);const m=new THREE.Mesh(ge,mats);
     const mid=(a0+a1)/2;m.userData={mid,mats};DON.add(m);segM.push(m);});
-  DON.position.set(0,sy(985),0);
+  DON.position.set(.35,sy(1014),0);
 
   /* белый акт */
   num40=Num3D(WHT,{digitPx:290,depthU:.7,col:C.red});num40.set('40%');num40.grp.position.set(sx(52),sy(860),0);
   for(let i=0;i<14;i++){const m=new THREE.Mesh(new THREE.BoxGeometry(.9,.42,.012),new THREE.MeshStandardMaterial({map:NOTE_G,roughness:.6,emissive:0xffffff,emissiveMap:NOTE_G,emissiveIntensity:.2}));
-    m.userData={x:lerp(-5.5,5.5,rnd(i*3.7)),z:lerp(-9,-4,rnd(i*5.3)),y0:lerp(-6,7,rnd(i*2.1)),sp:.35+rnd(i*1.9)*.3,r:rnd(i*7.7)*6.28};WHT.add(m);flyNotes.push(m);}
+    m.userData={x:lerp(-7,7,rnd(i*3.7)),z:lerp(-6,-3,rnd(i*5.3)),y0:lerp(-6.4,-4.4,rnd(i*2.1)),sp:.35+rnd(i*1.9)*.3,r:rnd(i*7.7)*6.28};WHT.add(m);flyNotes.push(m);}
 
   /* прибавка */
   num5=Num3D(RSE,{digitPx:96,col:C.ink});num5.set('+ ?');num5.grp.position.set(X0,sy(690),0);
@@ -409,16 +410,19 @@ function actHook(t){
   studio('hook',t,1-.6*P_(t,HK_LAB2,1.2),.35+.65*ent(t,HK_LAB2,1.2));
   HOOK.visible=true;
   camBase(t,0,0,lerp(16.9,CZ,E.out(P_(t,0,1.6))));
+  const gone=mov(t,COIN0,.35);HOOK.position.set(0,0,-1.6*gone);HOOK.visible=gone<.97;
+  const keep=1-gone;HOOKM.forEach(m=>{m.opacity=keep;m.transparent=keep<.999;});
   /* второе число набегает с 80 000 до 134 000 */
   const v=cnt(t,HK_CNT,HK_CD,80000,134000);num2.set(rub(v));
   const sp=1+.05*Math.sin(Math.PI*P_(t,HK_CNT,HK_CD));num2.grp.scale.setScalar(sp);
   /* пачки сверх ваших восьмидесяти падают по мере счёта, каскадом */
   extra.forEach((m,k)=>{const thr=k<5?(90000+k*10000):134000,on=HK_CNT+HK_CD*(thr-80000)/54000-.35;
     const p=ent(t,on,.45),sp_=spring(t,on,.6,.15);
-    m.visible=t>on-.01;
-    m.position.y=ROW2Y+(1-sp_)*.9;
+    m.visible=t>on-.01;if(m.userData.bx===undefined)m.userData.bx=m.position.x;
+    /* выезжает из конца полосы — точка роста у источника, сквозь число не проходит */
+    m.position.x=m.userData.bx-(1-sp_)*PITCH*.85;m.position.y=ROW2Y;
     const s=lerp(.88,1,p);m.scale.set(k===5?.4*s:s,s,s);
-    m.material.forEach(mm=>{mm.transparent=p<.999;mm.opacity=p;});
+    m.material.forEach(mm=>{mm.opacity=p*keep;mm.transparent=mm.opacity<.999;});
     /* доля государства: четыре пачки загораются и выходят вперёд */
     const lit=k<4?ent(t,HK_40+k*STAG,.5):0;
     m.position.z=lit*.32;m.position.y+=lit*.07;
@@ -433,11 +437,11 @@ function actHook(t){
 }
 
 function coinAt(t){
-  if(t<COIN0||t>X1+.45){COIN.visible=false;return;}
+  if(t<COIN0+.36||t>X1+.3){COIN.visible=false;return;}
   COIN.visible=true;
   /* поднимается из доли государства, встаёт перед камерой и летит в неё */
-  const src=new V3(X0+(8+2)*PITCH,ROW2Y,.4);
-  const up=ent(t,COIN0,.75),fly=mov(t,COIN1,X1+.45-COIN1);
+  const src=new V3(0,-.6,1.2);
+  const up=ent(t,COIN0+.36,.6),fly=mov(t,COIN1,X1+.3-COIN1);
   const mid=new V3(0,.2,3);
   const p=src.clone().lerp(mid,up);
   p.lerp(new V3(CAM.position.x,CAM.position.y-.05,CAM.position.z+.6),fly);
@@ -452,7 +456,7 @@ function coinAt(t){
 /* лента чека: перерисовать текстуру на момент t */
 function rowState(t){
   const ins=mov(t,T_NDFL,.6);
-  const S={ruk:{slot:0,on:T_RUK},nach:{slot:1+ins,on:T_NACH},ndfl:{slot:1,on:T_NDFL},vz:{slot:3,on:T_VZ},itog:{slot:4,on:T_ITOG},mest:{slot:5,on:T_MEST}};
+  const S={ruk:{slot:0,on:T_RUK},nach:{slot:1+ins,on:T_NACH},ndfl:{slot:1,on:T_NDFL+.5},vz:{slot:3,on:T_VZ},itog:{slot:4,on:T_ITOG},mest:{slot:5,on:T_MEST}};
   const V={ruk:rub(80000),nach:rub(cnt(t,T_NACHV,.55,80000,92000)),
     ndfl:t<T_NDFV?'+ ?':'+'+rub(cnt(t,T_NDFV,.5,0,12000)),
     vz:t<T_VZV?'+ ?':'+'+rub(cnt(t,T_VZV,.55,0,27600)),
@@ -482,6 +486,7 @@ function drawReceipt(t){
     let dx=lerp(-34,0,p),sc=1;
     if(r.k==='ndfl'){dx=lerp(-50,0,ins);}
     x.save();x.globalAlpha=p;if(p<.995)x.filter=`blur(${((1-p)*7).toFixed(1)}px)`;x.translate(dx,0);
+    if(BOXES&&p>.3)BOXES.push({k:'строка чека',n:r.lab,x0:10000+50+dx,y0:10000+y+16,x1:10000+TW-50+dx,y1:10000+y+RH-16});
     /* вспышка строки: цвет строки, гаснет ровно за 0,9 с */
     const fl=1-P_(t,st.on+.15,.9);if(fl>0&&fl<1&&r.col!==C.ink){x.fillStyle=rgba(r.col,.20*fl);x.fillRect(24,y+6,TW-48,RH-12);}
     if(r.kind==='sub'){x.setLineDash([10,10]);x.strokeStyle='rgba(255,255,255,.16)';x.beginPath();x.moveTo(50,y+4);x.lineTo(TW-50,y+4);x.stroke();
@@ -495,11 +500,11 @@ function drawReceipt(t){
   return {L,S};
 }
 function actRec(t){
-  const tot=mov(t,TOT,.7);
+  const tot=mov(t,TOT-.05,.35);
   studio(t<TOT?'rec':'tot',t,1,1);
   REC.visible=true;
   const {L,S}=drawReceipt(t);
-  const Lu=L*TU;
+  const Lu=L*TU;PL=L;
   /* лента: дышит волной и закручивается у нижнего края к зрителю */
   const pa=PGEO.attributes.position.array;
   for(let i=0;i<pa.length;i+=3){const y=PBASE[i+1],d=-y,x=PBASE[i];
@@ -510,36 +515,36 @@ function actRec(t){
   /* под итогом лента уходит назад и гаснет, но не пропадает */
   PGRP.position.set(0,PTOP+lerp(0,.6,tot),lerp(0,-4.5,tot));
   PGRP.updateMatrixWorld(true);
-  PMAT.emissiveIntensity=lerp(.62,.06,tot);PMAT.color.setScalar(lerp(1,.25,tot));PMAT.opacity=lerp(1,.05,tot);
+  PMAT.emissiveIntensity=lerp(.62,.06,tot);PMAT.color.setScalar(lerp(1,.25,tot));PMAT.opacity=lerp(1,0,tot)*ent(t,X1+.2,.45);PAPER.visible=tot<.995&&PMAT.opacity>.001;
   /* камера идёт вниз за удлиняющейся лентой */
-  const ty=-.25*Math.max(0,Lu-1.8)*(1-tot);
+  const ty=-.12*Math.max(0,Lu-2.0)*(1-tot);
   camBase(t,0,ty,lerp(CZ+.8,CZ,ent(t,X1,1.2)));
 
   /* монетки: налог — коралловые, взносы — янтарные; вылетают из строки
      вправо-вверх, туда, где «государство» за кадром */
-  const bursts=[{t0:T_NDFV+.05,n:8,col:C.red,row:'ndfl'},{t0:T_VZV+.05,n:10,col:C.amber,row:'vz'}];
+  const bursts=[{t0:T_NDFV+.05,n:7,col:C.red,row:'ndfl'},{t0:T_VZV+.05,n:7,col:C.amber,row:'vz'},{t0:T_MESV+.05,n:7,col:C.violet,row:'mest'}];
   let ci=0;
   bursts.forEach((b,bi)=>{const y=-(HEAD+S[b.row].slot*RH+RH*.55)*TU;
     for(let j=0;j<b.n;j++,ci++){const m=CP[ci];const s0=b.t0+j*.06,u=P_(t,s0,1.25);
       if(u<=0||u>=1){m.visible=false;continue;}
       m.visible=true;m.material.color.set(b.col);
-      const st=new V3(PW/2-.5,y,.15);PGRP.localToWorld(st);
-      const ang=lerp(.15,1.1,rnd(ci*3.1)),sp=lerp(2.2,3.6,rnd(ci*5.7));
+      const st=new V3(PW/2+.25,y,.15);PGRP.localToWorld(st);
+      const ang=lerp(-.35,.55,rnd(ci*3.1)),sp=lerp(2.2,3.6,rnd(ci*5.7));
       const pop=E.out(cl(u*2.2)),fly=E.move(cl((u-.25)/.75));
-      m.position.set(st.x+Math.cos(ang)*.9*pop+fly*(4.5+sp),st.y+Math.sin(ang)*.9*pop+fly*(2.6+sp*.6),st.z+.3*pop+fly*1.2);
+      m.position.set(st.x+Math.cos(ang)*.45*pop+fly*(3.5+sp),st.y+Math.sin(ang)*.45*pop+fly*(.25+sp*.12),st.z+.3*pop+fly*.6);
       m.rotation.set(t*7+j,t*5+j*2,0);m.scale.setScalar(lerp(.9,1,pop));}});
   for(;ci<CP.length;ci++)CP[ci].visible=false;
 
   /* монитор вырастает из строки «место и техника» */
-  const mp=ent(t,T_MESV-.05,.55),ms=spring(t,T_MESV-.05,.75,.18);
-  MON.visible=mp>0&&tot<.98;
+  const mp=0,ms=0;
+  MON.visible=false;
   if(MON.visible){const y=-(HEAD+S.mest.slot*RH+RH*.5)*TU;const st=new V3(PW/2-.6,y,.2);PGRP.localToWorld(st);
     MON.position.set(st.x+lerp(0,.55,ms),st.y+lerp(0,.95,ms),st.z+.6);
     MON.scale.setScalar(lerp(.85,1,ms)*(1-tot*.5));MON.rotation.set(.05,-.35+.08*Math.sin(t*.9),.04*Math.sin(t*.7));
     MON.children.forEach(c=>{if(c.material){c.material.transparent=mp<.999;c.material.opacity=mp*(1-tot);}});}
 
   /* итог: объёмное 134 000, садится на пружине */
-  const np=ent(t,TOT,.55),ns=spring(t,TOT,.8,.2);
+  const np=ent(t,TOT+.3,.5),ns=spring(t,TOT+.3,.8,.2);
   num3.grp.visible=np>0;
   if(num3.grp.visible){num3.set(rub(cnt(t,TOT,.6,119600,134000)));
     num3.grp.position.set(X0,sy(850)+lerp(-.5,0,ns),.6);num3.grp.scale.setScalar(lerp(.9,1,ns));
@@ -552,7 +557,7 @@ function actSplit(t){
   DON.rotation.set(-.62+.03*Math.sin(t*.5),.08*Math.sin(t*.33),.10*tri(t,17));
   segM.forEach((m,i)=>{const on=SP_IN+i*STAG*1.4,p=ent(t,on,.55),s=spring(t,on,.75,.15);
     const lift=i===0?ent(t,SP_A,.5)*(1-ent(t,SP_B,.5)*.6):0,out=i===1?ent(t,SP_B,.55):0;
-    const r=out*.38+lift*.05;
+    const r=out*.26+lift*.04;
     m.position.set(Math.cos(m.userData.mid)*r,Math.sin(m.userData.mid)*r+(1-s)*.9,lift*.25+out*.2);
     m.scale.setScalar(lerp(.88,1,p));setOp(m.userData.mats,p);
     m.userData.mats[0].emissiveIntensity=1;
@@ -565,8 +570,8 @@ function actWhite(t){
   num40.grp.position.set(sx(52),sy(860)+lerp(-.5,0,s),0);num40.grp.scale.setScalar(lerp(.86,1,s));
   num40.grp.rotation.set(.04*Math.sin(t*.6),.12*Math.sin(t*.4)+.08,0);setOp(num40.mats,p);
   /* купюры уплывают вверх — мимо рук, ровно и медленно */
-  flyNotes.forEach((m,i)=>{const d=m.userData,y=((d.y0+(t-X3)*d.sp+7)%14)-7;
-    m.position.set(d.x+Math.sin(t*.5+i)*.3,y,d.z);m.rotation.set(d.r+t*.4*d.sp,d.r*.5+t*.3,d.r+t*.2);
+  flyNotes.forEach((m,i)=>{const d=m.userData,x=((d.x+(t-X3)*d.sp*.8+8)%16)-8;
+    m.position.set(x,d.y0+Math.sin(t*.7+i)*.12,d.z);m.rotation.set(d.r+t*.4*d.sp,d.r*.5+t*.3,d.r+t*.2);
     m.material.transparent=true;m.material.opacity=p*.85;});
 }
 
@@ -584,8 +589,8 @@ function actRaise(t){
   strike.position.set(-.12,DIGH*num5.size*.46,.22);
   strike.scale.set(Math.max(.02,st)*(num5.w+.24),1,1);strike.rotation.z=.045;
   /* стрелка растёт от первого числа ко второму */
-  const ap=ent(t,RS_ARR,.5);arrow.visible=ap>0;arrow.scale.set(1,lerp(.15,1,ap),1);setOp(arrow.material,ap);
-  arrow.position.set(X0+.2,sy(718),0);
+  const ap=ent(t,RS_ARR,.5);arrow.visible=ap>0;arrow.scale.set(1,lerp(.15,.82,ap),1);setOp(arrow.material,ap);
+  arrow.position.set(X0+.2,sy(748),0);
   /* «а на самом деле» */
   const p6=ent(t,RS_ARR+.12,.5),s6=spring(t,RS_V2,.8,.2);
   num6.set('+'+rub(cnt(t,RS_V2,.65,10000,14900)));
@@ -605,14 +610,14 @@ function actCta(t){
   /* самолётик прилетает по дуге и садится на место значка */
   const u=mov(t,CT+.02,1.0);
   const end=new V3(sx(ICON.x),sy(ICON.y),0);
-  const pts=[new V3(-6,-7,5),new V3(-3.5,-2,6.5),new V3(2.5,0,4),new V3(end.x+1.2,end.y-.2,1.5),end];
+  const pts=[new V3(-8,-7,6),new V3(-5.5,-1.5,5.5),new V3(-4,2.2,3.5),new V3(end.x-1.3,end.y+.25,1.2),end];
   const curve=new THREE.CatmullRomCurve3(pts);
   const p=curve.getPointAt(u),tg=curve.getTangentAt(Math.min(.999,u));
   const bob=u>=1?.06*Math.sin((t-CT-1.02)*2.4):0;
   plane.position.set(p.x,p.y+bob,p.z);
   const look=p.clone().add(tg);plane.lookAt(look);
   plane.rotateZ(lerp(-.9,0,u)+.08*Math.sin(t*2));
-  const sc=lerp(1.2,.42,E.out(P_(t,CT,1.0)));plane.scale.setScalar(sc);
+  const sc=lerp(1.1,.34,E.out(P_(t,CT,1.0)));plane.scale.setScalar(sc);
   if(u>=1){plane.rotation.set(-.15+.05*Math.sin(t*1.7),-.55+.06*Math.sin(t*1.3),.12);}
   trail.forEach((s,i)=>{const back=u-(i+1)*.018;const vis=back>0&&u<1.02;s.visible=vis;
     if(!vis)return;const q=curve.getPointAt(cl(back));s.position.copy(q);
@@ -620,13 +625,17 @@ function actCta(t){
 }
 
 /* ═══ ПЛОСКИЙ СЛОЙ: подписи, титры, лента актов, профиль ═══ */
-function T2(s,x,y,font,col,a=1,al='left',ls=0,bl=0){if(a<=.001||!s)return 0;g.save();g.globalAlpha=a;g.font=font;g.fillStyle=col;g.textAlign=al;g.textBaseline='alphabetic';
-  g.letterSpacing=ls+'px';if(bl>.2)g.filter=`blur(${bl.toFixed(1)}px)`;g.fillText(s,x,y);const w=g.measureText(s).width;g.restore();return w;}
+function T2(s,x,y,font,col,a=1,al='left',ls=0,bl=0){if(a<=.001||!s)return 0;g.save();g.globalAlpha*=a;g.font=font;g.fillStyle=col;g.textAlign=al;g.textBaseline='alphabetic';
+  g.letterSpacing=ls+'px';if(bl>.2)g.filter=`blur(${bl.toFixed(1)}px)`;g.fillText(s,x,y);const w=g.measureText(s).width;
+  if(BOXES&&g.globalAlpha>.3){const fs=+font.match(/(\d+)px/)[1],m=g.getTransform(),x0=al==='center'?x-w/2:al==='right'?x-w:x;
+    const a_=m.transformPoint({x:x0,y:y-fs*.74}),b_=m.transformPoint({x:x0+w,y:y+fs*.2});BOXES.push({k:'текст',n:s,x0:a_.x,y0:a_.y,x1:b_.x,y1:b_.y});}
+  g.restore();return w;}
 function tw(s,font,ls=0){g.save();g.font=font;g.letterSpacing=ls+'px';const w=g.measureText(s).width;g.restore();return w;}
 /* вход детали: подъём, расфокус снимается, без масштаба из нуля */
 function rise(t,s,dy=26){const p=ent(t,s);return {a:p,y:(1-p)*dy,b:(1-p)*8};}
 function Lb(s,x,y,col,t,on,size=30,w=500,ls=4.8){const r=rise(t,on,18);T2(s,x,y+r.y,F(w,size),col,r.a,'left',ls,r.b);}
-function pill(x,y,w,h,fill,stroke,a=1){if(a<=0)return;g.save();g.globalAlpha=a;g.beginPath();g.roundRect(x,y,w,h,h/2);if(fill){g.fillStyle=fill;g.fill();}if(stroke){g.strokeStyle=stroke;g.lineWidth=2;g.stroke();}g.restore();}
+function pill(x,y,w,h,fill,stroke,a=1){if(a<=0)return;g.save();g.globalAlpha*=a;
+  if(BOXES&&g.globalAlpha>.3){const m=g.getTransform(),a_=m.transformPoint({x,y}),b_=m.transformPoint({x:x+w,y:y+h});BOXES.push({k:'плашка',n:'',x0:a_.x,y0:a_.y,x1:b_.x,y1:b_.y});}g.beginPath();g.roundRect(x,y,w,h,h/2);if(fill){g.fillStyle=fill;g.fill();}if(stroke){g.strokeStyle=stroke;g.lineWidth=2;g.stroke();}g.restore();}
 function scrOf(obj,dx=0,dy=0,dz=0){const v=new V3(dx,dy,dz);obj.localToWorld(v);return scr(v);}
 const exitA=(t,k)=>1-mov(t,swap(k)-fadeOut(k),fadeOut(k));
 
@@ -660,10 +669,10 @@ function drawCaption(t){
   const wh=onWhite(t)>.5;
   const lines=s=>{if(!s)return null;const p=s.split('|');return {l:[p[0],p[1]].filter(x=>x),c:CCOL[p[2]]||C.ink,two:!!p[0]};};
   const st=idx>=0?CUES[idx][0]:0;
-  if(idx>0&&CUES[idx-1][1]){const po=1-mov(t,st,.2);if(po>.001){const L=lines(CUES[idx-1][1]),s=fitCap(L.l);
+  if(idx>0&&CUES[idx-1][1]){const po=1-mov(t,st,.12);if(po>.001){const L=lines(CUES[idx-1][1]),s=fitCap(L.l);
     L.l.forEach((ln,i)=>T2(ln,60,258+s*.92+i*s*1.08-(1-po)*18,F(900,s),i===L.l.length-1?L.c:(wh?'#0B1026':C.ink),po,'left',-1,(1-po)*7));}}
   if(idx>=0&&CUES[idx][1]){const L=lines(CUES[idx][1]),s=fitCap(L.l);
-    L.l.forEach((ln,i)=>{const s0=st+.06+i*.09,p=ent(t,s0,.45);
+    L.l.forEach((ln,i)=>{const s0=st+.11+i*.09,p=ent(t,s0,.45);
       T2(ln,60,258+s*.92+i*s*1.08+(1-p)*24,F(900,s),i===L.l.length-1?L.c:(wh?'#0B1026':C.ink),p,'left',-1,(1-p)*6);});}
 }
 const CHIPS=['вопрос','налог','взносы','место','итог','доля','прибавка','телеграм'];
@@ -674,10 +683,10 @@ function drawRail(t){
   const f=F(600,26),ws=CHIPS.map(c=>tw(c,f,.5)+44);const xs=[];let x=0;ws.forEach(w=>{xs.push(x);x+=w+12;});
   const ctr=i=>xs[i]+ws[i]/2,off=300-lerp(k>0?ctr(prev):ctr(0),ctr(k),k>0?p:1);
   const wh=onWhite(t)>.5,ra=1-mov(t,DUR-.6,.5);
-  g.save();g.globalAlpha=ra;
+  g.save();g.globalAlpha*=ra;const ga0=g.globalAlpha;
   const fade=g.createLinearGradient(0,0,W,0);
   CHIPS.forEach((c,i)=>{const X=off+xs[i];if(X+ws[i]<20||X>880)return;const on=i===k?p:(i===prev&&k>0?1-p:0);
-    const edge=cl((X-30)/90)*cl((870-X-ws[i])/110);if(edge<=0)return;g.globalAlpha=ra*edge;
+    const edge=cl((X-30)/90)*cl((870-X-ws[i])/110);if(edge<=0)return;g.globalAlpha=ga0*edge;
     pill(X,176,ws[i],52,null,wh?'rgba(0,0,0,.14)':'rgba(255,255,255,.14)');
     if(on>0)pill(X,176,ws[i],52,mixc(C.teal,C.violet,(i%3)/4),null,on);
     T2(c,X+22,211,f,on>.5?'#07112A':(wh?'#5D647E':C.dim),1,'left',.5);});
@@ -693,7 +702,7 @@ function drawFooter(t){
 
 /* подписи к объёмным числам — крепятся к их проекции, едут вместе с камерой */
 function hudHook(t){
-  const a=exitA(t,3)*(1-P_(t,COIN1,.35));if(a<=0)return;
+  const a=exitA(t,3)*(1-ent(t,COIN0,.33));if(a<=0)return;
   g.save();g.globalAlpha=a;
   const p1=scrOf(num1.grp,0,num1.size*DIGH,0),p2=scrOf(num2.grp,0,num2.size*DIGH,0);
   T2('ВЫ ПОЛУЧАЕТЕ',p1[0],p1[1]-26,F(500,30),C.dim,1,'left',4.8);
@@ -701,7 +710,7 @@ function hudHook(t){
   /* плашка растёт из четырёх загоревшихся пачек: точка роста — у источника */
   const c=ent(t,HK_CHIP,.5);if(c>0){const q=scrOf(extra[3],BW/2,-BH/2,.32);const s='почти 40 000 — государству',f=F(600,34),w_=tw(s,f)+60;
     const xr=Math.min(1020,q[0]+8),x0=xr-w_,y0=q[1]+20+lerp(14,0,c);
-    g.save();g.globalAlpha=c;g.translate(xr,y0);g.scale(lerp(.92,1,c),lerp(.92,1,c));g.translate(-xr,-y0);
+    g.save();g.globalAlpha*=c;g.translate(xr,y0);g.scale(lerp(.92,1,c),lerp(.92,1,c));g.translate(-xr,-y0);
     pill(x0,y0,w_,66,rgba(C.red,.16),rgba(C.red,.5));T2(s,x0+30,y0+45,f,'#FF8A84',1,'left',0,(1-c)*6);g.restore();}
   g.restore();
 }
@@ -710,13 +719,13 @@ function hudRec(t){
   const a=1-mov(t,X2-fadeOut(10),fadeOut(10));if(a<=0)return;
   g.save();g.globalAlpha=a;
   const q=scrOf(num3.grp,0,num3.size*DIGH,0);
-  Lb('ВАША ЦЕНА ДЛЯ РАБОТОДАТЕЛЯ',q[0],q[1]-30,C.dim,t,TOT);
+  Lb('ВАША ЦЕНА ДЛЯ РАБОТОДАТЕЛЯ',q[0],q[1]-30,C.dim,t,TOT+.3);
   const b=scrOf(num3.grp,0,0,0);
-  Lb('в месяц — вместо 80 000',b[0],b[1]+76,C.ink,t,TOT+.3,46,500,0);
+  Lb('в месяц — вместо 80 000',b[0],b[1]+76,C.ink,t,TOT+.6,46,500,0);
   const SRC=[['НДФЛ 13%','ст. 224 НК РФ'],['взносы 30%','п. 3 ст. 425 НК РФ']];
   SRC.forEach((s,i)=>{const r=rise(t,TOT_SRC+i*STAG,14);if(r.a<=0)return;const y=b[1]+150+i*48+r.y;
     const w1=T2(s[0],b[0],y,F(600,27),i?C.amber:C.red,r.a,'left',.5,r.b);
-    g.save();g.globalAlpha=r.a;g.fillStyle=C.dim2;g.fillRect(b[0]+w1+14,y-9,70,2);g.restore();
+    g.save();g.globalAlpha*=r.a;g.fillStyle=C.dim2;g.fillRect(b[0]+w1+14,y-9,70,2);g.restore();
     T2(s[1],b[0]+w1+98,y,F(500,27),C.dim,r.a,'left',.5,r.b);});
   g.restore();
 }
@@ -730,8 +739,8 @@ function hudSplit(t){
   Lb('ГОСУДАРСТВУ',560,610,C.red,t,SP_B-.12,32,600,3);
   const r2=rise(t,SP_B-.12+STAG,24);T2(rub(cnt(t,SP_B-.02,.6,0,39600)),556,712+r2.y,F(900,92),C.red,r2.a,'left',-2,r2.b);
   /* подпись к фиолетовому сектору: выноска от самого сектора влево */
-  const m=segM[2];if(m){const q=scrOf(m,Math.cos(m.userData.mid)*1.6,Math.sin(m.userData.mid)*1.6,.3);
-    const lp=ent(t,SP_B+.5,.5);if(lp>0){const lx=120,ly=q[1]+150;g.save();g.globalAlpha=lp;g.strokeStyle=rgba(C.violet,.85);g.lineWidth=3;
+  const m=segM[2];if(m){const q=scrOf(m,Math.cos(m.userData.mid)*1.32,Math.sin(m.userData.mid)*1.32,.3);
+    const lp=ent(t,SP_B+.5,.5);if(lp>0){const lx=120,ly=q[1]+120;g.save();g.globalAlpha*=lp;g.strokeStyle=rgba(C.violet,.85);g.lineWidth=3;
       g.beginPath();g.moveTo(q[0],q[1]);g.lineTo(lerp(q[0],lx+40,lp),lerp(q[1],ly-34,lp));g.stroke();g.restore();
       T2('место',60,ly+lerp(10,0,lp),F(600,30),'#B3A8FF',lp,'left',.5,(1-lp)*6);
       T2('и техника',60,ly+38+lerp(10,0,lp),F(600,30),'#B3A8FF',lp,'left',.5,(1-lp)*6);}}
@@ -755,11 +764,11 @@ function hudRaise(t){
   const sp=ent(t,RS_SH,.5);if(sp>0){
     const press=t<RS_TAP?0:t<RS_TAP+.12?E.out(P_(t,RS_TAP,.12)):1-E.out(P_(t,RS_TAP+.12,.2));
     const s=lerp(1,.96,press),bx=60,by=1160+lerp(18,0,sp),bw=tw('↗ переслать',F(600,32))+60;
-    g.save();g.globalAlpha=sp;g.translate(bx+bw/2,by+34);g.scale(s,s);g.translate(-(bx+bw/2),-(by+34));
+    g.save();g.globalAlpha*=sp;g.translate(bx+bw/2,by+34);g.scale(s,s);g.translate(-(bx+bw/2),-(by+34));
     pill(bx,by,bw,68,rgba(C.teal,.12+.25*press),C.teal);T2('↗ переслать',bx+30,by+46,F(600,32),C.teal,1);g.restore();
     T2('тому, кто идёт за прибавкой',bx+bw+20,by+44,F(500,28),C.dim,sp,'left',0,(1-sp)*6);
     /* круг отклика от пальца */
-    const rp=P_(t,RS_TAP,.6);if(rp>0&&rp<1){g.save();g.globalAlpha=sp*(1-rp)*.7;g.strokeStyle=C.teal;g.lineWidth=4;g.beginPath();g.arc(bx+bw*.55,by+34,lerp(20,120,E.out(rp)),0,6.283);g.stroke();g.restore();}}
+    const rp=P_(t,RS_TAP,.6);if(rp>0&&rp<1){g.save();g.globalAlpha*=sp*(1-rp)*.7;g.strokeStyle=C.teal;g.lineWidth=4;g.beginPath();g.arc(bx+bw*.55,by+34,lerp(20,120,E.out(rp)),0,6.283);g.stroke();g.restore();}}
   g.restore();
 }
 const ICON={x:0,y:380};
@@ -821,7 +830,7 @@ window.SFX=[
 
 /* ═══ КАДР ═══ */
 const ACTL=[['hook',0,X1,actHook],['rec',X1,X2,actRec],['split',X2,X3,actSplit],['white',X3,X4,actWhite],['raise',X4,X5,actRaise],['cta',X5,1e9,actCta]];
-function render3(t,ai){hideAll();ACTL[ai][3](t);coinAt(t);COMP.render();}
+function render3(t,ai){hideAll();ACTL[ai][3](t);coinAt(t);if(BOXMODE){S3.updateMatrixWorld(true);CAM.updateMatrixWorld();if(BOXES)boxes3(ai);}else COMP.render();}
 function glow(src,dst){/* мягкое свечение светлых мест 3D-слоя */
   B1g.globalCompositeOperation='copy';B1g.filter='brightness(.7) contrast(3) blur(3px)';B1g.drawImage(src,0,0,270,480);B1g.filter='none';
   B2g.globalCompositeOperation='copy';B2g.filter='blur(6px)';B2g.drawImage(B1,0,0,135,240);B2g.filter='none';
@@ -834,24 +843,47 @@ function frame(t){
   let mix=null;
   if(nxt!==null&&t>nxt-XF/2)mix=[ai,ai+1,P_(t,nxt-XF/2,XF)];
   else if(b!==null&&t<b+XF/2)mix=[ai-1,ai,P_(t,b-XF/2,XF)];
-  if(mix){const e=E.move(mix[2]);
-    render3(t,mix[0]);XAg.globalCompositeOperation='copy';XAg.drawImage(RD.domElement,0,0);
-    render3(t,mix[1]);XBg.globalCompositeOperation='copy';XBg.drawImage(RD.domElement,0,0);
-    g.drawImage(XA,0,0);
-    g.save();g.globalAlpha=e;if(e<.98)g.filter=`blur(${((1-e)*12).toFixed(1)}px)`;g.drawImage(XB,0,0);g.restore();
-    if(e<.6){g.save();g.globalAlpha=(1-e/.6)*(e/.6)*2;g.filter=`blur(${(e*14).toFixed(1)}px)`;g.drawImage(XA,0,0);g.restore();}
+  if(mix&&BOXMODE){render3(t,mix[2]<.5?mix[0]:mix[1]);}
+  else if(mix){/* уходящий акт расплывается, на пике расфокуса — смена, новый собирается:
+       двух читаемых состояний поверх друг друга не бывает */
+    const e=mix[2],bA=18*E.out(cl(e/.5)),bB=18*(1-E.out(cl((e-.5)/.5))),k=E.move(P_(e,.42,.16));
+    if(k<1){render3(t,mix[0]);XAg.globalCompositeOperation='copy';XAg.drawImage(RD.domElement,0,0);}
+    if(k>0){render3(t,mix[1]);XBg.globalCompositeOperation='copy';XBg.drawImage(RD.domElement,0,0);}
+    if(k<1){g.save();if(bA>.3)g.filter=`blur(${bA.toFixed(1)}px)`;g.drawImage(XA,0,0);g.restore();}
+    if(k>0){g.save();g.globalAlpha=k;if(bB>.3)g.filter=`blur(${bB.toFixed(1)}px)`;g.drawImage(XB,0,0);g.restore();}
   }else{render3(t,ai);g.drawImage(RD.domElement,0,0);}
-  if(onWhite(t)<.5)glow(A,g);
+  if(onWhite(t)<.5&&!BOXMODE)glow(A,g);
   /* виньетка */
   const vg=g.createRadialGradient(540,860,500,540,960,1250);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,`rgba(0,0,0,${(.45*(1-onWhite(t))).toFixed(3)})`);g.fillStyle=vg;g.fillRect(0,0,W,H);
   /* плоский слой */
   hudHook(t);hudRec(t);hudSplit(t);hudWhite(t);hudRaise(t);hudCta(t);
-  drawRail(t);drawCaption(t);drawFooter(t);
+  const wipe=mov(t,COIN1+.2,.3)*(1-mov(t,X1+.25,.35));
+  g.save();g.globalAlpha=1-wipe;drawRail(t);drawCaption(t);drawFooter(t);g.restore();
   /* зерно */
   const f=Math.floor(t*30);g.save();g.globalCompositeOperation='overlay';g.globalAlpha=.05;g.fillStyle=GRP;g.translate(-Math.floor(rnd(f)*256),-Math.floor(rnd(f+.5)*256));g.fillRect(0,0,W+256,H+256);g.restore();
   O.globalCompositeOperation='copy';O.drawImage(A,0,0);O.globalCompositeOperation='source-over';
 }
 let BUILT=false;
+/* ═══ ЗАМЕР НАЛОЖЕНИЙ (?boxes=1): рамки плоского слоя и проекции 3D ═══ */
+let BOXES=null;const BOXMODE=QS.get('boxes')==='1';
+const _b=new THREE.Box3();
+function box3(list,name){_b.makeEmpty();let any=false;list.forEach(o=>{if(!o)return;let v=o,vis=true;while(v){if(!v.visible){vis=false;break;}v=v.parent;}if(vis){_b.expandByObject(o);any=true;}});
+  if(!any||_b.isEmpty())return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(let i=0;i<8;i++){const p=new V3(i&1?_b.max.x:_b.min.x,i&2?_b.max.y:_b.min.y,i&4?_b.max.z:_b.min.z);const q=scr(p);if(q[2]>1)continue;x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1]);}
+  BOXES.push({k:'3D',n:name,x0,y0,x1,y1});}
+function boxes3(ai){const n=ACTL[ai][0],op=m=>{const a=Array.isArray(m)?m[0]:m;return a.opacity===undefined||a.opacity>.3;};
+  if(n==='hook'){box3([num1.grp],'80 000');box3([num2.grp],'134 000');box3(bar1,'полоса 1');box3(bar2.concat(extra),'полоса 2');}
+  if(n==='rec'){if(PAPER.visible&&PMAT.opacity>.3){const c=[[-PW/2,0],[PW/2,0],[-PW/2,-PL*TU-.1],[PW/2,-PL*TU-.1]].map(([x,y])=>PGRP.localToWorld(new V3(x,y,0)));
+      let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;c.forEach(p=>{const q=scr(p);x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1]);});BOXES.push({k:'3D',n:'лента чека',x0,y0,x1,y1});}
+    if(op(num3.mats))box3([num3.grp],'134 000 итог');box3([MON],'монитор');}
+  if(n==='split')box3(segM,'бублик');
+  if(n==='white'){box3([num40.grp],'40%');}
+  if(n==='raise'){if(op(num5.mats))box3([num5.grp],'+10 000');if(arrow.visible)box3([arrow],'стрелка');if(op(num6.mats))box3([num6.grp],'+14 900');box3(tower,'стопка монет');}
+  if(n==='cta')box3([plane],'самолётик');
+  if(COIN.visible)box3([COIN],'монета');
+  if(n==='rec')CP.forEach(m=>{if(m.visible)box3([m],'монетка');});
+  if(n==='white')flyNotes.forEach(m=>box3([m],'купюра'));}
+window.boxesAt=function(t){BOXES=[];frame(t);const r=BOXES;BOXES=null;return r;};
 window.seek=function(t){if(!BUILT)return;frame(t);};
 window.seekMB=function(t,n=4){const sh=.5/30;for(let k=0;k<n;k++){frame(t+((k+.5)/n-.5)*sh);ACG.globalCompositeOperation=k?'source-over':'copy';ACG.globalAlpha=1/(k+1);ACG.drawImage(cv,0,0);}
   ACG.globalAlpha=1;O.globalCompositeOperation='copy';O.drawImage(ACC,0,0);O.globalCompositeOperation='source-over';};
