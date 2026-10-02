@@ -7,4 +7,7 @@ import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 import {Reflector} from 'three/addons/objects/Reflector.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-window.THREE=THREE;window.T3X={EffectComposer,RenderPass,UnrealBloomPass,OutputPass,ShaderPass,Reflector,RoomEnvironment,mergeGeometries};
+import {Font} from 'three/addons/loaders/FontLoader.js';
+import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+window.THREE=THREE;window.T3X={EffectComposer,RenderPass,UnrealBloomPass,OutputPass,ShaderPass,Reflector,RoomEnvironment,mergeGeometries,Font,TextGeometry,RoundedBoxGeometry};
