@@ -1,6 +1,6 @@
-# SHORTS RADAR — 2026-10-26 11:09 UTC
+# SHORTS RADAR — 2026-10-27 10:36 UTC
 
-Каналов в слежке: 24. Роликов снято: 1099. Прошлый прогон за 25 ч назад.
+Каналов в слежке: 24. Роликов снято: 1099. Прошлый прогон за 23 ч назад.
 
 ## 1. Что греется прямо сейчас
 
@@ -8,18 +8,18 @@
 
 | | Ролик | Канал | Прирост | Всего |
 |---|---|---|---|---|
-| 1 | [What If We Cool Down the Sun?](https://youtube.com/shorts/35No369rmq0) | Kurzgesagt – In a Nuts | +209 тыс. | 692 тыс. |
-| 2 | [Сколько вложить в ОФЗ, чтобы больше не работать?](https://youtube.com/shorts/HtKvEsTGMBQ) | Дмитрий Кокорев: инвес | +100 тыс. | 1,1 млн |
-| 3 | [И то, и другое невозможно](https://youtube.com/shorts/8SQDby5cbjU) | Garys Economics | +100 тыс. | 3,4 млн |
-| 4 | [Your Brain on Magic Mushrooms](https://youtube.com/shorts/b1EMX3wyqCY) | Kurzgesagt – In a Nuts | +100 тыс. | 1,2 млн |
-| 5 | [The Lake That Killed a Village](https://youtube.com/shorts/mWN2IefeJow) | Kurzgesagt – In a Nuts | +100 тыс. | 1,2 млн |
-| 6 | [Каршеринг или СВОЯ машина: что выгоднее?](https://youtube.com/shorts/ABfpDBb5588) | Дмитрий Кокорев: инвес | +57 тыс. | 58 тыс. |
-| 7 | [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | +41 тыс. | 66 тыс. |
-| 8 | [Что выгоднее: покупать квартиру или всю жизнь снимать?](https://youtube.com/shorts/TstCfQ17HQw) | Дмитрий Кокорев: инвес | +26 тыс. | 513 тыс. |
-| 9 | [Офицер разведки о Горбачёве / Андрей Безруков](https://youtube.com/shorts/U_hFzZZPuiU) | Лука Ебков | +20 тыс. | 72 тыс. |
-| 10 | [Рубли или доллары: что откладывать?](https://youtube.com/shorts/ZZi2CQ8kFNg) | Деньги не спят | +16 тыс. | 41 тыс. |
-| 11 | [Третья мировая в 2029-м. Деглобализация до 2031, потом волна до 2042](https://youtube.com/shorts/_Rq_vCxGh9s) | Эра Перемен — аналитич | +14 тыс. | 37 тыс. |
-| 12 | [3 экономики, которые исчезнут к 2040 году!](https://youtube.com/shorts/SgLtIfnolvI) | Дмитрий Кокорев: инвес | +9 тыс. | 636 тыс. |
+| 1 | [I'm trying to stop the redistribution](https://youtube.com/shorts/yKefsWYLgnY) | Garys Economics | +100 тыс. | 1,2 млн |
+| 2 | [The Deadliest Thing in Your Kitchen](https://youtube.com/shorts/2cK8l5Yg5w8) | Kurzgesagt – In a Nuts | +100 тыс. | 5,1 млн |
+| 3 | [The World’s Most Average Person](https://youtube.com/shorts/Gn-KqiRv0XI) | Kurzgesagt – In a Nuts | +100 тыс. | 3,5 млн |
+| 4 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | +100 тыс. | 1,8 млн |
+| 5 | [What If We Cool Down the Sun?](https://youtube.com/shorts/35No369rmq0) | Kurzgesagt – In a Nuts | +81 тыс. | 773 тыс. |
+| 6 | [Офицер разведки о Горбачёве / Андрей Безруков](https://youtube.com/shorts/U_hFzZZPuiU) | Лука Ебков | +38 тыс. | 110 тыс. |
+| 7 | [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | +32 тыс. | 98 тыс. |
+| 8 | [Сколько денег вложить в акции Сбера, чтобы получать 100к в месяц?](https://youtube.com/shorts/FBjyCUf0mi8) | Дмитрий Кокорев: инвес | +20 тыс. | 411 тыс. |
+| 9 | [Что выгоднее: покупать квартиру или всю жизнь снимать?](https://youtube.com/shorts/TstCfQ17HQw) | Дмитрий Кокорев: инвес | +16 тыс. | 529 тыс. |
+| 10 | [Скачок за четыре месяца вместо двух лет. Потом за три, потом за полтор](https://youtube.com/shorts/1jnZvzwOmgM) | Эра Перемен — аналитич | +14 тыс. | 19 тыс. |
+| 11 | [3 экономики, которые исчезнут к 2040 году!](https://youtube.com/shorts/SgLtIfnolvI) | Дмитрий Кокорев: инвес | +11 тыс. | 647 тыс. |
+| 12 | [Каршеринг или СВОЯ машина: что выгоднее?](https://youtube.com/shorts/ABfpDBb5588) | Дмитрий Кокорев: инвес | +10 тыс. | 68 тыс. |
 
 ## 2. Скорость с момента выхода
 
@@ -27,18 +27,18 @@
 
 | | Ролик | Канал | Скорость | Всего |
 |---|---|---|---|---|
-| 1 | [What If We Cool Down the Sun?](https://youtube.com/shorts/35No369rmq0) | Kurzgesagt – In a Nuts | 368 тыс./сут · 2 дн. | 692 тыс. |
-| 2 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | 94 тыс./сут · 18 дн. | 1,7 млн |
-| 3 | [Can Earth Run Out of Water?](https://youtube.com/shorts/tZ8i1RxGSYM) | Kurzgesagt – In a Nuts | 70 тыс./сут · 56 дн. | 3,9 млн |
-| 4 | [Каршеринг или СВОЯ машина: что выгоднее?](https://youtube.com/shorts/ABfpDBb5588) | Дмитрий Кокорев: инвес | 53 тыс./сут · 1 дн. | 58 тыс. |
-| 5 | [What If You Never Slept?](https://youtube.com/shorts/hiIIGMeMEuE) | Kurzgesagt – In a Nuts | 53 тыс./сут · 53 дн. | 2,8 млн |
-| 6 | [Для чего закладчикам ведро воды в ванной?](https://youtube.com/shorts/5peQAfXG3yc) | М О Р И А Р Т И | 50 тыс./сут · 32 дн. | 1,6 млн |
-| 7 | [Dust Is Not What You Think](https://youtube.com/shorts/YqAI0oqtt7w) | Kurzgesagt – In a Nuts | 48 тыс./сут · 60 дн. | 2,9 млн |
-| 8 | [Humans Can Regrow an Organ](https://youtube.com/shorts/oNTaHYXQ4MM) | Kurzgesagt – In a Nuts | 47 тыс./сут · 30 дн. | 1,4 млн |
-| 9 | [Your Brain on Magic Mushrooms](https://youtube.com/shorts/b1EMX3wyqCY) | Kurzgesagt – In a Nuts | 43 тыс./сут · 28 дн. | 1,2 млн |
-| 10 | [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | 37 тыс./сут · 2 дн. | 66 тыс. |
-| 11 | [И то, и другое невозможно](https://youtube.com/shorts/8SQDby5cbjU) | Garys Economics | 35 тыс./сут · 97 дн. | 3,4 млн |
-| 12 | [Лигалайз сошёл с ума / DJ MEG](https://youtube.com/shorts/YqutlunVGbs) | Лука Ебков | 28 тыс./сут · 12 дн. | 334 тыс. |
+| 1 | [What If We Cool Down the Sun?](https://youtube.com/shorts/35No369rmq0) | Kurzgesagt – In a Nuts | 270 тыс./сут · 3 дн. | 773 тыс. |
+| 2 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | 94 тыс./сут · 19 дн. | 1,8 млн |
+| 3 | [Can Earth Run Out of Water?](https://youtube.com/shorts/tZ8i1RxGSYM) | Kurzgesagt – In a Nuts | 69 тыс./сут · 57 дн. | 3,9 млн |
+| 4 | [What If You Never Slept?](https://youtube.com/shorts/hiIIGMeMEuE) | Kurzgesagt – In a Nuts | 52 тыс./сут · 54 дн. | 2,8 млн |
+| 5 | [Для чего закладчикам ведро воды в ванной?](https://youtube.com/shorts/5peQAfXG3yc) | М О Р И А Р Т И | 49 тыс./сут · 33 дн. | 1,6 млн |
+| 6 | [Dust Is Not What You Think](https://youtube.com/shorts/YqAI0oqtt7w) | Kurzgesagt – In a Nuts | 48 тыс./сут · 61 дн. | 2,9 млн |
+| 7 | [Humans Can Regrow an Organ](https://youtube.com/shorts/oNTaHYXQ4MM) | Kurzgesagt – In a Nuts | 45 тыс./сут · 31 дн. | 1,4 млн |
+| 8 | [Your Brain on Magic Mushrooms](https://youtube.com/shorts/b1EMX3wyqCY) | Kurzgesagt – In a Nuts | 42 тыс./сут · 29 дн. | 1,2 млн |
+| 9 | [Tax wealth not work in Japan](https://youtube.com/shorts/kAbTOKplgBg) | Garys Economics | 41 тыс./сут · 1 дн. | 37 тыс. |
+| 10 | [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | 36 тыс./сут · 3 дн. | 98 тыс. |
+| 11 | [И то, и другое невозможно](https://youtube.com/shorts/8SQDby5cbjU) | Garys Economics | 35 тыс./сут · 98 дн. | 3,4 млн |
+| 12 | [Каршеринг или СВОЯ машина: что выгоднее?](https://youtube.com/shorts/ABfpDBb5588) | Дмитрий Кокорев: инвес | 33 тыс./сут · 2 дн. | 68 тыс. |
 
 ## 3. Выбросы относительно своего канала
 
@@ -50,67 +50,67 @@
 | 2 | [Вот почему Coca-Cola зарабатывает МИЛЛИАРДЫ!!](https://youtube.com/shorts/iMY3CKltDGU) | Сложный Процент | ×115.3 | 3,4 млн |
 | 3 | [Сколько бизнес потерял из-за шатдаунов?](https://youtube.com/shorts/Hnt0r_sfAg4) | Екатерина Кузнецова -  | ×113.2 | 24 тыс. |
 | 4 | [На кого охотится МинФин?](https://youtube.com/shorts/cj5qQaOaL9Q) | Екатерина Кузнецова -  | ×103.8 | 22 тыс. |
-| 5 | [НОВЫЕ ПРАВИЛА для переводов и самозанятых в 2026 году!](https://youtube.com/shorts/rTKCD4eWEZs) | О налогах с Екатериной | ×71.3 | 524 тыс. |
+| 5 | [НОВЫЕ ПРАВИЛА для переводов и самозанятых в 2026 году!](https://youtube.com/shorts/rTKCD4eWEZs) | О налогах с Екатериной | ×67.2 | 524 тыс. |
 | 6 | [Сколько стоит отключение Интернета в России?](https://youtube.com/shorts/KyGjTNqnIv8) | Екатерина Кузнецова -  | ×66.0 | 14 тыс. |
 | 7 | [Банк стучит на тебя в ФНС](https://youtube.com/shorts/0IdNV97R6wI) | Екатерина Кузнецова -  | ×66.0 | 14 тыс. |
-| 8 | [НОВАЯ СХЕМА налоговой! Как вас могут развести на штрафы?](https://youtube.com/shorts/4XMidhF1qQU) | О налогах с Екатериной | ×47.8 | 351 тыс. |
-| 9 | [Налоговая завалила бизнес требованиями](https://youtube.com/shorts/bDpk_9jTT-I) | Екатерина Кузнецова -  | ×47.2 | 10 тыс. |
-| 10 | [Что ждёт общепит в 2026?](https://youtube.com/shorts/_Sc2-8tOJF0) | Екатерина Кузнецова -  | ×47.2 | 10 тыс. |
-| 11 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | ×44.2 | 1,7 млн |
+| 8 | [Налоговая завалила бизнес требованиями](https://youtube.com/shorts/bDpk_9jTT-I) | Екатерина Кузнецова -  | ×47.2 | 10 тыс. |
+| 9 | [Что ждёт общепит в 2026?](https://youtube.com/shorts/_Sc2-8tOJF0) | Екатерина Кузнецова -  | ×47.2 | 10 тыс. |
+| 10 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | ×46.8 | 1,8 млн |
+| 11 | [НОВАЯ СХЕМА налоговой! Как вас могут развести на штрафы?](https://youtube.com/shorts/4XMidhF1qQU) | О налогах с Екатериной | ×45.1 | 352 тыс. |
 | 12 | [How This Vandal Made $200 Million by Spray Painting An Office Building](https://youtube.com/shorts/jJ0i4JxY-tE) | How Money Works | ×42.7 | 5,4 млн |
 
 ## 4. Свежие ролики (до 7 дней)
 
 | Ролик | Канал | Возраст | Просмотры | Скорость |
 |---|---|---|---|---|
-| [Скачок за четыре месяца вместо двух лет. Потом за три, потом за полтор](https://youtube.com/shorts/1jnZvzwOmgM) | Эра Перемен — аналитич | 0.2 дн. | 5 тыс. | 19 тыс./сут |
-| [Если все дата-центры выйдут из строя](https://youtube.com/shorts/rbzeLmcZ5wM) | Деньги не спят | 0.8 дн. | 6 тыс. | 7 тыс./сут |
-| [Уезжать из России — уже вошло в бессознательное / Андрей Безруков](https://youtube.com/shorts/yZzOBTE8kso) | Лука Ебков | 0.8 дн. | 8 тыс. | 11 тыс./сут |
-| [Дропперство: Как подростки становятся преступниками?](https://youtube.com/shorts/9D0p731n6YI) | Финансовая грамотность | 0.8 дн. | 986 | 1 тыс./сут |
-| [Мы прекратили вкладывать деньги в соцсети. Это бесперспективняк](https://youtube.com/shorts/c8SoBX3eMw0) | Эра Перемен — аналитич | 0.8 дн. | 16 тыс. | 19 тыс./сут |
-| [Зачем ехать на Мальдивы сейчас?](https://youtube.com/shorts/nbkRNX8qyfE) | Татьяна Волкова  | 1.0 дн. | 1 тыс. | 1 тыс./сут |
-| [Каршеринг или СВОЯ машина: что выгоднее?](https://youtube.com/shorts/ABfpDBb5588) | Дмитрий Кокорев: инвес | 1.1 дн. | 58 тыс. | 53 тыс./сут |
-| [Инвесторам не страшно: почему?](https://youtube.com/shorts/lBUcAEDgFiA) | Деньги не спят | 1.1 дн. | 4 тыс. | 4 тыс./сут |
-| [Боевой робот сам решает, стрелять или нет, когда рвётся связь](https://youtube.com/shorts/bpxc5AhsyEo) | Эра Перемен — аналитич | 1.2 дн. | 10 тыс. | 9 тыс./сут |
-| [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | 1.8 дн. | 66 тыс. | 37 тыс./сут |
-| [Рубли или доллары: что откладывать?](https://youtube.com/shorts/ZZi2CQ8kFNg) | Деньги не спят | 1.8 дн. | 41 тыс. | 22 тыс./сут |
-| [Третья мировая в 2029-м. Деглобализация до 2031, потом волна до 2042](https://youtube.com/shorts/_Rq_vCxGh9s) | Эра Перемен — аналитич | 1.8 дн. | 37 тыс. | 20 тыс./сут |
-| [What If We Cool Down the Sun?](https://youtube.com/shorts/35No369rmq0) | Kurzgesagt – In a Nuts | 1.9 дн. | 692 тыс. | 368 тыс./сут |
-| [А давайте переименуем все города Америки! Ну а что, Трампу можно, а на](https://youtube.com/shorts/RNGhLjTE-v0) | Налоги в США Taxes USA | 1.9 дн. | 3 тыс. | 2 тыс./сут |
-| [Женщина - швейцарский нож](https://youtube.com/shorts/86CvjJ3_O2A) | Простая экономика | 1.9 дн. | 18 тыс. | 9 тыс./сут |
-| [24 индикатора США сведены в одну цифру. Обвал — когда перевалит за 70](https://youtube.com/shorts/9PgcBOxBOEY) | Эра Перемен — аналитич | 2.2 дн. | 8 тыс. | 4 тыс./сут |
-| [Как правильно поливать грядку?](https://youtube.com/shorts/1diuSd69PeM) | Татьяна Волкова  | 2.3 дн. | 2 тыс. | 1 тыс./сут |
-| [Офицер разведки о Горбачёве / Андрей Безруков](https://youtube.com/shorts/U_hFzZZPuiU) | Лука Ебков | 2.8 дн. | 72 тыс. | 26 тыс./сут |
-| [Почему цена биткоина будет расти / Орлов х Черемушкин](https://youtube.com/shorts/y8zU386odm0) | Популярные инвестиции | 2.8 дн. | 7 тыс. | 3 тыс./сут |
-| [НОВЫЙ ИНСТРУМЕНТ давления на бизнес!](https://youtube.com/shorts/BvxGlv4HrD8) | О налогах с Екатериной | 2.8 дн. | 2 тыс. | 845/сут |
+| [Тебя УЖЕ НЕЗАМЕТНО понизили!](https://youtube.com/shorts/Mv0NCQjRlQ8) | Дмитрий Кокорев: инвес | 0.2 дн. | 5 тыс. | 20 тыс./сут |
+| [Shaman не смог](https://youtube.com/shorts/YeW98l_Z4VA) | Лука Ебков | 0.7 дн. | 11 тыс. | 15 тыс./сут |
+| [Ведущие «Деньги не спят» о своих снах](https://youtube.com/shorts/Hb1Re8_9DWU) | Деньги не спят | 0.8 дн. | 3 тыс. | 3 тыс./сут |
+| [ЭТИ НАЛОГИ ЗАПЛАТИТ КАЖДЫЙ ИП В 2026 ГОДУ!](https://youtube.com/shorts/_8-728o7pDk) | О налогах с Екатериной | 0.8 дн. | 17 тыс. | 21 тыс./сут |
+| [Из денег надо будет выходить в 2027-м. Печатать будут все и сразу](https://youtube.com/shorts/uGP4P6Hh7Us) | Эра Перемен — аналитич | 0.8 дн. | 22 тыс. | 27 тыс./сут |
+| [Выборы без президента: что такое midterms и почему они важны?](https://youtube.com/shorts/IcVgsKPpCV0) | Налоги в США Taxes USA | 0.9 дн. | 4 тыс. | 5 тыс./сут |
+| [Свой бизнес в США](https://youtube.com/shorts/uHI8NhIt7Nc) | Налоги в США Taxes USA | 0.9 дн. | 507 | 567/сут |
+| [Tax wealth not work in Japan](https://youtube.com/shorts/kAbTOKplgBg) | Garys Economics | 0.9 дн. | 37 тыс. | 41 тыс./сут |
+| [Скачок за четыре месяца вместо двух лет. Потом за три, потом за полтор](https://youtube.com/shorts/1jnZvzwOmgM) | Эра Перемен — аналитич | 1.2 дн. | 19 тыс. | 17 тыс./сут |
+| [Если все дата-центры выйдут из строя](https://youtube.com/shorts/rbzeLmcZ5wM) | Деньги не спят | 1.7 дн. | 8 тыс. | 4 тыс./сут |
+| [Уезжать из России — уже вошло в бессознательное / Андрей Безруков](https://youtube.com/shorts/yZzOBTE8kso) | Лука Ебков | 1.7 дн. | 14 тыс. | 8 тыс./сут |
+| [Дропперство: Как подростки становятся преступниками?](https://youtube.com/shorts/9D0p731n6YI) | Финансовая грамотность | 1.8 дн. | 1 тыс. | 609/сут |
+| [Мы прекратили вкладывать деньги в соцсети. Это бесперспективняк](https://youtube.com/shorts/c8SoBX3eMw0) | Эра Перемен — аналитич | 1.8 дн. | 21 тыс. | 12 тыс./сут |
+| [Зачем ехать на Мальдивы сейчас?](https://youtube.com/shorts/nbkRNX8qyfE) | Татьяна Волкова  | 2.0 дн. | 2 тыс. | 866/сут |
+| [Каршеринг или СВОЯ машина: что выгоднее?](https://youtube.com/shorts/ABfpDBb5588) | Дмитрий Кокорев: инвес | 2.1 дн. | 68 тыс. | 33 тыс./сут |
+| [Инвесторам не страшно: почему?](https://youtube.com/shorts/lBUcAEDgFiA) | Деньги не спят | 2.1 дн. | 5 тыс. | 2 тыс./сут |
+| [Боевой робот сам решает, стрелять или нет, когда рвётся связь](https://youtube.com/shorts/bpxc5AhsyEo) | Эра Перемен — аналитич | 2.2 дн. | 11 тыс. | 5 тыс./сут |
+| [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | 2.7 дн. | 98 тыс. | 36 тыс./сут |
+| [Рубли или доллары: что откладывать?](https://youtube.com/shorts/ZZi2CQ8kFNg) | Деньги не спят | 2.8 дн. | 47 тыс. | 17 тыс./сут |
+| [Третья мировая в 2029-м. Деглобализация до 2031, потом волна до 2042](https://youtube.com/shorts/_Rq_vCxGh9s) | Эра Перемен — аналитич | 2.8 дн. | 42 тыс. | 15 тыс./сут |
 
 ## 5. Каналы
 
 | Канал | Роликов снято | Медиана | Максимум |
 |---|---|---|---|
-| Дмитрий Кокорев: инвестиции с  | 48 | 39 тыс. | 1,1 млн |
+| Дмитрий Кокорев: инвестиции с  | 48 | 36 тыс. | 1,1 млн |
 | Простая экономика | 48 | 374 тыс. | 1,7 млн |
 | Garys Economics | 48 | 325 тыс. | 4,0 млн |
 | Простые числа | 48 | 134 тыс. | 1,4 млн |
-| Эра Перемен — аналитическое аг | 48 | 22 тыс. | 383 тыс. |
-| Популярные инвестиции | 48 | 41 тыс. | 832 тыс. |
+| Эра Перемен — аналитическое аг | 48 | 22 тыс. | 388 тыс. |
+| Популярные инвестиции | 48 | 41 тыс. | 833 тыс. |
 | Сложный Процент | 30 | 30 тыс. | 3,4 млн |
-| Деньги не спят | 48 | 32 тыс. | 114 тыс. |
-| Лука Ебков | 48 | 33 тыс. | 334 тыс. |
-| О налогах с Екатериной Арсенть | 48 | 7 тыс. | 524 тыс. |
+| Деньги не спят | 48 | 32 тыс. | 115 тыс. |
+| Лука Ебков | 48 | 33 тыс. | 335 тыс. |
+| О налогах с Екатериной Арсенть | 48 | 8 тыс. | 524 тыс. |
 | Екатерина Кузнецова - юрист дл | 48 | 212 | 24 тыс. |
 | ЮК «Туров и партнеры» | Налоги | 48 | 920 | 30 тыс. |
 | Слюсарев и партнеры I Юрист I  | 48 | 4 тыс. | 896 тыс. |
 | Nikolay Mrochkovskiy | 48 | 10 тыс. | 80 тыс. |
 | Татьяна Волкова  | 48 | 2 тыс. | 7 тыс. |
-| Финансовая грамотность. Светла | 48 | 752 | 12 тыс. |
+| Финансовая грамотность. Светла | 48 | 754 | 12 тыс. |
 | Налоги в США Taxes USA | 48 | 5 тыс. | 31 тыс. |
 | How Money Works | 48 | 126 тыс. | 5,4 млн |
-| Economics Explained | 48 | 44 тыс. | 442 тыс. |
-| The Infographics Show | 48 | 275 тыс. | 2,9 млн |
+| Economics Explained | 48 | 44 тыс. | 443 тыс. |
+| The Infographics Show | 48 | 276 тыс. | 2,9 млн |
 | Lessons in Meme Culture | 13 | 151 тыс. | 2,8 млн |
-| Kurzgesagt – In a Nutshell | 48 | 1,4 млн | 5,0 млн |
-| Правое полушарие Интроверта | 48 | 38 тыс. | 1,7 млн |
+| Kurzgesagt – In a Nutshell | 48 | 1,4 млн | 5,1 млн |
+| Правое полушарие Интроверта | 48 | 38 тыс. | 1,8 млн |
 | М О Р И А Р Т И | 48 | 68 тыс. | 2,7 млн |
 
 ---
