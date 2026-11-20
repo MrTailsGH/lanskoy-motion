@@ -1,4 +1,4 @@
-# SHORTS RADAR — 2026-11-19 14:27 UTC
+# SHORTS RADAR — 2026-11-20 14:02 UTC
 
 Каналов в слежке: 24. Роликов снято: 1100. Прошлый прогон за 24 ч назад.
 
@@ -8,18 +8,18 @@
 
 | | Ролик | Канал | Прирост | Всего |
 |---|---|---|---|---|
-| 1 | [The World’s Most Average Person](https://youtube.com/shorts/Gn-KqiRv0XI) | Kurzgesagt – In a Nuts | +100 тыс. | 3,9 млн |
-| 2 | [Сколько нужно зарабатывать, чтобы получать МАКСИМАЛЬНУЮ пенсию?](https://youtube.com/shorts/A9wLAdgc2Cg) | Дмитрий Кокорев: инвес | +25 тыс. | 697 тыс. |
-| 3 | [What Is Food Fortification?](https://youtube.com/shorts/Y1vEGsnNYek) | Kurzgesagt – In a Nuts | +19 тыс. | 500 тыс. |
-| 4 | [Cool Down Your Room... With a FRIDGE?](https://youtube.com/shorts/NKeZ_HRk_O8) | Kurzgesagt – In a Nuts | +15 тыс. | 380 тыс. |
-| 5 | [Что случилось с артистами? / DJ MEG](https://youtube.com/shorts/XkB7k2MEjds) | Лука Ебков | +13 тыс. | 294 тыс. |
-| 6 | [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | +12 тыс. | 663 тыс. |
-| 7 | [СУМЕРКИ ПРЕДСКАЗАЛИ, ЧТО РОБЕРТ БУДЕТ БОНДОМ](https://youtube.com/shorts/OjWpA0x7lec) | Правое полушарие Интро | +11 тыс. | 51 тыс. |
-| 8 | [Сколько денег вложить в акции Сбера, чтобы получать 100к в месяц?](https://youtube.com/shorts/FBjyCUf0mi8) | Дмитрий Кокорев: инвес | +10 тыс. | 909 тыс. |
-| 9 | [Доживёшь до 2030 — ПОБЕДИЛ](https://youtube.com/shorts/DKmuPP2uS1U) | Эра Перемен — аналитич | +10 тыс. | 117 тыс. |
-| 10 | [Разведчики не стали работать с Ельциным / Офицер разведки Андрей Безру](https://youtube.com/shorts/Z4cLxCBo7p0) | Лука Ебков | +9 тыс. | 96 тыс. |
-| 11 | [Офицер разведки о Горбачёве / Андрей Безруков](https://youtube.com/shorts/U_hFzZZPuiU) | Лука Ебков | +9 тыс. | 673 тыс. |
-| 12 | [Сколько нужно денег, чтобы жить на ПРОЦЕНТЫ?](https://youtube.com/shorts/YlVlSUNJcas) | Дмитрий Кокорев: инвес | +8 тыс. | 12 тыс. |
+| 1 | [Cool Down Your Room... With a FRIDGE?](https://youtube.com/shorts/NKeZ_HRk_O8) | Kurzgesagt – In a Nuts | +16 тыс. | 396 тыс. |
+| 2 | [Сколько нужно зарабатывать, чтобы получать МАКСИМАЛЬНУЮ пенсию?](https://youtube.com/shorts/A9wLAdgc2Cg) | Дмитрий Кокорев: инвес | +15 тыс. | 712 тыс. |
+| 3 | [Сталин сильно недооценён / Андрей Безруков](https://youtube.com/shorts/McxDijOurSU) | Лука Ебков | +15 тыс. | 678 тыс. |
+| 4 | [Последнее изобретение человечества - ИИ.](https://youtube.com/shorts/2CIqfs1jYLQ) | М О Р И А Р Т И | +13 тыс. | 15 тыс. |
+| 5 | [Последнее изобретение человечества.](https://youtube.com/shorts/KhWtw4R8IsY) | М О Р И А Р Т И | +12 тыс. | 14 тыс. |
+| 6 | [What Is Food Fortification?](https://youtube.com/shorts/Y1vEGsnNYek) | Kurzgesagt – In a Nuts | +12 тыс. | 512 тыс. |
+| 7 | [Сколько денег вложить в акции Сбера, чтобы получать 100к в месяц?](https://youtube.com/shorts/FBjyCUf0mi8) | Дмитрий Кокорев: инвес | +11 тыс. | 920 тыс. |
+| 8 | [Что случилось с артистами? / DJ MEG](https://youtube.com/shorts/XkB7k2MEjds) | Лука Ебков | +10 тыс. | 304 тыс. |
+| 9 | [СУМЕРКИ ПРЕДСКАЗАЛИ, ЧТО РОБЕРТ БУДЕТ БОНДОМ](https://youtube.com/shorts/OjWpA0x7lec) | Правое полушарие Интро | +10 тыс. | 61 тыс. |
+| 10 | [Конец света из за ИИ.](https://youtube.com/shorts/xtsssoRG8J4) | М О Р И А Р Т И | +9 тыс. | 11 тыс. |
+| 11 | [Разведка РФ ошиблась? / Офицер разведки Андрей Безруков](https://youtube.com/shorts/gne5QXzsqLs) | Лука Ебков | +8 тыс. | 93 тыс. |
+| 12 | [Офицер разведки о Горбачёве / Андрей Безруков](https://youtube.com/shorts/U_hFzZZPuiU) | Лука Ебков | +8 тыс. | 681 тыс. |
 
 ## 2. Скорость с момента выхода
 
@@ -27,18 +27,18 @@
 
 | | Ролик | Канал | Скорость | Всего |
 |---|---|---|---|---|
-| 1 | [Cool Down Your Room... With a FRIDGE?](https://youtube.com/shorts/NKeZ_HRk_O8) | Kurzgesagt – In a Nuts | 76 тыс./сут · 5 дн. | 380 тыс. |
-| 2 | [Сколько нужно зарабатывать, чтобы получать МАКСИМАЛЬНУЮ пенсию?](https://youtube.com/shorts/A9wLAdgc2Cg) | Дмитрий Кокорев: инвес | 76 тыс./сут · 9 дн. | 697 тыс. |
-| 3 | [What Is Food Fortification?](https://youtube.com/shorts/Y1vEGsnNYek) | Kurzgesagt – In a Nuts | 72 тыс./сут · 7 дн. | 500 тыс. |
-| 4 | [How Does Ketamine Work?](https://youtube.com/shorts/KBfIo9sZbC4) | Kurzgesagt – In a Nuts | 46 тыс./сут · 21 дн. | 971 тыс. |
-| 5 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | 43 тыс./сут · 42 дн. | 1,8 млн |
-| 6 | [What If We Cool Down the Sun?](https://youtube.com/shorts/35No369rmq0) | Kurzgesagt – In a Nuts | 38 тыс./сут · 26 дн. | 1,0 млн |
-| 7 | [Humans Can Regrow an Organ](https://youtube.com/shorts/oNTaHYXQ4MM) | Kurzgesagt – In a Nuts | 30 тыс./сут · 54 дн. | 1,6 млн |
-| 8 | [Для чего закладчикам ведро воды в ванной?](https://youtube.com/shorts/5peQAfXG3yc) | М О Р И А Р Т И | 29 тыс./сут · 56 дн. | 1,6 млн |
-| 9 | [Your Brain on Magic Mushrooms](https://youtube.com/shorts/b1EMX3wyqCY) | Kurzgesagt – In a Nuts | 27 тыс./сут · 52 дн. | 1,4 млн |
-| 10 | [СУМЕРКИ ПРЕДСКАЗАЛИ, ЧТО РОБЕРТ БУДЕТ БОНДОМ](https://youtube.com/shorts/OjWpA0x7lec) | Правое полушарие Интро | 23 тыс./сут · 2 дн. | 51 тыс. |
-| 11 | [Скотт Коутон дальтоник](https://youtube.com/shorts/M4Q3k-rlfzc) | Lessons in Meme Cultur | 21 тыс./сут · 2 дн. | 43 тыс. |
-| 12 | [ОНА НОВАЯ ДЕВУШКА БОНДА?!](https://youtube.com/shorts/HVTkZHx1W9c) | Правое полушарие Интро | 18 тыс./сут · 1 дн. | 13 тыс. |
+| 1 | [How Many People Can You Feed with a Dollar?](https://youtube.com/shorts/39Hc0MZtE4w) | Kurzgesagt – In a Nuts | 250 тыс./сут · 1 дн. | 240 тыс. |
+| 2 | [Сколько нужно зарабатывать, чтобы получать МАКСИМАЛЬНУЮ пенсию?](https://youtube.com/shorts/A9wLAdgc2Cg) | Дмитрий Кокорев: инвес | 70 тыс./сут · 10 дн. | 712 тыс. |
+| 3 | [Cool Down Your Room... With a FRIDGE?](https://youtube.com/shorts/NKeZ_HRk_O8) | Kurzgesagt – In a Nuts | 66 тыс./сут · 6 дн. | 396 тыс. |
+| 4 | [What Is Food Fortification?](https://youtube.com/shorts/Y1vEGsnNYek) | Kurzgesagt – In a Nuts | 65 тыс./сут · 8 дн. | 512 тыс. |
+| 5 | [How Does Ketamine Work?](https://youtube.com/shorts/KBfIo9sZbC4) | Kurzgesagt – In a Nuts | 45 тыс./сут · 22 дн. | 978 тыс. |
+| 6 | [Сколько банк зарабатывает на ваших кредитках?](https://youtube.com/shorts/4-SXTcgUHG0) | Дмитрий Кокорев: инвес | 44 тыс./сут · 0 дн. | 11 тыс. |
+| 7 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | 42 тыс./сут · 43 дн. | 1,8 млн |
+| 8 | [What If We Cool Down the Sun?](https://youtube.com/shorts/35No369rmq0) | Kurzgesagt – In a Nuts | 37 тыс./сут · 27 дн. | 1,0 млн |
+| 9 | [Какие отсылки и пасхалки спрятаны в КУХНЕ](https://youtube.com/shorts/2cxGD-34F7w) | Правое полушарие Интро | 30 тыс./сут · 1 дн. | 27 тыс. |
+| 10 | [Humans Can Regrow an Organ](https://youtube.com/shorts/oNTaHYXQ4MM) | Kurzgesagt – In a Nuts | 29 тыс./сут · 55 дн. | 1,6 млн |
+| 11 | [В чём феномен Сергея Бодрова? / Андрей Бледный](https://youtube.com/shorts/e2Ym_D38qB8) | Лука Ебков | 28 тыс./сут · 1 дн. | 25 тыс. |
+| 12 | [Для чего закладчикам ведро воды в ванной?](https://youtube.com/shorts/5peQAfXG3yc) | М О Р И А Р Т И | 28 тыс./сут · 57 дн. | 1,6 млн |
 
 ## 3. Выбросы относительно своего канала
 
@@ -46,43 +46,43 @@
 
 | | Ролик | Канал | Индекс | Всего |
 |---|---|---|---|---|
-| 1 | [Транспортный налог вырастет для ВСЕХ в 2027](https://youtube.com/shorts/cVW1atMGvMw) | Екатерина Кузнецова -  | ×241.3 | 90 тыс. |
+| 1 | [Транспортный налог вырастет для ВСЕХ в 2027](https://youtube.com/shorts/cVW1atMGvMw) | Екатерина Кузнецова -  | ×249.3 | 93 тыс. |
 | 2 | [В больнице врач отправил сдавать анализы в платную поликлинику что дел](https://youtube.com/shorts/T9jxvqZjlKY) | Слюсарев и партнеры I  | ×224.0 | 896 тыс. |
-| 3 | [НДФЛ поднимут в 2027](https://youtube.com/shorts/0hz7buZ3kN0) | Екатерина Кузнецова -  | ×198.4 | 74 тыс. |
+| 3 | [НДФЛ поднимут в 2027](https://youtube.com/shorts/0hz7buZ3kN0) | Екатерина Кузнецова -  | ×201.1 | 75 тыс. |
 | 4 | [Вот почему Coca-Cola зарабатывает МИЛЛИАРДЫ!!](https://youtube.com/shorts/iMY3CKltDGU) | Сложный Процент | ×115.3 | 3,4 млн |
 | 5 | [Налог на квартиры ВЫРАСТЕТ в 2027](https://youtube.com/shorts/dICM4hyoBAY) | Екатерина Кузнецова -  | ×96.5 | 36 тыс. |
-| 6 | [НОВЫЕ ПРАВИЛА для переводов и самозанятых в 2026 году!](https://youtube.com/shorts/rTKCD4eWEZs) | О налогах с Екатериной | ×69.9 | 528 тыс. |
+| 6 | [НОВЫЕ ПРАВИЛА для переводов и самозанятых в 2026 году!](https://youtube.com/shorts/rTKCD4eWEZs) | О налогах с Екатериной | ×69.5 | 528 тыс. |
 | 7 | [Сколько бизнес потерял из-за шатдаунов?](https://youtube.com/shorts/Hnt0r_sfAg4) | Екатерина Кузнецова -  | ×64.3 | 24 тыс. |
 | 8 | [На кого охотится МинФин?](https://youtube.com/shorts/cj5qQaOaL9Q) | Екатерина Кузнецова -  | ×59.0 | 22 тыс. |
-| 9 | [НОВАЯ СХЕМА налоговой! Как вас могут развести на штрафы?](https://youtube.com/shorts/4XMidhF1qQU) | О налогах с Екатериной | ×49.1 | 371 тыс. |
-| 10 | [России скоро не станет.](https://youtube.com/shorts/PDNilxkbW5E) | М О Р И А Р Т И | ×49.1 | 2,8 млн |
+| 9 | [России скоро не станет.](https://youtube.com/shorts/PDNilxkbW5E) | М О Р И А Р Т И | ×49.6 | 2,8 млн |
+| 10 | [НОВАЯ СХЕМА налоговой! Как вас могут развести на штрафы?](https://youtube.com/shorts/4XMidhF1qQU) | О налогах с Екатериной | ×48.8 | 371 тыс. |
 | 11 | [Сколько вложить в ОФЗ, чтобы больше не работать?](https://youtube.com/shorts/HtKvEsTGMBQ) | Дмитрий Кокорев: инвес | ×44.7 | 1,7 млн |
-| 12 | [How This Vandal Made $200 Million by Spray Painting An Office Building](https://youtube.com/shorts/jJ0i4JxY-tE) | How Money Works | ×42.7 | 5,4 млн |
+| 12 | [Юра Борисов снова стал мемом](https://youtube.com/shorts/RuC0iNUOdrE) | Правое полушарие Интро | ×43.9 | 1,8 млн |
 
 ## 4. Свежие ролики (до 7 дней)
 
 | Ролик | Канал | Возраст | Просмотры | Скорость |
 |---|---|---|---|---|
-| [🤯😅 "Я познакомился с казuно"](https://youtube.com/shorts/5CzF6_eEhf4) | Дмитрий Кокорев: инвес | 0.2 дн. | 2 тыс. | 9 тыс./сут |
-| [Биткоин УМЕР? Мнение ФИНАНСИСТА](https://youtube.com/shorts/-bVeJl0iHWY) | Татьяна Волкова  | 0.2 дн. | 416 | 2 тыс./сут |
-| [Amazon просить український номер платника ПДВ до 31 грудня 2026 року?](https://youtube.com/shorts/r1ucl7mekN4) | Налоги в США Taxes USA | 0.2 дн. | 0 | — |
-| [У вас карта Visa или счёт в Chase?Хакеры угрожают опубликовать данные,](https://youtube.com/shorts/g1ogB6rAvGc) | Налоги в США Taxes USA | 0.2 дн. | 55 | 220/сут |
-| [Последнее изобретение человечества.](https://youtube.com/shorts/KhWtw4R8IsY) | М О Р И А Р Т И | 0.2 дн. | 2 тыс. | 8 тыс./сут |
-| [Социальные сети управляют миром.](https://youtube.com/shorts/SFj10yFj2ME) | М О Р И А Р Т И | 0.2 дн. | 1 тыс. | 4 тыс./сут |
-| [Последнее изобретение человечества - ИИ.](https://youtube.com/shorts/2CIqfs1jYLQ) | М О Р И А Р Т И | 0.2 дн. | 2 тыс. | 7 тыс./сут |
-| [Конец света из за ИИ.](https://youtube.com/shorts/xtsssoRG8J4) | М О Р И А Р Т И | 0.2 дн. | 2 тыс. | 8 тыс./сут |
-| [«Вашу пенсию переведут без согласия»: накопления автоматически уйдут в](https://youtube.com/shorts/ym5HsSIxzzw) | Эра Перемен — аналитич | 0.3 дн. | 3 тыс. | 9 тыс./сут |
-| [ОНА НОВАЯ ДЕВУШКА БОНДА?!](https://youtube.com/shorts/HVTkZHx1W9c) | Правое полушарие Интро | 0.7 дн. | 13 тыс. | 18 тыс./сут |
-| [О российской пропаганде / Андрей Бледный](https://youtube.com/shorts/BK3qamr5bGQ) | Лука Ебков | 0.9 дн. | 12 тыс. | 13 тыс./сут |
-| [Реальная цена Apple: сколько?](https://youtube.com/shorts/fDD7lIURNoY) | Деньги не спят | 0.9 дн. | 3 тыс. | 4 тыс./сут |
-| [«Готовимся к новому СССР»: Путин и Лукашенко войдут в Госсовет, осталь](https://youtube.com/shorts/xuAsrDVIaAQ) | Эра Перемен — аналитич | 1.0 дн. | 9 тыс. | 9 тыс./сут |
-| [Ёлка на пляже, фотограф за кадром — хобби или бизнес? 🎄🏖️](https://youtube.com/shorts/q404LW8g2X4) | Налоги в США Taxes USA | 1.0 дн. | 1 тыс. | 1 тыс./сут |
-| [Как превратить мечты в реальность?](https://youtube.com/shorts/v-9fnGn-Ujs) | Финансовая грамотность | 1.0 дн. | 106 | 104/сут |
-| [Как ВЫЙТИ на ПЕНСИЮ УЖЕ СЕЙЧАС?](https://youtube.com/shorts/CwE59wgpYnY) | Татьяна Волкова  | 1.1 дн. | 1 тыс. | 881/сут |
-| [Сколько нужно денег, чтобы жить на ПРОЦЕНТЫ?](https://youtube.com/shorts/YlVlSUNJcas) | Дмитрий Кокорев: инвес | 1.2 дн. | 12 тыс. | 10 тыс./сут |
-| [«Ядерная война к 2030 — практически 100%»: технологии ушли вперёд, чел](https://youtube.com/shorts/fJWC9-9BAtQ) | Эра Перемен — аналитич | 1.3 дн. | 10 тыс. | 7 тыс./сут |
-| [Психиатр-нарколог про женский алкоголизм / Василий Шуров](https://youtube.com/shorts/OCW3OC7xcsU) | Лука Ебков | 1.9 дн. | 7 тыс. | 4 тыс./сут |
-| [Какие еще сюрпризы приготовил Apple](https://youtube.com/shorts/SYdp7bO9oME) | Деньги не спят | 1.9 дн. | 9 тыс. | 5 тыс./сут |
+| [Сколько банк зарабатывает на ваших кредитках?](https://youtube.com/shorts/4-SXTcgUHG0) | Дмитрий Кокорев: инвес | 0.2 дн. | 11 тыс. | 44 тыс./сут |
+| [Почему ДЕТИ не СЛЫШАТ СВОИХ РОДИТЕЛЕЙ?](https://youtube.com/shorts/1xQgjfYw_EE) | Татьяна Волкова  | 0.2 дн. | 7 | 28/сут |
+| [Black Friday](https://youtube.com/shorts/S7CdEpV5cpQ) | Налоги в США Taxes USA | 0.2 дн. | 44 | 176/сут |
+| [Эволюция создала разум.](https://youtube.com/shorts/0pSA5o5rJyk) | М О Р И А Р Т И | 0.2 дн. | 2 тыс. | 9 тыс./сут |
+| [Как устроен твой мозг.](https://youtube.com/shorts/U-qIWlap8JY) | М О Р И А Р Т И | 0.2 дн. | 2 тыс. | 8 тыс./сут |
+| [Последнее изобретение человечества.](https://youtube.com/shorts/3B1cIrFjg5Q) | М О Р И А Р Т И | 0.2 дн. | 3 тыс. | 13 тыс./сут |
+| [ИИ Восстанет против мира.](https://youtube.com/shorts/P4SAGNw7uRM) | М О Р И А Р Т И | 0.2 дн. | 2 тыс. | 7 тыс./сут |
+| [«Три шага, чтобы защитить свои пенсии»: госуслуги, трубка, должность](https://youtube.com/shorts/4kf2HSsas1M) | Эра Перемен — аналитич | 0.3 дн. | 2 тыс. | 7 тыс./сут |
+| [В чём феномен Сергея Бодрова? / Андрей Бледный](https://youtube.com/shorts/e2Ym_D38qB8) | Лука Ебков | 0.9 дн. | 25 тыс. | 28 тыс./сут |
+| [Какие отсылки и пасхалки спрятаны в КУХНЕ](https://youtube.com/shorts/2cxGD-34F7w) | Правое полушарие Интро | 0.9 дн. | 27 тыс. | 30 тыс./сут |
+| [Россия нападет на Европу?](https://youtube.com/shorts/LoB0ko21Sgs) | Деньги не спят | 0.9 дн. | 7 тыс. | 8 тыс./сут |
+| [СРОЧНО проверьте свои налоги до 1 декабря!](https://youtube.com/shorts/oesm_RAKfVA) | О налогах с Екатериной | 1.0 дн. | 4 тыс. | 4 тыс./сут |
+| [How Many People Can You Feed with a Dollar?](https://youtube.com/shorts/39Hc0MZtE4w) | Kurzgesagt – In a Nuts | 1.0 дн. | 240 тыс. | 250 тыс./сут |
+| [«Бюджетников сокращают, казна трещит»: разнарядка со сроком до апреля](https://youtube.com/shorts/2NUoGtJyBmk) | Эра Перемен — аналитич | 1.0 дн. | 8 тыс. | 8 тыс./сут |
+| [Хобби или бизнес? Даже если вы работаете только по выходным 📸](https://youtube.com/shorts/0pIXyViuWAw) | Налоги в США Taxes USA | 1.0 дн. | 219 | 225/сут |
+| [Amazon просить український номер платника ПДВ до 31 грудня 2026 року?](https://youtube.com/shorts/r1ucl7mekN4) | Налоги в США Taxes USA | 1.0 дн. | 182 | 184/сут |
+| [У вас карта Visa или счёт в Chase?Хакеры угрожают опубликовать данные,](https://youtube.com/shorts/g1ogB6rAvGc) | Налоги в США Taxes USA | 1.0 дн. | 7 тыс. | 7 тыс./сут |
+| [Последнее изобретение человечества.](https://youtube.com/shorts/KhWtw4R8IsY) | М О Р И А Р Т И | 1.1 дн. | 14 тыс. | 13 тыс./сут |
+| [Социальные сети управляют миром.](https://youtube.com/shorts/SFj10yFj2ME) | М О Р И А Р Т И | 1.1 дн. | 7 тыс. | 6 тыс./сут |
+| [Последнее изобретение человечества - ИИ.](https://youtube.com/shorts/2CIqfs1jYLQ) | М О Р И А Р Т И | 1.1 дн. | 15 тыс. | 14 тыс./сут |
 
 ## 5. Каналы
 
@@ -92,26 +92,26 @@
 | Простая экономика | 48 | 358 тыс. | 1,7 млн |
 | Garys Economics | 48 | 320 тыс. | 4,1 млн |
 | Простые числа | 48 | 134 тыс. | 1,4 млн |
-| Эра Перемен — аналитическое аг | 48 | 20 тыс. | 117 тыс. |
+| Эра Перемен — аналитическое аг | 48 | 20 тыс. | 123 тыс. |
 | Популярные инвестиции | 48 | 32 тыс. | 846 тыс. |
 | Сложный Процент | 30 | 30 тыс. | 3,4 млн |
-| Деньги не спят | 48 | 28 тыс. | 151 тыс. |
-| Лука Ебков | 48 | 38 тыс. | 673 тыс. |
+| Деньги не спят | 48 | 25 тыс. | 152 тыс. |
+| Лука Ебков | 48 | 38 тыс. | 681 тыс. |
 | О налогах с Екатериной Арсенть | 48 | 8 тыс. | 528 тыс. |
-| Екатерина Кузнецова - юрист дл | 48 | 373 | 90 тыс. |
+| Екатерина Кузнецова - юрист дл | 48 | 373 | 93 тыс. |
 | ЮК «Туров и партнеры» | Налоги | 48 | 952 | 30 тыс. |
 | Слюсарев и партнеры I Юрист I  | 48 | 4 тыс. | 896 тыс. |
 | Nikolay Mrochkovskiy | 48 | 11 тыс. | 80 тыс. |
 | Татьяна Волкова  | 48 | 2 тыс. | 8 тыс. |
 | Финансовая грамотность. Светла | 48 | 743 | 14 тыс. |
-| Налоги в США Taxes USA | 48 | 3 тыс. | 30 тыс. |
+| Налоги в США Taxes USA | 48 | 3 тыс. | 27 тыс. |
 | How Money Works | 48 | 126 тыс. | 5,4 млн |
 | Economics Explained | 48 | 44 тыс. | 460 тыс. |
 | The Infographics Show | 48 | 278 тыс. | 3,0 млн |
-| Lessons in Meme Culture | 14 | 145 тыс. | 2,8 млн |
+| Lessons in Meme Culture | 14 | 146 тыс. | 2,8 млн |
 | Kurzgesagt – In a Nutshell | 48 | 1,3 млн | 5,3 млн |
-| Правое полушарие Интроверта | 48 | 44 тыс. | 1,8 млн |
-| М О Р И А Р Т И | 48 | 57 тыс. | 2,8 млн |
+| Правое полушарие Интроверта | 48 | 41 тыс. | 1,8 млн |
+| М О Р И А Р Т И | 48 | 56 тыс. | 2,8 млн |
 
 ---
 
